@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.BerthOrderMapper">
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.BerthOrder" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="berth_number" property="berthNumber" jdbcType="VARCHAR" />
+    <result column="user_community_id" property="userCommunityId" jdbcType="INTEGER" />
+    <result column="money" property="money" jdbcType="DOUBLE" />
+    <result column="out_trade_no" property="outTradeNo" jdbcType="VARCHAR" />
+    <result column="transaction_num" property="transactionNum" jdbcType="VARCHAR" />
+    <result column="payway" property="payway" jdbcType="VARCHAR" />
+    <result column="pay_time" property="payTime" jdbcType="TIMESTAMP" />
+    <result column="pay_statu" property="payStatu" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <sql id="BaseBerthColomn" >
+  	berth_number,user_community_id,money,out_trade_no,transaction_num,payway,pay_time,pay_statu
+  </sql>
+  
+  <insert id="insertBerthOrder" parameterType="com.zeng.ezsh.wy.entity.BerthOrder">
+  	insert into berth_order <include refid="BaseBerthColomn"/>
+  	values
+  	(#{berthNumber},#{userCommunityId},#{money},#{outTradeNo},
+  	#{transactionNum},#{payway},#{payTime},#{payStatu})
+  </insert>
+  
+  <delete id="deleteBerthOrder" parameterType="java.util.Map" >
+  	delete from berth_order 
+  	where berth_number = #{berthNumber} and user_community_id = #{userCommunityId}
+  </delete>
+  
+  <select id="findBerthOrder" parameterType="com.zeng.ezsh.wy.entity.BerthOrder" resultMap="BaseResultMap">
+  	select <include refid="BaseBerthColomn"/> from berth_order 
+  	where berth_number = #{berthNumber} and user_community_id = #{userCommunityId}
+  </select>
+  
+  <update id="updateBerthOrder" parameterType="com.zeng.ezsh.wy.entity.BerthOrder">
+  	update berth_order 
+  	<set>
+  		<if test="money != null"><!-- ,,,,,#{} -->
+  			money = #{money},
+  		</if>
+  		<if test="outTradeNo != null">
+  			out_trade_no = #{outTradeNo},
+  		</if>
+  		<if test="transactionNum != null">
+  			transaction_num = #{transactionNum},
+  		</if>
+  		<if test="payway != null">
+  			payway = #{payway},
+  		</if>
+  		<if test="payTime != null">
+			pay_time = #{payTime},
+  		</if>
+  		<if test="payStatu != null">
+  			pa_statu = #{payStatu},
+  		</if>
+  	</set>
+  	<where>
+  		berth_number = #{berthNumber} and user_community_id = #{userCommunityId} 
+  		order by id desc limit 1
+  	</where>
+  </update>
+  
+  <select id="getBerthOrderByOrderNum" parameterType="String" resultMap="BaseResultMap">
+  	select <include refid="BaseBerthColomn"/> from berth_order 
+  	where 
+  	out_trade_no=#{outTradeNo}
+  </select>
+  
+</mapper>

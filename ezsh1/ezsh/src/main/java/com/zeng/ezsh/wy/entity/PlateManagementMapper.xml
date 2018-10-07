@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.PlateManagementMapper" >
+  <resultMap id="CarMessage" type="com.zeng.ezsh.wy.entity.CarMessage">
+  	<result column="user_phone" property="userPhone" jdbcType="VARCHAR"></result>
+  	<result column="plate_number" property="plateNumber"></result>
+  	<result column="berth_number" property="berthNumber"></result>
+  	<result column="house_number" property="houseNumber"></result>
+  	<result column="user_community_id" property="userCommunityId"></result>
+  	<association property="berthMessage" column="{userCommunityId=user_community_id,berthNumber=berth_number}" javaType="com.zeng.ezsh.wy.entity.BerthMessage" select="getBerthMessageByBerthNumber">
+  	</association>
+  </resultMap>
+  <resultMap id="HouseMessage" type="com.zeng.ezsh.wy.entity.HouseMessage">
+  	<result column="room_floor" property="roomFloor"></result>
+  	<result column="room_num" property="roomNum"></result>
+  	<result column="build_id" property="buildId"></result>
+  	<result column="build_name" property="buildName"></result>
+  	<result column="manager_id" property="managerId"></result>
+  	<result column="manager_name" property="managerName"></result>
+  </resultMap>
+  <resultMap id="BerthMessage" type="com.zeng.ezsh.wy.entity.BerthMessage">
+  	<result column="id" property="id"></result>
+  	<result column="berth_number" property="berthNumber"></result>
+  	<result column="user_community_id" property="userCommunityId"></result>
+  	<result column="contract_start_time" property="contractStartTime"></result>
+  	<result column="contract_end_time" property="contractEndTime"></result>
+  	<result column="user_phone" property="userPhone"></result>
+  	<result column="handin_cost" property="handInCost"></result>
+  	<result column="is_hire" property="isHire"></result>
+  	<result column="berth_cost" property="berthCost"></result>
+  	<result column="hire_plate" property="hirePlate"></result>
+  	<result column="status" property="status"></result>
+  	<association property="userCommunity" column="user_community_id" javaType="String" select="getCommunitynameById">
+  	</association>
+  	<association property="userName" column="user_phone" javaType="String" select="getUserNameByPhone">
+  	</association>
+  </resultMap>
+  <resultMap type="com.zeng.ezsh.wy.entity.ParkRecord" id="ParkRecord">
+  	<result column="id" property="id"></result>
+  	<result column="plate_number" property="plateNumber"></result>
+  	<result column="enter_time" property="enterTime"></result>
+  	<result column="leave_time" property="leaveTime"></result>
+  	<result column="SN" property="SN"></result>
+  	<result column="user_community_id" property="userCommunityId"></result>
+  	<result column="suppose_park_cost" property="supposeParkCost"></result>
+  	<result column="hand_park_cost" property="handParkCost"></result>
+  	<result column="pay_way" property="payWay"></result>
+  	<result column="CRC_code" property="CRCCode"></result>
+  	<result column="advance_pay" property="advancePay"></result>
+  	<result column="order_num" property="orderNum"></result>
+  	<result column="transaction_num" property="transactionNum"></result>
+  	<result column="order_status" property="orderStatus"></result>
+  </resultMap>
+  
+  <resultMap type="com.zeng.ezsh.wy.entity.PlateCost" id="PlateCost">
+  	<result column="user_community_id" property="userCommunityId"></result>
+  	<result column="user_community_name" property="userCommunityName"></result>
+  	<result column="management_cost" property="managementCost"></result>
+  	<result column="onehour_cost" property="onehourCost"></result>
+  	<result column="twohour_cost" property="twohourCost"></result>
+  </resultMap>
+  <resultMap type="com.zeng.ezsh.wy.entity.InviteRecord" id="InviteRecord">
+  	<result column="invite_id" property="id"></result>
+  	<result column="user_phone" property="userPhone"></result>
+  	<result column="invite_plate" property="invitePlate"></result>
+  	<result column="is_pay" property="isPay"></result>
+  	<result column="user_community_id" property="userCommunityId"></result>
+  </resultMap>
+  <sql id="InviteRecord_Column_List">
+  	invite_id,user_phone,invite_plate,is_pay,user_community_id
+  </sql>
+  <sql id="Car_Column_List" >
+    user_phone,plate_number,house_number,berth_number,user_community_id
+  </sql>
+  <sql id="Berth_Column_List">
+  	id,berth_number,user_community_id,user_phone,handin_cost,hire_plate,is_hire,berth_cost,contract_start_time,contract_end_time
+  </sql>
+  <sql id="PlateCost_Column_List">
+  	user_community_id,user_community_name,management_cost,onehour_cost,twohour_cost
+  </sql>
+  <sql id="ParkRecord_Column_List">
+  	id,plate_number,enter_time,leave_time,user_community_id,suppose_park_cost,hand_park_cost,pay_way
+  </sql>
+  <!-- 根据车牌号查询对应车位信息 -->
+  <select id="getBerthMessageByBerthNumber" parameterType="map" resultMap="BerthMessage">
+  	select berth_number,handin_cost,hire_plate
+  	from berth_management
+  	where berth_number = #{berthNumber} and user_community_id = #{userCommunityId}
+  </select>
+  <!-- 用户添加车辆 -->
+  <insert id="addCar" parameterType="com.zeng.ezsh.wy.entity.CarMessage">
+  	insert ignore into plate_management (user_phone,plate_number,user_community_id,house_number,identity,user_name,berth_number)
+  	values (#{userPhone,jdbcType=VARCHAR},#{plateNumber,jdbcType=VARCHAR},#{userCommunityId,jdbcType=INTEGER},#{houseNumber,jdbcType=VARCHAR},#{identity,jdbcType=VARCHAR},#{userName,jdbcType=VARCHAR},#{berthNumber,jdbcType=VARCHAR})
+  </insert>
+  <!-- 用户修改车辆信息 (不涉及车位)-->
+  <update id="updateCarMessageSelective" parameterType="com.zeng.ezsh.wy.entity.CarMessage">
+  	update plate_management
+  	<set>
+      	<if test="houseNumber != null" >
+        house_number = #{houseNumber,jdbcType=VARCHAR},
+      	</if>
+  	</set>
+  	where user_community_id = #{userCommunityId} and plate_number = #{plateNumber}
+  </update>
+  <!-- 根据小区id查询小区名 -->
+  <select id="getCommunitynameById" parameterType="int" resultType="String">
+  	select manager_name
+  	from management
+  	where manager_id = #{userCommunityId}
+  </select>
+  <!-- 通过楼宇id查询栋数 -->
+  <select id="getBuildNameById" parameterType="int" resultType="String">
+  	select build_name
+  	from building
+  	where build_id = #{buildId}
+  </select>
+  <!-- 通过身份证号获取用户手机号-->
+  <select id="getPhoneByIdCard" parameterType="String" resultType="String">
+  	select user_linkphone
+  	from residential_user
+  	where user_identity_card = #{IDCard}
+  </select>
+  <!-- 通过手机号查询用户姓名 -->
+  <select id="getUserNameByPhone" parameterType="String" resultType="String">
+  	select user_name
+  	from residential_user
+  	where user_linkphone = #{phone};
+  </select>
+  <!-- 根据小区名称获取管理处id -->
+  <select id="getManageId" parameterType="String" resultType="int">
+  	select manager_id 
+  	from management
+  	where manager_name = #{userCommunity}
+  </select>
+  <!-- 根据身份证号获取管理处id获取房间号 -->
+  <select id="selectUserRoomNumber" parameterType="String" resultMap="HouseMessage">
+	select room_floor,room_num,build_id,manager_id
+	from room
+	where user_identity_card = #{identityCard}
+  </select>
+  <!-- 获取栋号 -->
+  <select id="selectUserBuildingNumber" parameterType="int" resultType="String">
+  	select build_name
+  	from building
+  	where build_id = #{buildId}
+  </select>
+ <!-- 添加初始车位信息 -->
+  <insert id="addBerth" parameterType="com.zeng.ezsh.wy.entity.BerthMessage">
+  	insert ignore into berth_management (id,berth_number,user_community_id,berth_cost)
+  	values (#{id,jdbcType=INTEGER},#{berthNumber,jdbcType=VARCHAR},#{userCommunityId,jdbcType=INTEGER},#{berthCost,jdbcType=DECIMAL})
+  </insert>
+  <!-- 后台查询车位信息 -->
+  <select id="getAllBerthMessge" parameterType="map" resultMap="BerthMessage">
+  	select 
+  	<include refid="Berth_Column_List"></include>
+  	from berth_management where status like #{status}
+  	limit #{start},#{rows}
+  </select>
+  <!--后台删除车位-->
+  <delete id="deleteBerth" parameterType="map">
+  	delete 
+  	from berth_management
+  	where berth_number = #{berthNumber} and id = #{id}
+  </delete>
+  <!-- 获取车位信息的数量 -->
+  <select id="getBerthCount" resultType="int">
+  	select count(*)
+  	from berth_management
+  </select>
+  <!-- 获取用户所有车位 -->
+  <select id="getUserBerthMessage" parameterType="map" resultMap="BerthMessage">
+  	select 
+  	<include refid="Berth_Column_List"></include>
+  	from berth_management
+  	where user_phone = #{userPhone} and user_community_id = #{userCommunityId}
+  </select>
+  <!-- 获取车位对应用户车牌号 -->
+  <select id="getPlateNumberByBerth" parameterType="map" resultType="String">
+	select plate_number
+	from plate_management
+	where user_community_id = #{userCommunityId} and berth_number = #{berthNumber}
+  </select>
+  <!-- 用户买车位 -->
+  <update id="buyBerth" parameterType="map">
+  	update berth_management
+  	set
+  	user_phone = #{userPhone},
+  	contract_start_time = #{contractStartTime},
+  	contract_end_time = #{contractEndTime}
+  	where berth_number = #{berthNumber} and id = #{id}
+  </update>
+  <!-- 用户提交管理费 -->
+  <update id="handPlateCost" parameterType="map">
+  	update berth_management
+  	set
+  	handin_cost = #{handinCost}
+  	where berth_number = #{berthNumber} and user_community_id = #{userCommunityId}
+  </update>
+  <!-- 根据车位和小区名查询车牌号 -->
+   <select id="getPlateNumberByBerthAndCommunity" parameterType="map" resultType="String">
+	select plate_number
+	from plate_management
+	where user_community_id = #{userCommunityId} and berth_number = #{berthNumber}  
+   </select>
+   <!-- 删除某车牌号对应车辆信息 -->
+   <delete id="deleteCarByplateNumebr" parameterType="String">
+   	delete
+   	from plate_management
+   	where plate_number = #{plateNumber}
+   </delete>
+   <!-- 用户取消购买车位后初始化车位信息 -->
+   <update id="initializeBerth" parameterType="map">
+   	update berth_management
+   	set 
+   	user_phone = null,
+   	handin_cost = 0,
+   	hire_plate = null,
+   	status = 0
+   	where berth_number = #{berthNumber} and id = #{id}
+   </update>
+   <!-- 用户取消购买车位或出租车位或取消时删除该车位对应的原车牌信息 -->
+   <delete id="deleteCarByBerth" parameterType="map">
+   	delete 
+   	from plate_management 
+   	where user_community_id = #{userCommunityId} and berth_number = #{berthNumber}
+   </delete>
+   <!-- 用户出租车位 -->
+   <update id="hireBerth" parameterType="map">
+   	update berth_management
+   	set
+   	hire_plate = #{hirePlate},
+   	is_hire = 1
+   	where berth_number = #{berthNumber} and user_community_id = #{userCommunityId}
+   </update>
+   <!-- 用户取消出租 -->
+   <update id="cancelHireBerth" parameterType="map">
+   	update berth_management
+   	set
+   	hire_plate = null,
+   	is_hire = 0
+   	where berth_number = #{berthNumber} and user_community_id = #{userCommunityId}
+   	and is_hire = 1
+   </update>
+   <!-- 根据车牌号判断某车是否租用了车位 -->
+   <select id="getBerthByPlateNumber" parameterType="map" resultType="String">
+   	select berth_number
+   	from berth_management
+   	where user_community_id = #{userCommunityId} and hire_plate = #{hirePlate}
+   </select>
+   <!-- 后台管理员删除车位号 -->
+   <delete id="deleteBerthNumber" parameterType="map">
+   	delete 
+   	from berth_management
+   	where berth_number = #{berthNumber} and user_community_id = #{userCommunityId}
+   </delete>
+   <!-- 根据小区id和车位号查询相关记录 -->
+   <select id="searchBerthRecord" parameterType="map" resultMap="BerthMessage">
+   	select 
+   	<include refid="Berth_Column_List"></include>
+   	from berth_management
+   	where berth_number = #{berthNumber} and user_community_id = #{userCommunityId}
+   </select>
+   <!-- 用户查询车辆信息 -->
+   <select id="getUserCarmessage" parameterType="map" resultMap="CarMessage">
+   	select distinct
+   	<include refid="Car_Column_List"></include>
+   	from plate_management
+   	where user_community_id = #{userCommunityId} and user_phone = #{userPhone}
+   </select>
+   <!-- 用户修改车辆信息 (涉及车位) -->
+   <update id="modifyCarMessage" parameterType="map">
+   	update plate_management
+   	<set>
+   		<if test="#{berthNumber != null}">
+   			berth_number = #{berthNumber}
+   		</if>
+   	</set>
+   	where plate_number = #{plateNumber}
+   	
+   </update>
+   <!-- 查询用户是否有某车位 -->
+   <select id="judgeBerthByUser" parameterType="map" resultType="String">
+   	select berth_number
+   	from berth_management
+   	where user_community_id = #{userCommunityId} and user_phone = #{userPhone} and
+   	berth_number = #{berthNumber}
+   </select>
+   <!-- 判断某车位是否已出租 -->
+   <select id="judgeBerthIsHire" parameterType="map" resultType="int">
+   	select is_hire
+   	from berth_management
+   	where berth_number = #{berthNumber} and user_community_id = #{userCommunityId}
+   </select>
+   <!-- 后台查询所有添加的车辆信息 -->
+   <select id="getAllCarMessage" resultMap="CarMessage">
+   	select
+   	<include refid="Car_Column_List"></include>
+   	from plate_management
+   </select>
+   <!-- 后台搜索某用户车位情况 -->
+   <select id="getBerthMessageByUser" parameterType="map" resultMap="BerthMessage">
+   	select 
+   	<include refid="Berth_Column_List"></include>
+   	from berth_management
+   	where user_phone = #{userPhone} and user_community_id = #{userCommunityId}
+   </select>
+   <!-- 查询某车是否有车位 -->
+   <select id="getCarBerth" parameterType="map" resultType="String">
+   	select berth_number
+   	from plate_management
+   	where plate_number = #{plateNumber} and user_community_id = #{userCommunityId}
+   </select>
+  	<!-- 后台用户删除车辆信息 -->
+  	<delete id="deleteCar" parameterType="String">
+  		delete 
+  		from plate_management
+  		where plate_number = #{plateNumber}
+  	</delete>
+  	
+  	<!-- 支付停车超时费 -->
+  	<update id="payParkCost" parameterType="map">
+  		update park_management
+  		set hand_park_cost = #{handParkCost}
+  		where plate_number = #{plateNumber} and is_pay = 0
+  	</update>
+  	
+  	<!-- 用户邀请外来访客 -->
+  	<insert id="addInvite" parameterType="InviteRecord">
+  		insert ignore into plate_invite (user_phone,invite_plate,user_community_id) 
+  		values(#{userPhone,jdbcType=VARCHAR},#{invitePlate,jdbcType=VARCHAR},#{userCommunityId,jdbcType=INTEGER})
+  	</insert>
+  	<!-- 用户查询邀请的车辆 -->
+  	<select id="getUserInvite" parameterType="map" resultType="String">
+  		select invite_plate
+  		from plate_invite
+  		where user_phone = #{userPhone} and user_community_id = #{userCommunityId}
+  	</select>
+  	<!-- 查询某车是否被邀请 -->
+  	<select id="judgeInvitedCar" parameterType="String" resultType="String">
+  		select invite_plate
+  		from plate_invite
+  		where invite_plate = #{invitePlate} and is_pay = 0
+  	</select>
+  	<!-- 根据车牌号查询被邀请情况 -->
+  	<select id="getInviteRecordByPlateNumber" parameterType="String" resultMap="InviteRecord">
+  		select 
+  		<include refid="InviteRecord_Column_List"></include>
+  		from plate_invite 
+  		where invite_plate = #{invitePlate} 
+  	</select>
+  	<!-- 用户取消邀请 -->
+  	<delete id="cancelInvite" parameterType="String">
+  		delete 
+  		from plate_invite
+  		where invite_plate = #{invitePlate} and is_pay = 0
+  	</delete>
+  	<!-- 后台查询所有用户邀请信息 -->
+  	<select id="getAllInviteRecord" resultMap="InviteRecord">
+  		select 
+  		<include refid="InviteRecord_Column_List"></include>
+  		from plate_invite 
+  	</select>
+  	<!-- 后台设置各小区车位管理费及停车费用 -->
+  	<insert id="setCost" parameterType="PlateCost">
+  		insert ignore into platecost_community (user_community_id,user_community_name,management_cost)
+  		values(#{userCommunityId,jdbcType=INTEGER},#{userCommunityName,jdbcType=VARCHAR},#{managementCost,jdbcType=DOUBLE})
+  	</insert>
+  	<!-- 修改车位管理费 -->
+  	<update id="alterBerthCost" parameterType="map">
+  		update platecost_community
+  		set
+  		management_cost = #{managementCost}
+  		where user_community_id = #{userCommunityId}
+  	</update>
+  	
+  	<!-- 通过小区id查询各项费用 -->
+  	<select id="getPlateCostByCommunityId" parameterType="int" resultType="double">
+  		select 
+  		management_cost
+  		from platecost_community
+  		where user_community_id = #{userCommunityId}
+  	</select>
+  	<!-- 后台查询所有小区停车各项费用 -->
+  	<select id="getAllPlateCost" parameterType="map" resultMap="PlateCost">
+  		select
+  		user_community_id,user_community_name,management_cost
+  		from platecost_community
+  		limit #{start},#{rows}
+  	</select>
+  	<!-- 查询各小区费用情况记录数 -->
+  	<select id="getCostCount" resultType="int"> 
+  		select count(*)
+  		from platecost_community
+  	</select>
+  	<!-- 后台查看车辆进出记录 -->
+  	<select id="getAllParkRecord" parameterType="map" resultMap="ParkRecord">
+  		select 
+  		<include refid="ParkRecord_Column_List"></include>
+  		from park_management
+  		limit #{start},#{rows}
+  	</select>
+  	<!-- 后台删除车辆进出记录 -->
+  	<delete id="deleteRecord" parameterType="map">
+  		delete 
+  		from park_management
+  		where id = #{id} and plate_number = #{plateNumber}
+  	</delete>
+  	<!-- 获取停车记录总数 -->
+  	<select id="getParkRecordCount" resultType="int">
+  		select count(*)
+  		from park_management
+  	</select>
+  	<!-- 插入车辆入场记录 -->
+  	<insert id="addParkRecord" parameterType="com.zeng.ezsh.wy.entity.ParkRecord">
+  		insert into park_management (plate_number,user_community_id,enter_time,CRC_code,order_num)
+  		values(#{id,jdbcType=VARCHAR},#{plateNumber,jdbcType=VARCHAR},#{userCommunityId,jdbcType=INTEGER},#{enterTime,jdbcType=TIMESTAMP},#{CRCCode,jdbcType=VARCHAR},#{orderNum,jdbcType=VARCHAR})
+  	</insert>
+  	<!-- 车辆离场时更新离场时间 -->
+  	<update id="updateLeaveTime" parameterType="com.zeng.ezsh.wy.entity.ParkRecord">
+  		update park_management
+  		set 
+  		leave_time = #{leaveTime}
+  		where plate_number = #{plateNumber} and user_community_id = #{userCommunityId} and leave_time is null
+  	</update>
+  	<!-- 通过订单号查找停车记录 -->
+  	<select id="getParkRecordByOrderNum" parameterType="String" resultType="com.zeng.ezsh.wy.entity.ParkRecord">
+  		select
+  		<include refid="ParkRecord_Column_List"></include>
+  		from 
+  		park_management
+  		where order_num = #{orderNum}
+  	</select>
+  	<!-- 更新停车记录信息 -->
+  	<update id="updateParkRecord" parameterType="com.zeng.ezsh.wy.entity.ParkRecord">
+  		update park_management
+  		<set>
+  			<if test="#{supposeParkCost != null}">
+  				suppose_park_cost = #{supposeParkCost}
+  			</if>
+  			<if test="#{handParkCost != null}">
+  				hand_park_cost = #{handParkCost}
+  			</if>
+  			<if test="#{SN != null}">
+  				SN = #{SN}
+  			</if>
+  			<if test="#{payWay != null}">
+  				pay_way = #{payWay}
+  			</if>
+  			<if test="#{advancePay != null}">
+  				advance_pay = #{advancePay}
+  			</if>
+  			<if test="#{transactionNum != null}">
+  				transaction_num = #{transactionNum}
+  			</if>
+  			<if test="#{orderStatus != null}">
+  				order_status = #{orderStatus}
+  			</if>
+  		</set>
+  		where plate_number = #{plateNumber} and user_community_id = #{userCommunityId} and leave_time = #{leaveTime}
+  	</update>
+  	<!-- 通过车牌号和小区id获取停车记录信息 -->
+  	<select id="getParkRecord" parameterType="map" resultMap="ParkRecord">
+  		select
+  		<include refid="ParkRecord_Column_List"></include>
+  		from park_management
+  		where plate_number = #{plateNumber} and user_community_id = #{userCommunityId}
+  	</select>
+  	<!-- 判断某车是否有车位 -->
+  	<select id="getBerthBycar" parameterType="map" resultType="String">
+  		select berth_number
+  		from plate_management
+  		where plate_number = #{plateNumber} and user_community_id = #{userCommunityId}
+  	</select>
+</mapper>

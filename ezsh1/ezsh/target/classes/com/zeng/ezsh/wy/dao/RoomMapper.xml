@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.RoomMapper" >
+<resultMap id="roomBaseMapper" type="com.zeng.ezsh.wy.entity.Room" >
+    <id column="room_id" property="roomId" jdbcType="INTEGER" />
+    <result column="manager_id" property="managerId" jdbcType="INTEGER" />
+    <result column="build_id" property="buildId" jdbcType="INTEGER" />
+    <result column="build_area" property="buildArea" jdbcType="DOUBLE" />
+    <result column="room_status" property="roomStatus" jdbcType="INTEGER" />
+    <result column="room_type" property="roomType" jdbcType="INTEGER" />
+    <result column="room_floor" property="roomFloor" jdbcType="INTEGER" />
+    <result column="room_num" property="roomNum" jdbcType="VARCHAR" />
+    <result column="charge_man" property="chargeMan" jdbcType="VARCHAR" />
+    <result column="room_use" property="roomUse" jdbcType="VARCHAR" />
+    <result column="decorate" property="decorate" jdbcType="VARCHAR" />
+    <result column="position" property="position" jdbcType="VARCHAR" />
+    <result column="toward" property="toward" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="rent" property="rent" jdbcType="DOUBLE" />
+    <result column="management_fee" property="managementFee" jdbcType="DOUBLE" />
+    <result column="single_price" property="singlePrice" jdbcType="DOUBLE" />
+    <result column="sum_price" property="sumPrice" jdbcType="DOUBLE" />
+    <result column="is_agreement" property="isAgreement" jdbcType="INTEGER" />
+    <result column="contract" property="contract" jdbcType="VARCHAR" />
+    <result column="rent_status" property="rentStatus" jdbcType="INTEGER" />
+    <result column="effective_status" property="effectiveStatus" jdbcType="INTEGER" />
+    <result column="pt_user_id" property="ptUserId" jdbcType="INTEGER" />
+    <result column="user_identity_card" property="userIdentityCard" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="roomMapper" type="com.zeng.ezsh.wy.entity.Room" extends="roomBaseMapper">
+    <association property="building" column="build_id" select="getbuild"></association>
+    <association property="management" column="manager_id" select="getmanager"></association>
+  </resultMap>
+  
+  <resultMap id="Customer_Check_roomMapper" type="com.zeng.ezsh.wy.entity.Room" extends="roomBaseMapper"> 
+    <association property="customerInfo" javaType="com.zeng.ezsh.wy.entity.Customer"> 
+    	<id property="customerId" column="customer_id"/>
+    	<result column="p_manager_id" property="pManagerId" jdbcType="INTEGER" />
+	    <result column="p_room_id" property="pRoomId" jdbcType="INTEGER" />
+	    <result column="customer_name" property="customerName" jdbcType="VARCHAR" />
+	    <result column="customer_classify" property="customerClassify" jdbcType="TINYINT" />
+	    <result column="customer_telephone" property="customerTelephone" jdbcType="VARCHAR" />
+	    <result column="customer_check_in_time" property="customerCheckInTime" jdbcType="VARCHAR" />
+	    <result column="customer_id_card_number" property="customerIdCardNumber" jdbcType="VARCHAR" />
+	    <result column="charge_start_date" property="chargeStartDate" jdbcType="VARCHAR" />
+	    <result column="charge_end_date" property="chargeEndDate" jdbcType="VARCHAR" />
+	    <result column="contract_start_date" property="contractStartDate" jdbcType="VARCHAR" />
+	    <result column="contract_end_date" property="contractEndDate" jdbcType="VARCHAR" />
+	    <result column="remark" property="remark" jdbcType="VARCHAR" />            
+	</association>
+	<!-- <collection property=""></collection> -->
+  </resultMap>
+  
+  <!-- 客户迁入迁出管理 -->
+  <resultMap id="Customer_Emigrate" type="com.zeng.ezsh.wy.entity.Room" extends="roomBaseMapper">
+    <association property="customerInfo" javaType="com.zeng.ezsh.wy.entity.Customer"> 
+    	<id property="customerId" column="customer_id"/>
+    	<result column="p_manager_id" property="pManagerId" jdbcType="INTEGER" />
+	    <result column="p_room_id" property="pRoomId" jdbcType="INTEGER" />
+	    <result column="customer_name" property="customerName" jdbcType="VARCHAR" />
+	    <result column="customer_classify" property="customerClassify" jdbcType="TINYINT" />
+	    <result column="customer_telephone" property="customerTelephone" jdbcType="VARCHAR" />
+	    <result column="customer_check_in_time" property="customerCheckInTime" jdbcType="VARCHAR" />
+	    <result column="customer_id_card_number" property="customerIdCardNumber" jdbcType="VARCHAR" />
+	    <result column="charge_start_date" property="chargeStartDate" jdbcType="VARCHAR" />
+	    <result column="charge_end_date" property="chargeEndDate" jdbcType="VARCHAR" />
+	    <result column="contract_start_date" property="contractStartDate" jdbcType="VARCHAR" />
+	    <result column="contract_end_date" property="contractEndDate" jdbcType="VARCHAR" />
+	    <result column="remark" property="remark" jdbcType="VARCHAR" />            
+	</association>
+	<collection property="building" javaType="com.zeng.ezsh.wy.entity.Building" column="build_id"  select="com.zeng.ezsh.wy.dao.BuildingMapper.getBuildingInfoById">
+	</collection>
+	<!-- <collection property="management" javaType="com.zeng.ezsh.wy.entity.Management" column="manager_id" ofType="com.zeng.ezsh.wy.entity.Management" select="com.zeng.ezsh.wy.dao.ManagementMapper.getManagerByParam"></collection> -->
+  </resultMap>
+  
+  <!-- 查询房间集合-->
+  <resultMap id="roomMapperToBuildTree" type="com.zeng.ezsh.wy.entity.Room" extends="roomBaseMapper">
+  </resultMap>
+  
+	<!-- 查询房间收费项目集合（用于生成应收费用记录）-->
+	<resultMap id="roomMapperToChargeCreate" type="com.zeng.ezsh.wy.entity.Room" extends="roomBaseMapper">
+		<collection property="customerInfo" javaType="com.zeng.ezsh.wy.entity.Customer" column="room_id"  select="com.zeng.ezsh.wy.dao.CustomerMapper.selectCustomerByRoomId">
+		</collection>
+		<collection property="chargeItemIdsList" javaType="ArrayList" column="room_id"  select="com.zeng.ezsh.wy.dao.ChargeRoomIdsMapper.selectChargeItemsByRoomId">
+		</collection>
+	</resultMap>
+	
+	<!-- 查询房间表计类别集合（用于生成应抄表记录）-->
+	<resultMap id="roomMapperToGridItem" type="com.zeng.ezsh.wy.entity.Room" extends="roomBaseMapper">
+		<collection property="customerInfo" javaType="com.zeng.ezsh.wy.entity.Customer" column="room_id"  select="com.zeng.ezsh.wy.dao.CustomerMapper.selectCustomerByRoomId">
+		</collection>
+		<collection property="gridRoomItemList" javaType="ArrayList" column="room_id"  select="com.zeng.ezsh.wy.dao.GridRoomItemMapper.selectGridRoomItemsByRoomId">
+		</collection>
+	</resultMap>
+	
+	<resultMap id="roomBaseMapper_Room_Customer" type="com.zeng.ezsh.wy.entity.Room" extends="roomBaseMapper">
+	    <association property="customerInfo" javaType="com.zeng.ezsh.wy.entity.Customer"> 
+	    	<id property="customerId" column="customer_id"/>
+	    	<result column="p_manager_id" property="pManagerId" jdbcType="INTEGER" />
+		    <result column="p_room_id" property="pRoomId" jdbcType="INTEGER" />
+		    <result column="customer_name" property="customerName" jdbcType="VARCHAR" />         
+		</association>
+	</resultMap>
+  
+	<sql id="Base_Column_List" >
+		room_id, manager_id, build_id, build_area, room_status, room_type, room_floor, room_num, 
+		charge_man, room_use, decorate, position, toward, remark, rent, management_fee, single_price, 
+		sum_price, is_agreement, contract, rent_status, effective_status, pt_user_id, user_identity_card
+ 	</sql>
+  
+	<sql id="Base_Column_List_Roo_Customer" >
+	  roo.room_id, roo.manager_id, roo.build_id, roo.build_area, roo.room_status, roo.room_type, roo.room_floor, roo.room_num, 
+	  roo.charge_man, roo.room_use, roo.decorate, roo.position, roo.toward, roo.remark, roo.rent, roo.management_fee, roo.single_price, 
+	  roo.sum_price, roo.is_agreement, roo.contract, roo.rent_status, roo.effective_status, roo.user_identity_card,
+	  customr.id,customr.p_room_id,customr.name
+	</sql>
+  
+    <!-- 根据楼宇ID获取楼宇信息（用于级联查询） -->
+	<select id="getbuild" parameterType="Integer" resultMap="com.zeng.ezsh.wy.dao.BuildingMapper.buildingMapper">
+	    select * from building where build_id=#{buildId}
+	</select>
+     
+    <!-- 根据管理处ID获取管理处信息（用于级联查询）-->
+	<select id="getmanager" parameterType="Integer" resultMap="com.zeng.ezsh.wy.dao.ManagementMapper.managementMapper">
+	    SELECT manager_id, manager_name, manager_addr, 
+	    height_build_num, many_build_num, build_area, 
+	    floor_area, green_area, public_area, 
+	    parking_area, parking_num, contact, 
+	    head, contact_num, remark   FROM management WHERE manager_id=#{managerId}  
+	</select>
+	
+	<!-- 检测房间号是否存在 -->
+  	<select id="checkNameHasOn" parameterType="com.zeng.ezsh.wy.entity.Room" resultType="Integer">
+	    select count(*) from room WHERE manager_id=#{managerId} and build_id=#{buildId}
+	    and room_num = #{roomNum}
+	</select>
+	
+  	<!-- 获取房间列表集合（后台）-->
+	<select id="selectPageListUseDyc" parameterType="page" resultMap="roomMapper" >
+	  select * from room 
+	  <where>
+	  	<if test="paramEntity.roomId!=null">and room_id = #{paramEntity.roomId}</if>
+	  	<if test="paramEntity.buildId!=null">and build_id = #{paramEntity.buildId}</if>
+	  	<if test="paramEntity.managerId!=null">and manager_id = #{paramEntity.managerId}</if>
+	  	<if test="paramEntity.roomStatus!=null">and room_status = #{paramEntity.roomStatus}</if>
+	  	<if test="paramEntity.roomType!=null">and room_type = #{paramEntity.roomType}</if>
+	  	<if test="paramEntity.buildArea!=null">and build_area = #{paramEntity.buildArea}</if>
+	  	<if test="paramEntity.roomNum!=null">and room_num = #{paramEntity.roomNum}</if>
+	  	<if test="paramEntity.position!=null">and position like #{paramEntity.position}</if>
+	  	<if test="paramEntity.roomUse!=null">and room_use like #{paramEntity.roomUse}</if>
+	  	<if test="paramEntity.chargeMan!=null">and charge_man like #{paramEntity.chargeMan}</if>
+	  	<if test="paramEntity.toward!=null">and toward like #{paramEntity.toward}</if>
+	  	<if test="paramEntity.rent!=null">and rent = #{paramEntity.rent}</if>
+	  	<if test="paramEntity.managementFee!=null">and management_fee = #{paramEntity.managementFee}</if>
+	  	<if test="paramEntity.singlePrice!=null">and single_price = #{paramEntity.singlePrice}</if>
+	  	<if test="paramEntity.sumPrice!=null">and sum_price = #{paramEntity.sumPrice}</if>
+	  </where>
+	  limit #{start},#{rows}
+	</select>
+	<!-- 通过多条件分页查询，返回总记录数（后台） -->
+	<select id="selectPageCountUseDyc" parameterType="page" resultType="Integer">
+		select count(1) from room 
+	  <where>
+	      <!-- <if test="paramEntity.roomId!=null">and room_id = #{paramEntity.roomId}</if> -->
+	  	<if test="paramEntity.buildId!=null">and build_id = #{paramEntity.buildId}</if>
+	  	<if test="paramEntity.managerId!=null">and manager_id = #{paramEntity.managerId}</if>
+	  	<if test="paramEntity.roomStatus!=null">and room_status = #{paramEntity.roomStatus}</if>
+	  	<if test="paramEntity.roomType!=null">and room_type = #{paramEntity.roomType}</if>
+	  	<if test="paramEntity.buildArea!=null">and build_area = #{paramEntity.buildArea}</if>
+	  	<if test="paramEntity.roomNum!=null">and room_num = #{paramEntity.roomNum}</if>
+	  	<if test="paramEntity.position!=null">and position like #{paramEntity.position}</if>
+	  	<if test="paramEntity.roomUse!=null">and room_use like #{paramEntity.roomUse}</if>
+	  	<if test="paramEntity.chargeMan!=null">and charge_man like #{paramEntity.chargeMan}</if>
+	  	<if test="paramEntity.toward!=null">and toward like #{paramEntity.toward}</if>
+	  	<if test="paramEntity.rent!=null">and rent = #{paramEntity.rent}</if>
+	  	<if test="paramEntity.managementFee!=null">and management_fee = #{paramEntity.managementFee}</if>
+	  	<if test="paramEntity.singlePrice!=null">and single_price = #{paramEntity.singlePrice}</if>
+	  	<if test="paramEntity.sumPrice!=null">and sum_price = #{paramEntity.sumPrice}</if>
+	  </where>
+	</select>
+  
+	<!-- 查询给房间号（用于移动端） -->
+	<select id="findRoomByParam" parameterType="java.util.Map" resultMap="roomMapper" >
+	  select * from room 
+	  <where>
+	  	pt_user_id = 0
+		<if test="managerId!=null">and manager_id = #{managerId}</if>
+		<if test="buildId!=null">and build_id = #{buildId}</if>
+		<if test="roomNum!=null and roomNum!=''">and room_num = #{roomNum}</if>
+	  </where>
+	</select>
+  
+	<!-- 查询房间集(没有牵连嵌套查询) -->
+	<select id="findRoomByParamToAfter" parameterType="java.util.Map" resultMap="roomBaseMapper" >
+	  select * from room 
+	  <where>
+	    <if test="managerId!=null">and manager_id = #{managerId}</if>
+	  	<if test="buildId!=null">and build_id = #{buildId}</if>
+	  	<if test="roomNum!=null and roomNum!=''">and room_num = #{roomNum}</if>
+	  </where>
+	</select>
+  
+	<!-- 查询房间集合（联表查询） -->
+	<select id="findRoomCustomer" parameterType="java.util.Map" resultMap="roomBaseMapper_Room_Customer" >
+		select * from room roo right join customer customr
+		on roo.room_id=customr.p_room_id
+		<where>
+		    <if test="managerId!=null">and manager_id = #{managerId}</if>
+			<if test="buildId!=null">and build_id = #{buildId}</if>
+		</where>
+	</select>
+  
+	<!--用于构建房间树 -->
+	<select id="findRoomToBuildTree" parameterType="java.lang.Integer" resultMap="roomBaseMapper" >
+	  select * from room 
+	  <where>
+	      build_id = #{buildId}
+	  </where>
+	</select>
+  
+	<!-- 获取房间集合（嵌套获取房间的收费项目集合） -->
+	<select id="findRoomChargeByParam" parameterType="java.lang.Integer" resultMap="roomMapperToChargeCreate" >
+	  select * from room 
+	  <where>
+	      build_id = #{buildId}
+	  </where>
+	</select>
+  
+	<!-- 获取房间集合（嵌套获取房间的抄表类别集合） -->
+	<select id="findRoomRecordByParam" parameterType="java.lang.Integer" resultMap="roomMapperToGridItem" >
+	  select * from room 
+	  <where>
+	      build_id = #{buildId}
+	  </where>
+	</select>   
+
+	<!-- 根据条件查询单个房间信息(后台)-->
+	<select id="findRoomByParamToAfterEnd" parameterType="java.util.Map" resultMap="roomMapper" >
+	  select manager_id from room 
+	  <where>
+	  	<if test="roomId!=null and roomId!=''"> room_id = #{roomId}</if>
+	  </where>
+	</select>
+	
+	<!-- 根据房间ID获取房间信息（前台） -->
+	<select id="findRoomByParamToFrontEnd" parameterType="java.util.Map" resultMap="roomMapper" >
+	  select * from room where room_id = #{ptRoomId}
+	</select>
+  	
+  	
+  	<!-- 根据房间ID获取单个房间信息 -->
+  	<select id="findRoomByRoomId" parameterType="java.lang.Integer" resultMap="roomBaseMapper" >
+	    select 
+	    <include refid="Base_Column_List"></include>
+	    from room 
+	    <where>
+	    	room_id = #{0}
+	    </where>
+  	</select>
+  
+	<select id="findAll" resultMap="roomMapper">
+	    select * from room
+	</select>
+  
+  	<select id="findByMBR" parameterType="java.util.Map" resultMap="roomBaseMapper">
+  		select <include refid="Base_Column_List" /> from room
+  		where manager_id = #{pManagerId}
+  		and build_id = #{pBuildId}
+  		and room_id = #{pRoomId}
+  	</select>
+  
+	<insert id="insert" parameterType="com.zeng.ezsh.wy.entity.Room" >
+		insert into room (room_id, manager_id, build_id, 
+		  build_area, room_status, room_type, 
+		  room_floor, room_num, charge_man, 
+		  room_use, decorate, position, 
+		  toward, remark, rent, 
+		  management_fee, single_price, sum_price, 
+		  is_agreement, contract, rent_status, 
+		  effective_status)
+		values (#{roomId,jdbcType=INTEGER}, #{managerId,jdbcType=INTEGER}, #{buildId,jdbcType=INTEGER}, 
+		  #{buildArea,jdbcType=DOUBLE}, #{roomStatus,jdbcType=INTEGER}, #{roomType,jdbcType=INTEGER}, 
+		  #{roomFloor,jdbcType=INTEGER}, #{roomNum,jdbcType=VARCHAR}, #{chargeMan,jdbcType=VARCHAR}, 
+		  #{roomUse,jdbcType=VARCHAR}, #{decorate,jdbcType=VARCHAR}, #{position,jdbcType=VARCHAR}, 
+		  #{toward,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{rent,jdbcType=DOUBLE}, 
+		  #{managementFee,jdbcType=DOUBLE}, #{singlePrice,jdbcType=DOUBLE}, #{sumPrice,jdbcType=DOUBLE}, 
+		  #{isAgreement,jdbcType=INTEGER}, #{contract,jdbcType=VARCHAR}, #{rentStatus,jdbcType=INTEGER}, 
+		  #{effectiveStatus,jdbcType=INTEGER})
+	</insert>
+  
+	<delete id="deleteList">
+	 	delete from room where room_id in
+		<foreach collection="array" open="(" close=")" separator="," item="pk">
+			#{pk}
+		</foreach>
+	</delete>
+  
+	<update id="update" parameterType="com.zeng.ezsh.wy.entity.Room" >
+		update room
+		set manager_id = #{managerId,jdbcType=INTEGER},
+		  build_id = #{buildId,jdbcType=INTEGER},
+		  build_area = #{buildArea,jdbcType=DOUBLE},
+		  room_status = #{roomStatus,jdbcType=INTEGER},
+		  room_type = #{roomType,jdbcType=INTEGER},
+		  room_floor = #{roomFloor,jdbcType=INTEGER},
+		  room_num = #{roomNum,jdbcType=VARCHAR},
+		  charge_man = #{chargeMan,jdbcType=VARCHAR},
+		  room_use = #{roomUse,jdbcType=VARCHAR},
+		  decorate = #{decorate,jdbcType=VARCHAR},
+		  position = #{position,jdbcType=VARCHAR},
+		  toward = #{toward,jdbcType=VARCHAR},
+		  remark = #{remark,jdbcType=VARCHAR},
+		  rent = #{rent,jdbcType=DOUBLE},
+		  management_fee = #{managementFee,jdbcType=DOUBLE},
+		  single_price = #{singlePrice,jdbcType=DOUBLE},
+		  sum_price = #{sumPrice,jdbcType=DOUBLE},
+		  is_agreement = #{isAgreement,jdbcType=INTEGER},
+		  contract = #{contract,jdbcType=VARCHAR},
+		  rent_status = #{rentStatus,jdbcType=INTEGER},
+		  effective_status = #{effectiveStatus,jdbcType=INTEGER}
+		where room_id = #{roomId,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 更新房间信息(后台操作客户迁入、迁出时等) -->
+	<update id="updateRoomSelective" parameterType="com.zeng.ezsh.wy.entity.Room" >
+	   update room
+	   <set >
+	     <if test="managerId != null" >
+	       manager_id = #{managerId,jdbcType=INTEGER},
+	     </if>
+	     <if test="buildId != null" >
+	       build_id = #{buildId,jdbcType=INTEGER},
+	     </if>
+	     <if test="buildArea != null" >
+	       build_area = #{buildArea,jdbcType=DOUBLE},
+	     </if>
+	     <if test="roomStatus != null" >
+	       room_status = #{roomStatus,jdbcType=INTEGER},
+	     </if>
+	     <if test="roomType != null" >
+	       room_type = #{roomType,jdbcType=INTEGER},
+	     </if>
+	     <if test="roomFloor != null" >
+	       room_floor = #{roomFloor,jdbcType=INTEGER},
+	     </if>
+	     <if test="roomNum != null" >
+	       room_num = #{roomNum,jdbcType=VARCHAR},
+	     </if>
+	     <if test="chargeMan != null" >
+	       charge_man = #{chargeMan,jdbcType=VARCHAR},
+	     </if>
+	     <if test="roomUse != null" >
+	       room_use = #{roomUse,jdbcType=VARCHAR},
+	     </if>
+	     <if test="decorate != null" >
+	       decorate = #{decorate,jdbcType=VARCHAR},
+	     </if>
+	     <if test="position != null" >
+	       position = #{position,jdbcType=VARCHAR},
+	     </if>
+	     <if test="toward != null" >
+	       toward = #{toward,jdbcType=VARCHAR},
+	     </if>
+	     <if test="remark != null" >
+	       remark = #{remark,jdbcType=VARCHAR},
+	     </if>
+	     <if test="rent != null" >
+	       rent = #{rent,jdbcType=DOUBLE},
+	     </if>
+	     <if test="managementFee != null" >
+	       management_fee = #{managementFee,jdbcType=DOUBLE},
+	     </if>
+	     <if test="singlePrice != null" >
+	       single_price = #{singlePrice,jdbcType=DOUBLE},
+	     </if>
+	     <if test="sumPrice != null" >
+	       sum_price = #{sumPrice,jdbcType=DOUBLE},
+	     </if>
+	     <if test="isAgreement != null" >
+	       is_agreement = #{isAgreement,jdbcType=INTEGER},
+	     </if>
+	     <if test="contract != null" >
+	       contract = #{contract,jdbcType=VARCHAR},
+	     </if>
+	     <if test="rentStatus != null" >
+	       rent_status = #{rentStatus,jdbcType=INTEGER},
+	     </if>
+	     <if test="effectiveStatus != null" >
+	       effective_status = #{effectiveStatus,jdbcType=INTEGER},
+	     </if>
+	     <if test="ptUserId != null" >
+	       pt_user_id = #{ptUserId,jdbcType=INTEGER},
+	     </if>
+	     <if test="userIdentityCard != null" >
+	       user_identity_card = #{userIdentityCard,jdbcType=VARCHAR},
+	     </if>
+	   </set>
+	   where room_id = #{roomId,jdbcType=INTEGER}
+	 </update>
+
+	<select id="selectRoomUserByRoomId" parameterType="java.lang.Integer" resultType="com.zeng.ezsh.wy.entity.Vo.RoomUserVoLin">
+		SELECT DISTINCT
+			c.customer_name,b.build_name
+		from
+ 			customer c,building b,room r
+		WHERE
+ 			c.p_room_id=r.room_id and r.build_id=b.build_id and r.room_id=#{roomId}
+	</select>
+	 
+	 <!-- <select id="findIdentityCardById" parameterType="Integer" resultMap="String">
+	 	select user_identity_card from room 
+	 	where 
+	 	
+	 </select> -->
+</mapper>

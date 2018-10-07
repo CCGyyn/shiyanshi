@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.GoodsMerchantMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.GoodsMerchant" >
+    <id column="merchant_id" property="merchantId" jdbcType="INTEGER" />
+    <result column="p_manager_id" property="pManagerId" jdbcType="INTEGER" />
+    <result column="manager_name" property="managerName" jdbcType="VARCHAR" />
+    <result column="merchant_name" property="merchantName" jdbcType="VARCHAR" />
+    <result column="merchant_link_phone" property="merchantLinkPhone" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zeng.ezsh.wy.entity.GoodsMerchant" extends="BaseResultMap" >
+    <result column="merchant_descr" property="merchantDescr" jdbcType="LONGVARCHAR" />
+  </resultMap>
+ 
+  <sql id="Base_Column_List" >
+    merchant_id, p_manager_id, manager_name, merchant_name, merchant_link_phone
+  </sql>
+  <sql id="Blob_Column_List" >
+    merchant_descr
+  </sql>
+  
+  <!-- 获取商家数量 -->
+  <select id="getMerchantAmount" resultType="java.lang.Integer" parameterType="com.zeng.ezsh.wy.entity.GoodsMerchant" >
+    select count(*)
+    from goods_merchant
+    where p_manager_id = #{pManagerId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 通过商家ID获取商家信息 -->
+  <select id="getMerchantInfoById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_merchant
+    where merchant_id = #{merchantId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 获取商家集合 -->
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.GoodsMerchant" >
+    select 
+    <include refid="Base_Column_List" />,
+    <include refid="Blob_Column_List" />
+    from goods_merchant
+    <where>
+    	<if test="pManagerId != null" >
+        	and p_manager_id = #{pManagerId,jdbcType=INTEGER}
+    	</if>
+    	<if test="merchantName != null and merchantName != ''" >
+        	and merchant_name like CONCAT ("%",#{merchantName},"%")
+    	</if>
+    </where>
+  </select>
+  
+  <!-- 添加商家 -->
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.GoodsMerchant" >
+    insert into goods_merchant
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="merchantId != null" >
+        merchant_id,
+      </if>
+      <if test="pManagerId != null" >
+        p_manager_id,
+      </if>
+      <if test="managerName != null" >
+        manager_name,
+      </if>
+      <if test="merchantName != null" >
+        merchant_name,
+      </if>
+      <if test="merchantLinkPhone != null" >
+        merchant_link_phone,
+      </if>
+      <if test="merchantDescr != null" >
+        merchant_descr,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="merchantId != null" >
+        #{merchantId,jdbcType=INTEGER},
+      </if>
+      <if test="pManagerId != null" >
+        #{pManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="managerName != null" >
+        #{managerName,jdbcType=VARCHAR},
+      </if>
+      <if test="merchantName != null" >
+        #{merchantName,jdbcType=VARCHAR},
+      </if>
+      <if test="merchantLinkPhone != null" >
+        #{merchantLinkPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="merchantDescr != null" >
+        #{merchantDescr,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 更新商家 -->
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.GoodsMerchant" >
+    update goods_merchant
+    <set >
+      <if test="pManagerId != null" >
+        p_manager_id = #{pManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="managerName != null" >
+        manager_name = #{managerName,jdbcType=VARCHAR},
+      </if>
+      <if test="merchantName != null" >
+        merchant_name = #{merchantName,jdbcType=VARCHAR},
+      </if>
+      <if test="merchantLinkPhone != null" >
+        merchant_link_phone = #{merchantLinkPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="merchantDescr != null" >
+        merchant_descr = #{merchantDescr,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where merchant_id = #{merchantId,jdbcType=INTEGER}
+  </update>
+  <!-- <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.GoodsMerchant" >
+    insert into goods_merchant (merchant_id, p_manager_id, manager_name, 
+      merchant_name, merchant_link_phone, merchant_descr
+      )
+    values (#{merchantId,jdbcType=INTEGER}, #{pManagerId,jdbcType=INTEGER}, #{managerName,jdbcType=VARCHAR}, 
+      #{merchantName,jdbcType=VARCHAR}, #{merchantLinkPhone,jdbcType=VARCHAR}, #{merchantDescr,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from goods_merchant
+    where merchant_id = #{merchantId,jdbcType=INTEGER}
+  </delete> -->
+  
+  
+  
+  <!-- <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.GoodsMerchant" >
+    update goods_merchant
+    set p_manager_id = #{pManagerId,jdbcType=INTEGER},
+      manager_name = #{managerName,jdbcType=VARCHAR},
+      merchant_name = #{merchantName,jdbcType=VARCHAR},
+      merchant_link_phone = #{merchantLinkPhone,jdbcType=VARCHAR},
+      merchant_descr = #{merchantDescr,jdbcType=LONGVARCHAR}
+    where merchant_id = #{merchantId,jdbcType=INTEGER}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.GoodsMerchant" >
+    update goods_merchant
+    set p_manager_id = #{pManagerId,jdbcType=INTEGER},
+      manager_name = #{managerName,jdbcType=VARCHAR},
+      merchant_name = #{merchantName,jdbcType=VARCHAR},
+      merchant_link_phone = #{merchantLinkPhone,jdbcType=VARCHAR}
+    where merchant_id = #{merchantId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

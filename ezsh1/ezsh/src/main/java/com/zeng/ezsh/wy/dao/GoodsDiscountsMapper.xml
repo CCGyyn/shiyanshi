@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.GoodsDiscountsMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.GoodsDiscounts" >
+    <id column="p_goods_info_id" property="pGoodsInfoId" jdbcType="INTEGER" />
+    <result column="show_background_image" property="showBackgroundImage" jdbcType="VARCHAR" />
+    <result column="show_section_one_value" property="showSectionOneValue" jdbcType="VARCHAR" />
+    <result column="show_section_two_value" property="showSectionTwoValue" jdbcType="VARCHAR" />
+    <result column="show_section_three_value" property="showSectionThreeValue" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    p_goods_info_id, show_background_image, show_section_one_value, show_section_two_value, 
+    show_section_three_value
+  </sql>
+  
+  <!-- 通过商品基本信息获取优惠信息 -->
+  <select id="selectDiscountInfoByGoodsInfoId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_discounts
+    where p_goods_info_id = #{0,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 插入商品的优惠信息 -->
+  <insert id="insertDiscountInfoByGoodsInfoId" parameterType="com.zeng.ezsh.wy.entity.GoodsDiscounts" >
+    insert into goods_discounts (p_goods_info_id, show_background_image, 
+      show_section_one_value, show_section_two_value, 
+      show_section_three_value)
+    values (#{pGoodsInfoId,jdbcType=INTEGER}, #{showBackgroundImage,jdbcType=VARCHAR}, 
+      #{showSectionOneValue,jdbcType=VARCHAR}, #{showSectionTwoValue,jdbcType=VARCHAR}, 
+      #{showSectionThreeValue,jdbcType=VARCHAR})
+  </insert>
+  
+  <!-- 更新商品附加优惠信息 -->
+  <update id="updateDiscountInfoByGoodsInfoId" parameterType="com.zeng.ezsh.wy.entity.GoodsDiscounts" >
+    update goods_discounts
+    <set >
+      <if test="showBackgroundImage != null" >
+        show_background_image = #{showBackgroundImage,jdbcType=VARCHAR},
+      </if>
+      <if test="showSectionOneValue != null" >
+        show_section_one_value = #{showSectionOneValue,jdbcType=VARCHAR},
+      </if>
+      <if test="showSectionTwoValue != null" >
+        show_section_two_value = #{showSectionTwoValue,jdbcType=VARCHAR},
+      </if>
+      <if test="showSectionThreeValue != null" >
+        show_section_three_value = #{showSectionThreeValue,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where p_goods_info_id = #{pGoodsInfoId,jdbcType=INTEGER}
+  </update>
+</mapper>

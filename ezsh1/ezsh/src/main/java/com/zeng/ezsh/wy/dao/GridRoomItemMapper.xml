@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.GridRoomItemMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.GridRoomItem" >
+    <id column="room_grid_item_id" property="roomGridItemId" jdbcType="INTEGER" />
+    <result column="pt_manager_id" property="ptManagerId" jdbcType="INTEGER" />
+    <result column="pt_build_id" property="ptBuildId" jdbcType="INTEGER" />
+    <result column="pt_room_id" property="ptRoomId" jdbcType="INTEGER" />
+    <result column="room_num" property="roomNum" jdbcType="VARCHAR" />
+    <result column="pt_grid_id" property="ptGridId" jdbcType="INTEGER" />
+    <result column="room_grid_name" property="roomGridName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    room_grid_item_id, pt_manager_id, pt_build_id, pt_room_id, room_num, pt_grid_id, 
+    room_grid_name
+  </sql>
+  
+  <!-- 添加房间表计类型 -->
+  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.GridRoomItem" >
+    insert into grid_room_item (room_grid_item_id, pt_manager_id, pt_build_id, 
+      pt_room_id, room_num, pt_grid_id, 
+      room_grid_name)
+    values (#{roomGridItemId,jdbcType=INTEGER}, #{ptManagerId,jdbcType=INTEGER}, #{ptBuildId,jdbcType=INTEGER}, 
+      #{ptRoomId,jdbcType=INTEGER}, #{roomNum,jdbcType=VARCHAR}, #{ptGridId,jdbcType=INTEGER}, 
+      #{roomGridName,jdbcType=VARCHAR})
+  </insert>
+  
+  <!-- 获取房间表计类型列表(后台表格展示) -->
+  <select id="selectGridRoomItemsByParam" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from grid_room_item
+    <where>
+	    <if test="ptManagerId != null" >
+	      and pt_manager_id = #{ptManagerId,jdbcType=INTEGER}
+	    </if>
+	    <if test="ptBuildId != null" >
+	      and pt_build_id = #{ptBuildId,jdbcType=INTEGER}
+	    </if>
+	    <if test="ptRoomId != null" >
+	      and pt_room_id = #{ptRoomId,jdbcType=INTEGER}
+	    </if>
+	    <if test="roomGridName != null" >
+	      and room_grid_name = #{roomGridName,jdbcType=VARCHAR}
+	    </if>
+    </where>
+  </select>
+  
+  <!-- 删除房间表计类型 -->
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from grid_room_item
+    where room_grid_item_id = #{roomGridItemId,jdbcType=INTEGER}
+  </delete>
+  
+  <!--  查询表计类型是否已被使用 -->
+  <select id="checkGridRoomItemIsOnUse" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.GridRoomItem" >
+    select count(*)
+    from grid_room_item
+    <where>
+    	<if test="roomGridName != null">
+    	and room_grid_name = #{roomGridName,jdbcType=VARCHAR}
+    	</if>
+    	<if test="ptManagerId != null">
+        and pt_manager_id = #{ptManagerId,jdbcType=INTEGER}
+      	</if>
+    </where>
+  </select>
+  
+  <!-- 修改房间表计类别(后台) -->
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.GridRoomItem" >
+    update grid_room_item
+    <set >
+      <!-- <if test="ptManagerId != null" >
+        pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="ptBuildId != null" >
+        pt_build_id = #{ptBuildId,jdbcType=INTEGER},
+      </if>
+      <if test="ptRoomId != null" >
+        pt_room_id = #{ptRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="roomNum != null" >
+        room_num = #{roomNum,jdbcType=VARCHAR},
+      </if> -->
+      <if test="ptGridId != null" >
+        room_grid_item_id = #{roomGridItemId,jdbcType=INTEGER},
+      </if>
+      <if test="roomGridName != null" >
+        room_grid_name = #{roomGridName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where pt_grid_id = #{ptGridId,jdbcType=INTEGER}
+  </update>
+  
+  <!-- 根据房间ID获取表计类别集合（用于后台嵌套查询） -->
+  <select id="selectGridRoomItemsByRoomId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from grid_room_item
+    where pt_room_id = #{0}
+  </select>
+  <!-- 
+  <delete id="deleteByExample" parameterType="com.zeng.ezsh.wy.entity.GridRoomItemExample" >
+    delete from grid_room_item
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.GridRoomItem" >
+    insert into grid_room_item
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="roomGridItemId != null" >
+        room_grid_item_id,
+      </if>
+      <if test="ptManagerId != null" >
+        pt_manager_id,
+      </if>
+      <if test="ptBuildId != null" >
+        pt_build_id,
+      </if>
+      <if test="ptRoomId != null" >
+        pt_room_id,
+      </if>
+      <if test="roomNum != null" >
+        room_num,
+      </if>
+      <if test="ptGridId != null" >
+        pt_grid_id,
+      </if>
+      <if test="roomGridName != null" >
+        room_grid_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="roomGridItemId != null" >
+        #{roomGridItemId,jdbcType=INTEGER},
+      </if>
+      <if test="ptManagerId != null" >
+        #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="ptBuildId != null" >
+        #{ptBuildId,jdbcType=INTEGER},
+      </if>
+      <if test="ptRoomId != null" >
+        #{ptRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="roomNum != null" >
+        #{roomNum,jdbcType=VARCHAR},
+      </if>
+      <if test="ptGridId != null" >
+        #{ptGridId,jdbcType=INTEGER},
+      </if>
+      <if test="roomGridName != null" >
+        #{roomGridName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.GridRoomItemExample" resultType="java.lang.Integer" >
+    select count(*) from grid_room_item
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  
+  <update id="updateByExampleSelective" parameterType="map" >
+    update grid_room_item
+    <set >
+      <if test="record.roomGridItemId != null" >
+        room_grid_item_id = #{record.roomGridItemId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptManagerId != null" >
+        pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptBuildId != null" >
+        pt_build_id = #{record.ptBuildId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptRoomId != null" >
+        pt_room_id = #{record.ptRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="record.roomNum != null" >
+        room_num = #{record.roomNum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ptGridId != null" >
+        pt_grid_id = #{record.ptGridId,jdbcType=INTEGER},
+      </if>
+      <if test="record.roomGridName != null" >
+        room_grid_name = #{record.roomGridName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  <update id="updateByExample" parameterType="map" >
+    update grid_room_item
+    set room_grid_item_id = #{record.roomGridItemId,jdbcType=INTEGER},
+      pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      pt_build_id = #{record.ptBuildId,jdbcType=INTEGER},
+      pt_room_id = #{record.ptRoomId,jdbcType=INTEGER},
+      room_num = #{record.roomNum,jdbcType=VARCHAR},
+      pt_grid_id = #{record.ptGridId,jdbcType=INTEGER},
+      room_grid_name = #{record.roomGridName,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.GridRoomItem" >
+    update grid_room_item
+    set pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      pt_build_id = #{ptBuildId,jdbcType=INTEGER},
+      pt_room_id = #{ptRoomId,jdbcType=INTEGER},
+      room_num = #{roomNum,jdbcType=VARCHAR},
+      pt_grid_id = #{ptGridId,jdbcType=INTEGER},
+      room_grid_name = #{roomGridName,jdbcType=VARCHAR}
+    where room_grid_item_id = #{roomGridItemId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

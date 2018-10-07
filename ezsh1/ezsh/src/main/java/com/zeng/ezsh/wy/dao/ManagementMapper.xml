@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.ManagementMapper" >
+    <resultMap id="managementMapper" type="com.zeng.ezsh.wy.entity.Management" >
+	    <id column="manager_id" property="managerId" jdbcType="INTEGER" />
+	    <result column="manager_name" property="managerName" jdbcType="VARCHAR" />
+	    <result column="manager_addr" property="managerAddr" jdbcType="VARCHAR" />
+	    <result column="height_build_num" property="heightBuildNum" jdbcType="INTEGER" />
+	    <result column="many_build_num" property="manyBuildNum" jdbcType="INTEGER" />
+	    <result column="build_area" property="buildArea" jdbcType="DOUBLE" />
+	    <result column="floor_area" property="floorArea" jdbcType="DOUBLE" />
+	    <result column="green_area" property="greenArea" jdbcType="DOUBLE" />
+	    <result column="public_area" property="publicArea" jdbcType="DOUBLE" />
+	    <result column="parking_area" property="parkingArea" jdbcType="DOUBLE" />
+	    <result column="parking_num" property="parkingNum" jdbcType="INTEGER" />
+	    <result column="contact" property="contact" jdbcType="VARCHAR" />
+	    <result column="head" property="head" jdbcType="VARCHAR" />
+	    <result column="contact_num" property="contactNum" jdbcType="VARCHAR" />
+	    <result column="reamrk" property="reamrk" jdbcType="VARCHAR" />
+	    <result column="p_province_id" property="pProvinceId" jdbcType="INTEGER" />
+	    <result column="p_city_id" property="pCityId" jdbcType="INTEGER" />
+	    <result column="p_district_id" property="pDistrictId" jdbcType="INTEGER" />
+	    <result column="status" property="status" jdbcType="INTEGER" />
+	    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    </resultMap>
+    
+	<sql id="Base_Column_List" >
+	  manager_id, p_province_id, province_name, p_district_id, district_name, p_city_id, 
+	  city_name, manager_name, manager_addr, height_build_num, many_build_num, build_area, 
+	  floor_area, green_area, public_area, parking_area, parking_num, contact, head, contact_num, 
+	  remark, status
+	</sql>
+	
+	<!-- 通过省份名称/城市名称/小区名 来搜索小区（移动端） -->
+    <resultMap id="managementMapper_To_Android" type="com.zeng.ezsh.wy.entity.Management" extends="managementMapper">
+	    <association property="provinceName" javaType="java.lang.String" column="p_province_id" select="com.zeng.ezsh.wy.dao.ProvinceMapper.getProvinceNameById"></association>
+	    <association property="cityName" javaType="java.lang.String" column="p_city_id" select="com.zeng.ezsh.wy.dao.CityMapper.getCityNameById"></association>
+    </resultMap>
+    
+  	<!-- 查询所有小区集合用于构建树（后台） -->
+	<resultMap id="managementMapperToBuildTree" type="com.zeng.ezsh.wy.entity.Management" extends="managementMapper">
+		<collection property="buildList" javaType="ArrayList" column="manager_id"  select="com.zeng.ezsh.wy.dao.BuildingMapper.findBuildingByParamToAdminBuidTree">
+		 
+		</collection>
+	</resultMap>
+  
+  	<!-- 通过多条件分页查询，返回管理处列表(后台) -->
+	<select id="selectPageListUseDyc" parameterType="page" resultMap="managementMapper" >
+	  	select * from management 
+		<where>
+			<if test="paramEntity.managerName!=null and paramEntity.managerName!=''">and manager_name like CONCAT("%",#{paramEntity.managerName},"%")</if>
+			<if test="paramEntity.managerName!=null and paramEntity.managerName!=''">and manager_addr like CONCAT("%",#{paramEntity.managerAddr},"%")</if>
+			<if test="paramEntity.managerName!=null and paramEntity.managerName!=''">and head like CONCAT("%",#{paramEntity.head},"%")</if>
+			<if test="paramEntity.managerName!=null and paramEntity.managerName!=''">and contact like CONCAT("%",#{paramEntity.contact},"%")</if>
+			<if test="paramEntity.managerName!=null and paramEntity.managerName!=''">and contact_num like CONCAT("%",#{paramEntity.contactNum},"%")</if>
+		</where>
+		limit #{start},#{rows}
+	</select>
+  
+  	<!--查找全部管理集合 -->
+	<select id="findAll"  resultMap="managementMapper" >
+		select * from management 
+	</select>
+	
+	<!-- 查询所有小区集合用于构建树（后台） -->
+	<select id="findAllManagement"  resultMap="managementMapperToBuildTree" >
+		select * from management 
+	</select>
+  	
+	<select id="findIdByName" parameterType="string"  resultType="Integer" >
+		select t.manager_id from management t where t.manager_name = #{managerName}
+	</select>
+  
+	<!-- 通过多条件分页查询，返回总记录数 -->
+	<select id="selectPageCountUseDyc" parameterType="page" resultType="Integer">
+		select count(1) from management 
+		<where>
+		 	<if test="paramEntity.managerName!=null">and manager_name like #{paramEntity.managerName}</if>
+			<if test="paramEntity.managerId!=null">and manager_id = #{paramEntity.managerId}</if>
+			<if test="paramEntity.managerName!=null">and manager_addr like #{paramEntity.managerAddr}</if>
+			<if test="paramEntity.managerName!=null">and head like #{paramEntity.head}</if>
+			<if test="paramEntity.managerName!=null">and contact like #{paramEntity.contact}</if>
+			<if test="paramEntity.managerName!=null">and contact_num like #{paramEntity.contactNum}</if>
+		</where>
+	</select>
+  
+    <!-- 省市区级联获取小区信息(ID和名称) -->
+	<select id="getManagerListByPCityDistrId"  parameterType="java.util.Map" resultMap="managementMapper">
+		select manager_id,manager_name from management 
+		where p_province_id =#{provinceId} and p_city_id=#{cityId} and p_district_id=#{districtId}
+	</select>
+  
+    <!-- 通过省份名称/城市名称/小区名 来搜索小区(移动端) -->
+	<select id="getManagerListByPCName"  parameterType="java.util.Map" resultMap="managementMapper_To_Android">
+		select manager_id,manager_name,p_province_id,p_city_id,p_district_id from management where
+		<choose>
+			<when test="keyWord!=null and keyWord!=''">
+				manager_name like CONCAT('%','${keyWord}','%' )
+			</when>
+			<when test="provinceId!=null and p_city_id!=null">
+				p_province_id =#{provinceId} and p_city_id=#{cityId}
+			</when>
+			<when test="p_city_id!=null">
+				p_city_id=#{cityId}
+			</when>
+			<when test="provinceId!=null">
+				p_province_id =#{provinceId}
+			</when>
+			<otherwise>
+				manager_id>0
+			</otherwise>
+		</choose> 
+	</select>
+  
+  	<!-- 根据ManagerId获取单个管理处信息（用于关联嵌套查询） -->
+	<select id="getManagerByParam" resultMap="managementMapper"  parameterType="java.lang.Integer" >
+		select * from management
+		<where>
+			<if test="#{0}!=null" >
+				manager_id=#{managerId,jdbcType=INTEGER}
+			</if>
+		</where> 
+	</select>
+	
+    <!-- 检测管理处名称是否存在 （后台）-->
+	<select id="checkNameHasOn" parameterType="com.zeng.ezsh.wy.entity.Management"
+		resultType="java.lang.Integer">
+		select count(*) from management
+		<where>
+			<if test="managerName != null">
+				and manager_name = #{managerName,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+	
+ 	<!-- 新增管理处(后台) -->
+	<insert id="insert" parameterType="com.zeng.ezsh.wy.entity.Management" >
+	  insert into management ( manager_name, manager_addr, 
+	    height_build_num, many_build_num, build_area, 
+	    floor_area, green_area, public_area, 
+	    parking_area, parking_num, contact, 
+	    head, contact_num, remark,
+	    p_province_id,p_city_id,p_district_id, 
+	    status)
+	  values ( #{managerName,jdbcType=VARCHAR}, #{managerAddr,jdbcType=VARCHAR}, 
+	    #{heightBuildNum,jdbcType=INTEGER}, #{manyBuildNum,jdbcType=INTEGER}, #{buildArea,jdbcType=DOUBLE}, 
+	    #{floorArea,jdbcType=DOUBLE}, #{greenArea,jdbcType=DOUBLE}, #{publicArea,jdbcType=DOUBLE}, 
+	    #{parkingArea,jdbcType=DOUBLE}, #{parkingNum,jdbcType=INTEGER}, #{contact,jdbcType=VARCHAR}, 
+	    #{head,jdbcType=VARCHAR}, #{contactNum,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
+	    #{pProvinceId,jdbcType=INTEGER},#{pCityId,jdbcType=INTEGER},#{pDistrictId,jdbcType=INTEGER},
+	    #{status,jdbcType=INTEGER})
+	</insert>
+	
+	<!-- 更新管理处信息（后台） -->
+	<update id="update" parameterType="com.zeng.ezsh.wy.entity.Management" >
+	  update management
+	  set manager_name = #{managerName,jdbcType=VARCHAR},
+	    manager_addr = #{managerAddr,jdbcType=VARCHAR},
+	    height_build_num = #{heightBuildNum,jdbcType=INTEGER},
+	    many_build_num = #{manyBuildNum,jdbcType=INTEGER},
+	    build_area = #{buildArea,jdbcType=DOUBLE},
+	    floor_area = #{floorArea,jdbcType=DOUBLE},
+	    green_area = #{greenArea,jdbcType=DOUBLE},
+	    public_area = #{publicArea,jdbcType=DOUBLE},
+	    parking_area = #{parkingArea,jdbcType=DOUBLE},
+	    parking_num = #{parkingNum,jdbcType=INTEGER},
+	    contact = #{contact,jdbcType=VARCHAR},
+	    head = #{head,jdbcType=VARCHAR},
+	    contact_num = #{contactNum,jdbcType=VARCHAR},
+	    remark = #{remark,jdbcType=VARCHAR},
+	    p_province_id=#{pProvinceId,jdbcType=INTEGER},
+	    province_name=#{provinceName,jdbcType=VARCHAR},
+	    p_city_id=#{pCityId,jdbcType=INTEGER},
+	    city_name=#{cityName,jdbcType=VARCHAR},
+	    p_district_id=#{pDistrictId,jdbcType=INTEGER},
+	    district_name=#{districtName,jdbcType=VARCHAR},
+	    status = #{status,jdbcType=INTEGER}
+	  where manager_id = #{managerId,jdbcType=VARCHAR}
+	</update>
+	
+	<!--批量删除管理处（后台） -->
+   	<delete id="deleteList">
+  		delete from management where manager_id in
+		<foreach collection="array" open="(" close=")" separator="," item="pk">
+			#{pk}
+		</foreach>
+  	</delete>
+</mapper>

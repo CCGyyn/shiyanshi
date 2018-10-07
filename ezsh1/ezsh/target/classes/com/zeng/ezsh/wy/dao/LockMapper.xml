@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.LockMapper">
+	<resultMap type="com.zeng.ezsh.wy.entity.Lock" id="BaseResultMap">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="car" property="car" jdbcType="VARCHAR"/>
+		<result column="validity" property="validity" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<insert id="locked" parameterType="Lock">
+		insert into lock_msg (
+		<trim suffixOverrides=",">
+			car,
+			<if test="validity != null">
+				validity,
+			</if>
+		</trim>
+		 ) value (
+		 <trim suffixOverrides=",">
+		 	#{car,jdbcType=VARCHAR},
+		 	<if test="validity != null">
+		 		#{validity,jdbcType=VARCHAR},
+		 	</if>
+		 </trim>
+		 )
+	</insert>
+	
+	<delete id="unlock" parameterType="String">
+		delete from lock_msg where car = #{car,jdbcType=VARCHAR}
+	</delete>
+	
+	<select id="getUnlockTask" resultMap="BaseResultMap">
+		select car,validity from lock_msg where validity != null
+	</select>
+	
+	<select id="getLockNumByCar" parameterType="String" resultType="java.lang.Integer">
+		select count(*) from lock_msg where car = #{car}
+	</select>
+	
+	<select id="getLock" resultMap="BaseResultMap" parameterType="String">
+		select * from lock_msg where car = #{car}
+	</select>
+</mapper>

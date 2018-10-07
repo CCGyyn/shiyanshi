@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.VisitorCodeMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.VisitorCode" >
+    <id column="code_id" property="codeId" jdbcType="INTEGER" />
+    <result column="pt_user_id" property="ptUserId" jdbcType="INTEGER" />
+    <result column="pt_manager_id" property="ptManagerId" jdbcType="INTEGER" />
+    <result column="pt_build_id" property="ptBuildId" jdbcType="INTEGER" />
+    <result column="pt_room_id" property="ptRoomId" jdbcType="INTEGER" />
+    <result column="pt_lock_id" property="ptLockId" jdbcType="INTEGER" />
+    <result column="manager_name" property="managerName" jdbcType="VARCHAR" />
+    <result column="build_name" property="buildName" jdbcType="VARCHAR" />
+    <result column="room_num" property="roomNum" jdbcType="VARCHAR" />
+    <result column="visitor_name" property="visitorName" jdbcType="VARCHAR" />
+    <result column="visitor_telephone" property="visitorTelephone" jdbcType="VARCHAR" />
+    <result column="visitor_password" property="visitorPassword" jdbcType="VARCHAR" />
+    <result column="visitor_validity_time_start" property="visitorValidityTimeStart" jdbcType="VARCHAR" />
+    <result column="visitor_validity_time_end" property="visitorValidityTimeEnd" jdbcType="VARCHAR" />
+    <result column="vitsit_status" property="vitsitStatus" jdbcType="TINYINT" />
+  </resultMap>
+  
+  <!--获取单条访问码记录【移动端】（用于开门） -->
+  <resultMap id="BaseResultMap_Open_Door" type="com.zeng.ezsh.wy.entity.VisitorCode" extends="BaseResultMap">
+	<collection property="deviceLock" javaType="com.zeng.ezsh.wy.entity.DeviceLock"  column="pt_lock_id" ofType="com.zeng.ezsh.wy.entity.DeviceLock" select="com.zeng.ezsh.wy.dao.DeviceLockMapper.selectDeviceByLockId">
+	</collection>
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    code_id, pt_user_id, pt_manager_id, pt_build_id, pt_room_id, pt_lock_id, manager_name, 
+    build_name, room_num, visitor_name, visitor_telephone, visitor_password, visitor_validity_time_start, 
+    visitor_validity_time_end, vitsit_status
+  </sql>
+  
+  <!-- <sql id="Base_Column_List_Device_Lock" >
+    v_c.code_id, v_c.pt_user_id, v_c.pt_manager_id, v_c.pt_build_id, v_c.pt_room_id, v_c.pt_lock_id, v_c.manager_name, 
+    v_c.build_name, v_c.room_num, v_c.visitor_name, v_c.visitor_telephone, v_c.visitor_password, v_c.visitor_validity_time_start, 
+    v_c.visitor_validity_time_end, v_c.vitsit_status,
+    d_l.lock_id, d_l.device_id, d_l.device_pass, d_l.pt_build_id, d_l.build_name, d_l.pt_manager_id, d_l.manager_name
+  </sql> -->
+  
+  <!--获取最大的Id值 -->
+  <select id="selectMaxId" resultType="java.lang.Long">
+	select
+	IFNULL(max(code_id),0)
+	from visitor_code
+  </select>
+  
+  <!--通过访问码获取访问码记录 -->
+  <select id="selectCodeByDeviceIdAndCode" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from visitor_code <!-- v_c left join device_lock d_l --> 
+    where visitor_password = #{visitorPassword,jdbcType=VARCHAR}
+    <![CDATA[ and visitor_validity_time_end >= #{visitorValidityTimeEnd,jdbcType=VARCHAR} limit 1]]>
+  </select>
+  	
+  <!-- 查询是否在有效期内重设访客码 -->
+  <select id="checkByParam" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.VisitorCode" >
+    select 
+    <include refid="Base_Column_List" />
+    from visitor_code
+    where visitor_telephone = #{visitorTelephone,jdbcType=VARCHAR}
+	<if test="visitorValidityTimeStart != null">
+		<![CDATA[ and visitor_validity_time_end >= #{visitorValidityTimeStart,jdbcType=VARCHAR} limit 1]]>
+	</if> 
+  </select>
+  
+  <!--根据codeId获取单条访客码记录(移动端)-->
+  <select id="selectCodeById" resultMap="BaseResultMap_Open_Door" parameterType="com.zeng.ezsh.wy.entity.VisitorCode" >
+    select 
+    <include refid="Base_Column_List" />
+    from visitor_code
+    where code_id = #{codeId,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 根据用户ID和楼宇ID获取访客同行码 -->
+  <select id="selectCodeByParam" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.VisitorCode" >
+    select 
+    <include refid="Base_Column_List" />
+    from visitor_code
+    where pt_user_id = #{ptUserId,jdbcType=INTEGER} and  pt_build_id = #{ptBuildId,jdbcType=INTEGER}
+    <if test="visitorValidityTimeStart != null">
+		<![CDATA[ and visitor_validity_time_end >= #{visitorValidityTimeStart,jdbcType=VARCHAR}]]>
+	</if> 
+    Order by visitor_validity_time_end DESC  limit 1
+  </select>
+  
+  <!-- 获取业主个人设置的访客码列表 -->
+  <select id="selectCodeListByParam" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.VisitorCode" >
+    select 
+    <include refid="Base_Column_List" />
+    from visitor_code
+    where pt_user_id = #{ptUserId,jdbcType=VARCHAR} Order by visitor_validity_time_end DESC
+  </select>
+  
+  <!-- 添加访客码 -->
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.VisitorCode" useGeneratedKeys="true" keyProperty="codeId">
+    insert into visitor_code
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="codeId != null" >
+        code_id,
+      </if>
+      <if test="ptUserId != null" >
+        pt_user_id,
+      </if>
+      <if test="ptManagerId != null and ptManagerId != ''" >
+        pt_manager_id,
+      </if>
+      <if test="ptBuildId != null and ptBuildId != ''" >
+        pt_build_id,
+      </if>
+      <if test="ptRoomId != null and ptRoomId != ''" >
+        pt_room_id,
+      </if>
+      <if test="ptLockId != null" >
+        pt_lock_id,
+      </if>
+      <if test="managerName != null" >
+        manager_name,
+      </if>
+      <if test="buildName != null" >
+        build_name,
+      </if>
+      <if test="roomNum != null" >
+        room_num,
+      </if>
+      <if test="visitorName != null" >
+        visitor_name,
+      </if>
+      <if test="visitorTelephone != null" >
+        visitor_telephone,
+      </if>
+      <if test="visitorPassword != null" >
+        visitor_password,
+      </if>
+      <if test="visitorValidityTimeStart != null" >
+        visitor_validity_time_start,
+      </if>
+      <if test="visitorValidityTimeEnd != null" >
+        visitor_validity_time_end,
+      </if>
+      <if test="vitsitStatus != null" >
+        vitsit_status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="codeId != null" >
+        #{codeId,jdbcType=INTEGER},
+      </if>
+      <if test="ptUserId != null" >
+        #{ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="ptManagerId != null" >
+        #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="ptBuildId != null" >
+        #{ptBuildId,jdbcType=INTEGER},
+      </if>
+      <if test="ptRoomId != null" >
+        #{ptRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="ptLockId != null" >
+        #{ptLockId,jdbcType=INTEGER},
+      </if>
+      <if test="managerName != null" >
+        #{managerName,jdbcType=VARCHAR},
+      </if>
+      <if test="buildName != null" >
+        #{buildName,jdbcType=VARCHAR},
+      </if>
+      <if test="roomNum != null" >
+        #{roomNum,jdbcType=VARCHAR},
+      </if>
+      <if test="visitorName != null" >
+        #{visitorName,jdbcType=VARCHAR},
+      </if>
+      <if test="visitorTelephone != null" >
+        #{visitorTelephone,jdbcType=VARCHAR},
+      </if>
+      <if test="visitorPassword != null" >
+        #{visitorPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="visitorValidityTimeStart != null" >
+        #{visitorValidityTimeStart,jdbcType=VARCHAR},
+      </if>
+      <if test="visitorValidityTimeEnd != null" >
+        #{visitorValidityTimeEnd,jdbcType=VARCHAR},
+      </if>
+      <if test="vitsitStatus != null" >
+        #{vitsitStatus,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  
+  <!--  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.VisitorCode" >
+    insert into visitor_code (code_id, pt_user_id, pt_manager_id, 
+      pt_build_id, pt_room_id, manager_name, 
+      build_name, room_num, visitor_name, 
+      visitor_telephone, visitor_password, visitor_validity_time_start, 
+      visitor_validity_time_end, vitsit_status)
+    values (#{codeId,jdbcType=INTEGER}, #{ptUserId,jdbcType=INTEGER}, #{ptManagerId,jdbcType=INTEGER}, 
+      #{ptBuildId,jdbcType=INTEGER}, #{ptRoomId,jdbcType=INTEGER}, #{managerName,jdbcType=VARCHAR}, 
+      #{buildName,jdbcType=VARCHAR}, #{roomNum,jdbcType=VARCHAR}, #{visitorName,jdbcType=VARCHAR}, 
+      #{visitorTelephone,jdbcType=VARCHAR}, #{visitorPassword,jdbcType=VARCHAR}, #{visitorValidityTimeStart,jdbcType=TIMESTAMP}, 
+      #{visitorValidityTimeEnd,jdbcType=VARCHAR}, #{vitsitStatus,jdbcType=TINYINT})
+  </insert> -->
+  <!-- <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.VisitorCode" >
+    update visitor_code
+    <set >
+      <if test="ptUserId != null" >
+        pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="ptManagerId != null" >
+        pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="ptBuildId != null" >
+        pt_build_id = #{ptBuildId,jdbcType=INTEGER},
+      </if>
+      <if test="ptRoomId != null" >
+        pt_room_id = #{ptRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="managerName != null" >
+        manager_name = #{managerName,jdbcType=VARCHAR},
+      </if>
+      <if test="buildName != null" >
+        build_name = #{buildName,jdbcType=VARCHAR},
+      </if>
+      <if test="roomNum != null" >
+        room_num = #{roomNum,jdbcType=VARCHAR},
+      </if>
+      <if test="visitorName != null" >
+        visitor_name = #{visitorName,jdbcType=VARCHAR},
+      </if>
+      <if test="visitorTelephone != null" >
+        visitor_telephone = #{visitorTelephone,jdbcType=VARCHAR},
+      </if>
+      <if test="visitorPassword != null" >
+        visitor_password = #{visitorPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="visitorValidityTimeStart != null" >
+        visitor_validity_time_start = #{visitorValidityTimeStart,jdbcType=VARCHAR},
+      </if>
+      <if test="visitorValidityTimeEnd != null" >
+        visitor_validity_time_end = #{visitorValidityTimeEnd,jdbcType=VARCHAR},
+      </if>
+      <if test="vitsitStatus != null" >
+        vitsit_status = #{vitsitStatus,jdbcType=TINYINT},
+      </if>
+    </set>
+    where code_id = #{codeId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.VisitorCode" >
+    update visitor_code
+    set pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      pt_build_id = #{ptBuildId,jdbcType=INTEGER},
+      pt_room_id = #{ptRoomId,jdbcType=INTEGER},
+      manager_name = #{managerName,jdbcType=VARCHAR},
+      build_name = #{buildName,jdbcType=VARCHAR},
+      room_num = #{roomNum,jdbcType=VARCHAR},
+      visitor_name = #{visitorName,jdbcType=VARCHAR},
+      visitor_telephone = #{visitorTelephone,jdbcType=VARCHAR},
+      visitor_password = #{visitorPassword,jdbcType=VARCHAR},
+      visitor_validity_time_start = #{visitorValidityTimeStart,jdbcType=VARCHAR},
+      visitor_validity_time_end = #{visitorValidityTimeEnd,jdbcType=VARCHAR},
+      vitsit_status = #{vitsitStatus,jdbcType=TINYINT}
+    where code_id = #{codeId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

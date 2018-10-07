@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.HireMapper">
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.Hire">
+		<id column="hire_id" property="hireId" jdbcType="INTEGER" />
+		<result column="hire_type" property="hireType" jdbcType="INTEGER" />
+		<result column="owner_name" property="ownerName" jdbcType="VARCHAR" />
+		<result column="owner_tele" property="ownerTele" jdbcType="VARCHAR" />
+		<result column="owner_type_number" property="ownerTypeNumber"
+			jdbcType="VARCHAR" />
+		<result column="renter_name" property="renterName" jdbcType="VARCHAR" />
+		<result column="renter_tele" property="renterTele" jdbcType="VARCHAR" />
+		<result column="hrie_time" property="hrieTime" jdbcType="VARCHAR" />
+		<result column="hrie_plot" property="hriePlot" jdbcType="VARCHAR" />
+		<result column="make_time" property="makeTime" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		hire_id, hire_type, owner_name, owner_tele,
+		owner_type_number, renter_name,
+		renter_tele,
+		hrie_time, hrie_plot,
+		make_time
+	</sql>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from hire
+		where hire_id = #{hireId,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from hire
+		where hire_id = #{hireId,jdbcType=INTEGER}
+	</delete>
+
+	<insert id="insert" parameterType="java.util.List">
+		insert into hire (hire_id,hire_type, owner_name,owner_tele,
+		owner_type_number, renter_name,renter_tele, hrie_time, hrie_plot,
+		make_time)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.hireId},#{item.hireType},#{item.ownerName},#{item.ownerTele},
+			#{item.ownerTypeNumber},#{item.renterName},#{item.renterTele},
+			#{item.hrieTime},#{item.hriePlot},#{item.makeTime})
+		</foreach>
+	</insert>
+
+
+	<update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.Hire">
+		update hire
+		set
+		hire_type = #{hireType,jdbcType=INTEGER},
+		owner_name =
+		#{ownerName,jdbcType=VARCHAR},
+		owner_tele =
+		#{ownerTele,jdbcType=VARCHAR},
+		owner_type_number =
+		#{ownerTypeNumber,jdbcType=VARCHAR},
+		renter_name =
+		#{renterName,jdbcType=VARCHAR},
+		renter_tele =
+		#{renterTele,jdbcType=VARCHAR},
+		hrie_time =
+		#{hrieTime,jdbcType=VARCHAR},
+		hrie_plot = #{hriePlot,jdbcType=VARCHAR},
+		make_time = #{makeTime,jdbcType=VARCHAR}
+		where hire_id =
+		#{hireId,jdbcType=INTEGER}
+	</update>
+	<!-- 分页获取租售登记 -->
+	<select id="selectHireByPage" resultMap="BaseResultMap"
+		parameterType="com.zeng.ezsh.wy.entity.Page">
+		select
+		<include refid="Base_Column_List" />
+		from hire
+		where hire_id > 0
+		<if test="paramEntity!=null and paramEntity.hireType!=0">and
+			hire_type= #{paramEntity.hireType}</if>
+		<if test="paramEntity!=null and paramEntity.hireType==0"> and
+			hire_type >0</if>
+		<if test="paramEntity!=null and paramEntity.hriePlot!=null">and hrie_plot= #{paramEntity.hriePlot}</if>
+		<if test="paramEntity!=null and paramEntity.hriePlot==null"> and
+			hrie_plot >0</if>
+		order by make_time DESC
+		<if test="page> 0">
+			limit #{start},#{rows}
+		</if>
+	</select>
+	<select id="getCount" resultType="java.lang.Integer"
+		parameterType="com.zeng.ezsh.wy.entity.Page">
+		select
+		count(*)
+		from hire
+		where 1=1
+		<if test="paramEntity!=null and paramEntity.hriePlot!=0"> and hrie_plot=#{paramEntity.hriePlot}</if>
+		<if test="paramEntity!=null and paramEntity.hireType!=0"> and hrie_plot=#{paramEntity.hireType}</if>
+	</select>
+</mapper>

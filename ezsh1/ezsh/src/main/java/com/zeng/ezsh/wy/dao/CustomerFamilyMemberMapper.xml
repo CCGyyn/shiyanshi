@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.CustomerFamilyMemberMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.CustomerFamilyMember" >
+    <id column="family_member_id" property="familyMemberId" jdbcType="INTEGER" />
+    <result column="pt_manager_id" property="ptManagerId" jdbcType="INTEGER" />
+    <result column="pt_room_id" property="ptRoomId" jdbcType="INTEGER" />
+    <result column="pt_customer_id" property="ptCustomerId" jdbcType="INTEGER" />
+    <result column="family_member_name" property="familyMemberName" jdbcType="VARCHAR" />
+    <result column="family_member_sex" property="familyMemberSex" jdbcType="VARCHAR" />
+    <result column="family_member_id_card" property="familyMemberIdCard" jdbcType="VARCHAR" />
+    <result column="family_member_telephone" property="familyMemberTelephone" jdbcType="VARCHAR" />
+    <result column="family_member_reside_classify" property="familyMemberResideClassify" jdbcType="TINYINT" />
+    <result column="family_member_relationship" property="familyMemberRelationship" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    family_member_id, pt_manager_id, pt_room_id, pt_customer_id, family_member_name, 
+    family_member_sex, family_member_id_card, family_member_telephone, family_member_reside_classify, 
+    family_member_relationship
+  </sql>
+<!--   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.CustomerFamilyMemberExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from customer_family_member
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from customer_family_member
+    where family_member_id = #{familyMemberId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from customer_family_member
+    where family_member_id = #{familyMemberId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.zeng.ezsh.wy.entity.CustomerFamilyMemberExample" >
+    delete from customer_family_member
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.CustomerFamilyMember" >
+    insert into customer_family_member (family_member_id, pt_manager_id, pt_room_id, 
+      pt_customer_id, family_member_name, family_member_sex, 
+      family_member_id_card, family_member_telephone, 
+      family_member_reside_classify, family_member_relationship
+      )
+    values (#{familyMemberId,jdbcType=INTEGER}, #{ptManagerId,jdbcType=INTEGER}, #{ptRoomId,jdbcType=INTEGER}, 
+      #{ptCustomerId,jdbcType=INTEGER}, #{familyMemberName,jdbcType=VARCHAR}, #{familyMemberSex,jdbcType=VARCHAR}, 
+      #{familyMemberIdCard,jdbcType=VARCHAR}, #{familyMemberTelephone,jdbcType=VARCHAR}, 
+      #{familyMemberResideClassify,jdbcType=TINYINT}, #{familyMemberRelationship,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.CustomerFamilyMember" >
+    insert into customer_family_member
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="familyMemberId != null" >
+        family_member_id,
+      </if>
+      <if test="ptManagerId != null" >
+        pt_manager_id,
+      </if>
+      <if test="ptRoomId != null" >
+        pt_room_id,
+      </if>
+      <if test="ptCustomerId != null" >
+        pt_customer_id,
+      </if>
+      <if test="familyMemberName != null" >
+        family_member_name,
+      </if>
+      <if test="familyMemberSex != null" >
+        family_member_sex,
+      </if>
+      <if test="familyMemberIdCard != null" >
+        family_member_id_card,
+      </if>
+      <if test="familyMemberTelephone != null" >
+        family_member_telephone,
+      </if>
+      <if test="familyMemberResideClassify != null" >
+        family_member_reside_classify,
+      </if>
+      <if test="familyMemberRelationship != null" >
+        family_member_relationship,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="familyMemberId != null" >
+        #{familyMemberId,jdbcType=INTEGER},
+      </if>
+      <if test="ptManagerId != null" >
+        #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="ptRoomId != null" >
+        #{ptRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="ptCustomerId != null" >
+        #{ptCustomerId,jdbcType=INTEGER},
+      </if>
+      <if test="familyMemberName != null" >
+        #{familyMemberName,jdbcType=VARCHAR},
+      </if>
+      <if test="familyMemberSex != null" >
+        #{familyMemberSex,jdbcType=VARCHAR},
+      </if>
+      <if test="familyMemberIdCard != null" >
+        #{familyMemberIdCard,jdbcType=VARCHAR},
+      </if>
+      <if test="familyMemberTelephone != null" >
+        #{familyMemberTelephone,jdbcType=VARCHAR},
+      </if>
+      <if test="familyMemberResideClassify != null" >
+        #{familyMemberResideClassify,jdbcType=TINYINT},
+      </if>
+      <if test="familyMemberRelationship != null" >
+        #{familyMemberRelationship,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.CustomerFamilyMemberExample" resultType="java.lang.Integer" >
+    select count(*) from customer_family_member
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update customer_family_member
+    <set >
+      <if test="record.familyMemberId != null" >
+        family_member_id = #{record.familyMemberId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptManagerId != null" >
+        pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptRoomId != null" >
+        pt_room_id = #{record.ptRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptCustomerId != null" >
+        pt_customer_id = #{record.ptCustomerId,jdbcType=INTEGER},
+      </if>
+      <if test="record.familyMemberName != null" >
+        family_member_name = #{record.familyMemberName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.familyMemberSex != null" >
+        family_member_sex = #{record.familyMemberSex,jdbcType=VARCHAR},
+      </if>
+      <if test="record.familyMemberIdCard != null" >
+        family_member_id_card = #{record.familyMemberIdCard,jdbcType=VARCHAR},
+      </if>
+      <if test="record.familyMemberTelephone != null" >
+        family_member_telephone = #{record.familyMemberTelephone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.familyMemberResideClassify != null" >
+        family_member_reside_classify = #{record.familyMemberResideClassify,jdbcType=TINYINT},
+      </if>
+      <if test="record.familyMemberRelationship != null" >
+        family_member_relationship = #{record.familyMemberRelationship,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update customer_family_member
+    set family_member_id = #{record.familyMemberId,jdbcType=INTEGER},
+      pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      pt_room_id = #{record.ptRoomId,jdbcType=INTEGER},
+      pt_customer_id = #{record.ptCustomerId,jdbcType=INTEGER},
+      family_member_name = #{record.familyMemberName,jdbcType=VARCHAR},
+      family_member_sex = #{record.familyMemberSex,jdbcType=VARCHAR},
+      family_member_id_card = #{record.familyMemberIdCard,jdbcType=VARCHAR},
+      family_member_telephone = #{record.familyMemberTelephone,jdbcType=VARCHAR},
+      family_member_reside_classify = #{record.familyMemberResideClassify,jdbcType=TINYINT},
+      family_member_relationship = #{record.familyMemberRelationship,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.CustomerFamilyMember" >
+    update customer_family_member
+    <set >
+      <if test="ptManagerId != null" >
+        pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="ptRoomId != null" >
+        pt_room_id = #{ptRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="ptCustomerId != null" >
+        pt_customer_id = #{ptCustomerId,jdbcType=INTEGER},
+      </if>
+      <if test="familyMemberName != null" >
+        family_member_name = #{familyMemberName,jdbcType=VARCHAR},
+      </if>
+      <if test="familyMemberSex != null" >
+        family_member_sex = #{familyMemberSex,jdbcType=VARCHAR},
+      </if>
+      <if test="familyMemberIdCard != null" >
+        family_member_id_card = #{familyMemberIdCard,jdbcType=VARCHAR},
+      </if>
+      <if test="familyMemberTelephone != null" >
+        family_member_telephone = #{familyMemberTelephone,jdbcType=VARCHAR},
+      </if>
+      <if test="familyMemberResideClassify != null" >
+        family_member_reside_classify = #{familyMemberResideClassify,jdbcType=TINYINT},
+      </if>
+      <if test="familyMemberRelationship != null" >
+        family_member_relationship = #{familyMemberRelationship,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where family_member_id = #{familyMemberId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.CustomerFamilyMember" >
+    update customer_family_member
+    set pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      pt_room_id = #{ptRoomId,jdbcType=INTEGER},
+      pt_customer_id = #{ptCustomerId,jdbcType=INTEGER},
+      family_member_name = #{familyMemberName,jdbcType=VARCHAR},
+      family_member_sex = #{familyMemberSex,jdbcType=VARCHAR},
+      family_member_id_card = #{familyMemberIdCard,jdbcType=VARCHAR},
+      family_member_telephone = #{familyMemberTelephone,jdbcType=VARCHAR},
+      family_member_reside_classify = #{familyMemberResideClassify,jdbcType=TINYINT},
+      family_member_relationship = #{familyMemberRelationship,jdbcType=VARCHAR}
+    where family_member_id = #{familyMemberId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

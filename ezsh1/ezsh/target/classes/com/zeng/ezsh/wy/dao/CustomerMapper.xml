@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.CustomerMapper" >
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.Customer" >
+	  <id column="customer_id" property="customerId" jdbcType="INTEGER" />
+	  <result column="p_manager_id" property="pManagerId" jdbcType="INTEGER" />
+	  <result column="pt_build_id" property="ptBuildId" jdbcType="INTEGER" />
+	  <result column="p_room_id" property="pRoomId" jdbcType="INTEGER" />
+	  <result column="customer_name" property="customerName" jdbcType="VARCHAR" />
+	  <result column="customer_classify" property="customerClassify" jdbcType="TINYINT" />
+	  <result column="customer_telephone" property="customerTelephone" jdbcType="VARCHAR" />
+	  <result column="customer_check_in_time" property="customerCheckInTime" jdbcType="VARCHAR" />
+	  <result column="customer_id_card_number" property="customerIdCardNumber" jdbcType="VARCHAR" />
+	  <result column="charge_start_date" property="chargeStartDate" jdbcType="VARCHAR" />
+	  <result column="charge_end_date" property="chargeEndDate" jdbcType="VARCHAR" />
+	  <result column="contract_start_date" property="contractStartDate" jdbcType="VARCHAR" />
+	  <result column="contract_end_date" property="contractEndDate" jdbcType="VARCHAR" />
+	  <result column="reside_status" property="resideStatus" jdbcType="TINYINT" />
+	  <result column="remark" property="remark" jdbcType="VARCHAR" />
+	</resultMap>
+  
+	<!-- 获取房间客户档案列表 -->
+	<resultMap id="BaseResultMap_Archives" type="com.zeng.ezsh.wy.entity.Customer" extends="BaseResultMap">
+		<collection property="roomInfo" column="p_room_id" ofType="com.zeng.ezsh.wy.entity.Room" select="com.zeng.ezsh.wy.dao.RoomMapper.findRoomByRoomId">
+		</collection>
+	</resultMap>
+	
+	<sql id="Base_Column_List" >
+	  customer_id, p_manager_id, pt_build_id, p_room_id, customer_name, customer_classify, 
+	  customer_telephone, customer_check_in_time, customer_id_card_number, charge_start_date, 
+	  charge_end_date, contract_start_date, contract_end_date, reside_status, remark
+	</sql>
+	
+	<sql id="Base_Column_List_To_Customer_Check_In" >
+		r.room_id, r.manager_id, r.build_id, r.build_area, r.room_status, r.room_type, r.room_floor, r.room_num, 
+	  r.charge_man, r.room_use, r.decorate, r.position, r.toward, r.remark, r.rent, r.management_fee, r.single_price, 
+	  r.sum_price, r.is_agreement, r.contract, r.rent_status, r.effective_status, r.user_identity_card,
+	  c.customer_id, c.p_manager_id, c.pt_build_id, c.p_room_id, c.customer_name, c.customer_classify, 
+	  c.customer_telephone, c.customer_check_in_time, c.customer_id_card_number, c.charge_start_date, 
+	  c.charge_end_date, c.contract_start_date, c.contract_end_date, c.reside_status, c.remark
+	</sql>
+  
+	<!-- <sql id="Base_Column_List_To_Customer_Archives" >
+		r.room_id, r.manager_id, r.build_id, r.build_area, r.room_status, r.room_type, r.room_floor, r.room_num, 
+	  r.charge_man, r.room_use, r.decorate, r.position, r.toward, r.remark, r.rent, r.management_fee, r.single_price, 
+	  r.sum_price, r.is_agreement, r.contract, r.rent_status, r.effective_status, r.user_identity_card,
+	  c.customer_id, c.p_manager_id, c.p_room_id, 
+	  c.customer_name, c.customer_id, c.p_manager_id, c.p_room_id, c.customer_name, c.customer_classify, 
+	  c.customer_telephone, c.customer_check_in_time, c.customer_id_card_number, c.charge_start_date,c.charge_end_date, 
+	  c.contract_start_date, c.contract_end_date, c.remark
+	</sql> -->
+  
+	<!-- 登记房间客户资料 -->
+	<insert id="insert" parameterType="com.zeng.ezsh.wy.entity.Customer" >
+	  insert into customer (customer_id, p_manager_id, pt_build_id, p_room_id, 
+	    customer_name, customer_classify, customer_telephone, 
+	    customer_check_in_time, customer_id_card_number, 
+	    charge_start_date, charge_end_date, contract_start_date, 
+	    contract_end_date, remark)
+	  values (#{customerId,jdbcType=INTEGER}, #{pManagerId,jdbcType=INTEGER}, #{ptBuildId,jdbcType=INTEGER}, #{pRoomId,jdbcType=INTEGER}, 
+	    #{customerName,jdbcType=VARCHAR}, #{customerClassify,jdbcType=TINYINT}, #{customerTelephone,jdbcType=VARCHAR}, 
+	    #{customerCheckInTime,jdbcType=VARCHAR}, #{customerIdCardNumber,jdbcType=VARCHAR}, 
+	    #{chargeStartDate,jdbcType=VARCHAR}, #{chargeEndDate,jdbcType=VARCHAR}, #{contractStartDate,jdbcType=VARCHAR}, 
+	    #{contractEndDate,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR})
+	</insert>
+  
+	<!-- 获取房间客户迁入迁出管理列表（后台） -->
+	<select id="selectCustomerCheckInList" parameterType="com.zeng.ezsh.wy.entity.Room" resultMap="com.zeng.ezsh.wy.dao.RoomMapper.Customer_Emigrate" >
+	  select 
+	  <include refid="Base_Column_List_To_Customer_Check_In"></include> 
+	  from room r left join customer c
+	  on r.room_id=c.p_room_id and c.reside_status = 0
+	  <where>
+	  	<if test="managerId!=null">
+	  		and manager_id = #{managerId}
+	  	</if>
+	  	<if test="buildId!=null">
+	  		and build_id = #{buildId}
+	  	</if>
+	  	<if test="roomNum!=null and roomNum!=''">
+	  		and room_num like CONCAT('%',#{roomNum},'%')
+	  	</if>
+	  </where>
+	</select>
+  
+	<!-- 获取房间客户档案管理列表（后台） -->
+	<select id="selectCustomerArchivesList" parameterType="com.zeng.ezsh.wy.entity.Customer" resultMap="BaseResultMap_Archives" >
+		select 
+		<include refid="Base_Column_List"></include> 
+		from customer
+		<where>
+		 	customer_id > 0
+			<if test="pManagerId != null">	
+		       	and p_manager_id = #{pManagerId,jdbcType=INTEGER}
+			</if>
+			<if test="pRoomId != null" >
+		        and p_room_id = #{pRoomId,jdbcType=INTEGER}
+		    </if>
+		    <if test="ptBuildId != null">
+		  		and pt_build_id = #{ptBuildId,jdbcType=INTEGER}
+		  	</if>
+			<if test="customerName != null and customerName != ''">
+				and customer_name like CONCAT('%',#{customerName},'%' ) 
+			</if>
+		</where>
+	</select>
+  
+	<!-- 通过房间ID获取客户信息 -->
+	<select id="selectCustomerByRoomId" parameterType="java.lang.Integer" resultMap="BaseResultMap" >
+	  select 
+	  <include refid="Base_Column_List"></include> 
+	  from customer 
+	  where p_room_id=#{0} and reside_status = 0
+	</select>
+  
+	<!-- 更新客户档案资料 -->
+	<update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.Customer" >
+	  update customer
+	  <set >
+	    <if test="customerName != null" >
+	      customer_name = #{customerName,jdbcType=VARCHAR},
+	    </if>
+	    <if test="customerClassify != null and customerClassify!=0 " >
+	      customer_classify = #{customerClassify,jdbcType=TINYINT},
+	    </if>
+	    <if test="customerTelephone != null" >
+	      customer_telephone = #{customerTelephone,jdbcType=VARCHAR},
+	    </if>
+	    <if test="customerCheckInTime != null" >
+	      customer_check_in_time = #{customerCheckInTime,jdbcType=VARCHAR},
+	    </if>
+	    <if test="customerIdCardNumber != null" >
+	      customer_id_card_number = #{customerIdCardNumber,jdbcType=VARCHAR},
+	    </if>
+	    <if test="chargeStartDate != null" >
+	      charge_start_date = #{chargeStartDate,jdbcType=VARCHAR},
+	    </if>
+	    <if test="chargeEndDate != null" >
+	      charge_end_date = #{chargeEndDate,jdbcType=VARCHAR},
+	    </if>
+	    <if test="contractStartDate != null" >
+	      contract_start_date = #{contractStartDate,jdbcType=VARCHAR},
+	    </if>
+	    <if test="contractEndDate != null" >
+	      contract_end_date = #{contractEndDate,jdbcType=VARCHAR},
+	    </if>
+	  </set>
+	  where customer_id = #{customerId,jdbcType=INTEGER}
+	</update>
+ 	
+ 	<!-- 迁出客户 -->
+	<update id="checkOut" parameterType="com.zeng.ezsh.wy.entity.Customer" >
+	  update customer
+	  set reside_status = #{resideStatus,jdbcType=TINYINT}
+	  where customer_id = #{customerId,jdbcType=INTEGER}
+	</update>
+	
+	<!-- <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.CustomerExample" >
+	  select
+	  <if test="distinct" >
+	    distinct
+	  </if>
+	  <include refid="Base_Column_List" />
+	  from customer
+	  <if test="_parameter != null" >
+	    <include refid="Example_Where_Clause" />
+	  </if>
+	  <if test="orderByClause != null" >
+	    order by ${orderByClause}
+	  </if>
+	</select>
+  
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+	  select 
+	  <include refid="Base_Column_List" />
+	  from customer
+	  where customer_id = #{customerId,jdbcType=INTEGER}
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+	  delete from customer
+	  where customer_id = #{customerId,jdbcType=INTEGER}
+	</delete>
+
+ 
+  
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.Customer" >
+    insert into customer
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="customerId != null" >
+        customer_id,
+      </if>
+      <if test="pManagerId != null" >
+        p_manager_id,
+      </if>
+      <if test="pRoomId != null" >
+        p_room_id,
+      </if>
+      <if test="customerName != null" >
+        customer_name,
+      </if>
+      <if test="customerClassify != null" >
+        customer_classify,
+      </if>
+      <if test="customerTelephone != null" >
+        customer_telephone,
+      </if>
+      <if test="customerCheckInTime != null" >
+        customer_check_in_time,
+      </if>
+      <if test="customerIdCardNumber != null" >
+        customer_id_card_number,
+      </if>
+      <if test="contractStartDate != null" >
+        contract_start_date,
+      </if>
+      <if test="contractEndDate != null" >
+        contract_end_date,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="customerId != null" >
+        #{customerId,jdbcType=INTEGER},
+      </if>
+      <if test="pManagerId != null" >
+        #{pManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="pRoomId != null" >
+        #{pRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="customerName != null" >
+        #{customerName,jdbcType=VARCHAR},
+      </if>
+      <if test="customerClassify != null" >
+        #{customerClassify,jdbcType=TINYINT},
+      </if>
+      <if test="customerTelephone != null" >
+        #{customerTelephone,jdbcType=VARCHAR},
+      </if>
+      <if test="customerCheckInTime != null" >
+        #{customerCheckInTime,jdbcType=VARCHAR},
+      </if>
+      <if test="customerIdCardNumber != null" >
+        #{customerIdCardNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="contractStartDate != null" >
+        #{contractStartDate,jdbcType=VARCHAR},
+      </if>
+      <if test="contractEndDate != null" >
+        #{contractEndDate,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateByExampleSelective" parameterType="map" >
+    update customer
+    <set >
+      <if test="record.customerId != null" >
+        customer_id = #{record.customerId,jdbcType=INTEGER},
+      </if>
+      <if test="record.pManagerId != null" >
+        p_manager_id = #{record.pManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="record.pRoomId != null" >
+        p_room_id = #{record.pRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="record.customerName != null" >
+        customer_name = #{record.customerName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.customerClassify != null" >
+        customer_classify = #{record.customerClassify,jdbcType=TINYINT},
+      </if>
+      <if test="record.customerTelephone != null" >
+        customer_telephone = #{record.customerTelephone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.customerCheckInTime != null" >
+        customer_check_in_time = #{record.customerCheckInTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.customerIdCardNumber != null" >
+        customer_id_card_number = #{record.customerIdCardNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contractStartDate != null" >
+        contract_start_date = #{record.contractStartDate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contractEndDate != null" >
+        contract_end_date = #{record.contractEndDate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  <update id="updateByExample" parameterType="map" >
+    update customer
+    set customer_id = #{record.customerId,jdbcType=INTEGER},
+      p_manager_id = #{record.pManagerId,jdbcType=INTEGER},
+      p_room_id = #{record.pRoomId,jdbcType=INTEGER},
+      customer_name = #{record.customerName,jdbcType=VARCHAR},
+      customer_classify = #{record.customerClassify,jdbcType=TINYINT},
+      customer_telephone = #{record.customerTelephone,jdbcType=VARCHAR},
+      customer_check_in_time = #{record.customerCheckInTime,jdbcType=VARCHAR},
+      customer_id_card_number = #{record.customerIdCardNumber,jdbcType=VARCHAR},
+      contract_start_date = #{record.contractStartDate,jdbcType=VARCHAR},
+      contract_end_date = #{record.contractEndDate,jdbcType=VARCHAR},
+      remark = #{record.remark,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  -->
+  <select id="getCustomerRoomid" parameterType="map" resultMap="BaseResultMap">
+  	select <include refid="Base_Column_List" /> from customer
+  	where customer_telephone = #{telephone}
+  </select>
+<!--   <select id="getCustomerById" parameterType="Integer" resultMap="BaseResultMap">
+  	select <include refid="Base_Column_List"></include>
+  	from customer where customer_id = #{ptUserId}
+  </select> -->
+  <select id="getCustomerByMBR" parameterType="map" resultMap="BaseResultMap">
+  	select <include refid="Base_Column_List"></include> from customer
+  	where p_manager_id = #{pManagerId} and
+  	pt_build_id = #{pBuildId} and
+  	p_room_id = #{pRoomId}
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+	  select 
+	  <include refid="Base_Column_List" />
+	  from customer
+	  where customer_id = #{customerId,jdbcType=INTEGER}
+	</select>
+</mapper>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.ChargeItemMapper" >
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.ChargeItem" >
+	  <id column="charge_id" property="chargeId" jdbcType="INTEGER" />
+	  <result column="p_manager_id" property="pManagerId" jdbcType="INTEGER" />
+	  <result column="charge_name" property="chargeName" jdbcType="VARCHAR" />
+	  <result column="charge_way" property="chargeWay" jdbcType="TINYINT" />
+	  <result column="charge_billing_way" property="chargeBillingWay" jdbcType="TINYINT" />
+	  <result column="charge_billing_unit_price" property="chargeBillingUnitPrice" jdbcType="DECIMAL" />
+	  <result column="charge_classify" property="chargeClassify" jdbcType="TINYINT" />
+	  <result column="charge_billing_cycle_count" property="chargeBillingCycleCount" jdbcType="INTEGER" />
+	  <result column="charge_billing_cycle_unit" property="chargeBillingCycleUnit" jdbcType="TINYINT" />
+	  <result column="charge_overdue_fine" property="chargeOverdueFine" jdbcType="DOUBLE" />
+	  <result column="print_order" property="printOrder" jdbcType="INTEGER" />
+	</resultMap>
+  
+	<sql id="Base_Column_List" >
+	  charge_id, p_manager_id, charge_name, charge_way, charge_billing_way, charge_billing_unit_price, 
+	  charge_classify, charge_billing_cycle_count, charge_billing_cycle_unit, charge_overdue_fine, 
+	  print_order
+	</sql>
+  
+	<!-- 添加收费项目 -->
+	<insert id="insert" parameterType="com.zeng.ezsh.wy.entity.ChargeItem" >
+	  insert into charge_item (charge_id, p_manager_id, charge_name, charge_way, 
+	    charge_billing_way, charge_billing_unit_price, 
+	    charge_classify, charge_billing_cycle_count, 
+	    charge_billing_cycle_unit, charge_overdue_fine, 
+	    print_order)
+	  values (#{chargeId,jdbcType=INTEGER}, #{pManagerId,jdbcType=INTEGER}, #{chargeName,jdbcType=VARCHAR}, #{chargeWay,jdbcType=TINYINT}, 
+	    #{chargeBillingWay,jdbcType=TINYINT}, #{chargeBillingUnitPrice,jdbcType=DECIMAL}, 
+	    #{chargeClassify,jdbcType=TINYINT}, #{chargeBillingCycleCount,jdbcType=INTEGER}, 
+	    #{chargeBillingCycleUnit,jdbcType=TINYINT}, #{chargeOverdueFine,jdbcType=DOUBLE}, 
+	    #{printOrder,jdbcType=INTEGER})
+	</insert>
+  
+	<!-- 条件查询收费项目(管理处ID、收费项目名查询) -->
+	<select id="selectByParam" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+	  select 
+	  <include refid="Base_Column_List" />
+	  from charge_item
+	  <where>
+	  	charge_id>0
+	  	<if test="chargeName!=null">
+	  	and charge_name like CONCAT('%',#{chargeName},'%' )
+	  	</if>
+	  	<if test="pManagerId!=null">
+	  	and p_manager_id =#{pManagerId,jdbcType=INTEGER}
+	  	</if>
+	  </where>
+	</select>
+    
+    <!-- 根据收费项目ID获取单个收费项目信息(后台嵌套查询) -->
+    <select id="selectChargeItemsById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+	    select 
+	    <include refid="Base_Column_List" />
+	    from charge_item
+	    <where>
+	    	charge_id=#{0}
+	    </where>
+  	</select>
+
+
+
+	<!--根据小区的id，获取计算费用为单价*度数的收费项目-->
+	<select id="selectByManagerId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		charge_item
+		WHERE
+		p_manager_id = #{managerId}
+		AND charge_billing_way = 2
+	</select>
+
+
+  	<!-- 检测收费项目名是否存在 -->
+  	<select id="checkChargeItemNameIsOnUse" parameterType="com.zeng.ezsh.wy.entity.ChargeItem" resultType="java.lang.Integer" >
+	    select count(*) from charge_item
+	    where charge_name = #{chargeName,jdbcType=VARCHAR} and p_manager_id =#{pManagerId,jdbcType=INTEGER}
+    </select>
+    
+    <!-- 检测打印次序是否存在 -->
+    <select id="checkChargeItemNamePrintOrderIsOnUse" parameterType="com.zeng.ezsh.wy.entity.ChargeItem" resultType="java.lang.Integer" >
+	    select count(*) from charge_item
+	    where p_manager_id =#{pManagerId,jdbcType=INTEGER}  and print_order = #{printOrder,jdbcType=INTEGER}
+    </select>
+    
+    <!-- 检测打印次序是否存在 -->
+    <select id="checkChargeItemNamePrintOrderIsOnUseOnUpdate" parameterType="com.zeng.ezsh.wy.entity.ChargeItem" resultType="java.lang.Integer" >
+	    select count(*) from charge_item
+	    where p_manager_id =#{pManagerId,jdbcType=INTEGER}  and print_order = #{printOrder,jdbcType=INTEGER}
+	    and charge_id != #{chargeId,jdbcType=INTEGER}
+    </select>
+    
+	<!--更新收费项目信息-->
+	<update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.ChargeItem" >
+		update charge_item
+		<set >
+		  <if test="chargeName != null" >
+		    charge_name = #{chargeName,jdbcType=VARCHAR},
+		  </if>
+		  <if test="chargeWay != null" >
+		    charge_way = #{chargeWay,jdbcType=TINYINT},
+		  </if>
+		  <if test="chargeBillingWay != null" >
+		    charge_billing_way = #{chargeBillingWay,jdbcType=TINYINT},
+		  </if>
+		  <if test="chargeBillingUnitPrice != null" >
+		    charge_billing_unit_price = #{chargeBillingUnitPrice,jdbcType=DECIMAL},
+		  </if>
+		  <if test="chargeClassify != null" >
+		    charge_classify = #{chargeClassify,jdbcType=TINYINT},
+		  </if>
+		  <if test="chargeBillingCycleCount != null" >
+		    charge_billing_cycle_count = #{chargeBillingCycleCount,jdbcType=INTEGER},
+		  </if>
+		  <if test="chargeBillingCycleUnit != null" >
+		    charge_billing_cycle_unit = #{chargeBillingCycleUnit,jdbcType=TINYINT},
+		  </if>
+		  <if test="chargeOverdueFine != null" >
+		    charge_overdue_fine = #{chargeOverdueFine,jdbcType=DOUBLE},
+		  </if>
+		  <if test="printOrder != null" >
+		    print_order = #{printOrder,jdbcType=INTEGER},
+		  </if>
+		</set>
+		where charge_id = #{chargeId,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 删除收费项目 -->
+    <delete id="delete" parameterType="com.zeng.ezsh.wy.entity.ChargeItem" >
+	    delete from charge_item
+	    where charge_id = #{chargeId,jdbcType=INTEGER} and p_manager_id =#{pManagerId,jdbcType=INTEGER}
+  	</delete>
+</mapper>

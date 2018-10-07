@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.WechatTokenMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.WechatToken" >
+    <id column="token_id" jdbcType="INTEGER" property="tokenId" />
+    <result column="expires_to_time" property="expiresToTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zeng.ezsh.wy.entity.WechatToken" extends="BaseResultMap" >
+    <result column="access_token" property="accessToken" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    token_id, expires_to_time
+  </sql>
+  <sql id="Blob_Column_List" >
+    access_token
+  </sql>
+  <!-- 获取接口调用凭据 -->
+  <select id="select" resultMap="ResultMapWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.WechatToken" >
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from wechat_token
+    where token_id = 1
+  </select>
+  
+  <!-- 更新接口调用凭据 -->
+  <update id="update" parameterType="com.zeng.ezsh.wy.entity.WechatToken" >
+    update wechat_token
+    <set >
+      <if test="expiresToTime != null" >
+        expires_to_time = #{expiresToTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="accessToken != null" >
+        access_token = #{accessToken,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where token_id = 1
+  </update>
+  
+</mapper>

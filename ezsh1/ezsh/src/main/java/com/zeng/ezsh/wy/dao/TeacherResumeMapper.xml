@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.TeacherResumeMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.TeacherResume" >
+    <id column="teacher_resume_id" property="teacherResumeId" jdbcType="INTEGER" />
+    <result column="pt_teacher_id" property="ptTeacherId" jdbcType="INTEGER" />
+    <result column="place_school" property="placeSchool" jdbcType="VARCHAR" />
+    <result column="work_province" property="workProvince" jdbcType="VARCHAR" />
+    <result column="work_city" property="workCity" jdbcType="VARCHAR" />
+    <result column="expect_course" property="expectCourse" jdbcType="VARCHAR" />
+    <result column="time_bucket" property="timeBucket" jdbcType="VARCHAR" />
+    <result column="expect_salary" property="expectSalary" jdbcType="DECIMAL" />
+  </resultMap>
+  
+  <resultMap id="ResultMapWithBLOBs" type="com.zeng.ezsh.wy.entity.TeacherResume" extends="BaseResultMap" >
+    <result column="other_explain" property="otherExplain" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  
+  <resultMap id="BaseResultMap_Teacher" type="com.zeng.ezsh.wy.entity.TeacherResume" extends="ResultMapWithBLOBs">
+    <collection property="teacherInfo" column="pt_teacher_id" select="com.zeng.ezsh.wy.dao.TeacherMapper.selectByTeacherId">
+       	
+    </collection>
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    teacher_resume_id, pt_teacher_id, place_school, work_province, work_city, expect_course, 
+    time_bucket, expect_salary
+  </sql>
+  <sql id="Blob_Column_List" >
+    other_explain
+  </sql>
+  
+  <!-- 获取家教老师需求列表（移动端） -->
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap_Teacher" parameterType="com.zeng.ezsh.wy.entity.TeacherResume" >
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from teacher_resume
+    <where>
+      <if test="placeSchool != null" >
+        and place_school like CONCAT('%',#{placeSchool},'%')
+      </if>
+      <if test="workProvince != null" >
+        and work_province like CONCAT('%',#{workProvince},'%')
+      </if>
+      <if test="workCity != null" >
+        and work_city like CONCAT('%',#{workCity},'%')
+      </if>
+      <if test="expectCourse != null" >
+        and expect_course like CONCAT('%',#{expectCourse},'%')
+      </if>
+    </where>
+  </select>
+  
+  <!-- 获取个人简历信息 -->
+  <select id="selectByteacherId" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from teacher_resume
+    <where>
+      pt_teacher_id = #{0}
+    </where>
+  </select>
+  
+  <!-- 添加个人简历 -->
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.TeacherResume" >
+    insert into teacher_resume
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="teacherResumeId != null" >
+        teacher_resume_id,
+      </if>
+      <if test="ptTeacherId != null" >
+        pt_teacher_id,
+      </if>
+      <if test="placeSchool != null" >
+        place_school,
+      </if>
+      <if test="workProvince != null" >
+        work_province,
+      </if>
+      <if test="workCity != null" >
+        work_city,
+      </if>
+      <if test="expectCourse != null" >
+        expect_course,
+      </if>
+      <if test="expectSalary != null" >
+        expect_salary,
+      </if>
+      <if test="timeBucket != null" >
+        time_bucket,
+      </if>
+      <if test="otherExplain != null" >
+        other_explain,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="teacherResumeId != null" >
+        #{teacherResumeId,jdbcType=INTEGER},
+      </if>
+      <if test="ptTeacherId != null" >
+        #{ptTeacherId,jdbcType=INTEGER},
+      </if>
+      <if test="placeSchool != null" >
+        #{placeSchool,jdbcType=VARCHAR},
+      </if>
+      <if test="workProvince != null" >
+        #{workProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="workCity != null" >
+        #{workCity,jdbcType=VARCHAR},
+      </if>
+      <if test="expectCourse != null" >
+        #{expectCourse,jdbcType=VARCHAR},
+      </if>
+      <if test="expectSalary != null" >
+        #{expectSalary,jdbcType=DECIMAL},
+      </if>
+      <if test="timeBucket != null" >
+        #{timeBucket,jdbcType=VARCHAR},
+      </if>
+      <if test="otherExplain != null" >
+        #{otherExplain,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 完善个人简历 -->
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.TeacherResume" >
+    update teacher_resume
+    <set >
+      <if test="ptTeacherId != null" >
+        pt_teacher_id = #{ptTeacherId,jdbcType=INTEGER},
+      </if>
+      <if test="placeSchool != null" >
+        place_school = #{placeSchool,jdbcType=VARCHAR},
+      </if>
+      <if test="workProvince != null" >
+        work_province = #{workProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="workCity != null" >
+        work_city = #{workCity,jdbcType=VARCHAR},
+      </if>
+      <if test="expectCourse != null" >
+        expect_course = #{expectCourse,jdbcType=VARCHAR},
+      </if>
+      <if test="expectSalary != null" >
+        expect_salary = #{expectSalary,jdbcType=DECIMAL},
+      </if>
+      <if test="timeBucket != null" >
+        time_bucket = #{timeBucket,jdbcType=VARCHAR},
+      </if>
+      <if test="otherExplain != null" >
+        other_explain = #{otherExplain,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where teacher_resume_id = #{teacherResumeId,jdbcType=INTEGER}
+  </update>
+  
+  <!-- <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.TeacherResumeExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from teacher_resume
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from teacher_resume
+    where teacher_resume_id = #{teacherResumeId,jdbcType=INTEGER}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from teacher_resume
+    where teacher_resume_id = #{teacherResumeId,jdbcType=INTEGER}
+  </delete>
+  
+  <delete id="deleteByExample" parameterType="com.zeng.ezsh.wy.entity.TeacherResumeExample" >
+    delete from teacher_resume
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.TeacherResume" >
+    insert into teacher_resume (teacher_resume_id, pt_teacher_id, place_school, 
+      work_province, work_city, expect_course, 
+      expect_salary, other_explain)
+    values (#{teacherResumeId,jdbcType=INTEGER}, #{ptTeacherId,jdbcType=INTEGER}, #{placeSchool,jdbcType=VARCHAR}, 
+      #{workProvince,jdbcType=VARCHAR}, #{workCity,jdbcType=VARCHAR}, #{expectCourse,jdbcType=VARCHAR}, 
+      #{expectSalary,jdbcType=DECIMAL}, #{otherExplain,jdbcType=LONGVARCHAR})
+  </insert>
+  
+  
+  
+  <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.TeacherResumeExample" resultType="java.lang.Integer" >
+    select count(*) from teacher_resume
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  
+  <update id="updateByExampleSelective" parameterType="map" >
+    update teacher_resume
+    <set >
+      <if test="record.teacherResumeId != null" >
+        teacher_resume_id = #{record.teacherResumeId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptTeacherId != null" >
+        pt_teacher_id = #{record.ptTeacherId,jdbcType=INTEGER},
+      </if>
+      <if test="record.placeSchool != null" >
+        place_school = #{record.placeSchool,jdbcType=VARCHAR},
+      </if>
+      <if test="record.workProvince != null" >
+        work_province = #{record.workProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="record.workCity != null" >
+        work_city = #{record.workCity,jdbcType=VARCHAR},
+      </if>
+      <if test="record.expectCourse != null" >
+        expect_course = #{record.expectCourse,jdbcType=VARCHAR},
+      </if>
+      <if test="record.expectSalary != null" >
+        expect_salary = #{record.expectSalary,jdbcType=DECIMAL},
+      </if>
+      <if test="record.otherExplain != null" >
+        other_explain = #{record.otherExplain,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update teacher_resume
+    set teacher_resume_id = #{record.teacherResumeId,jdbcType=INTEGER},
+      pt_teacher_id = #{record.ptTeacherId,jdbcType=INTEGER},
+      place_school = #{record.placeSchool,jdbcType=VARCHAR},
+      work_province = #{record.workProvince,jdbcType=VARCHAR},
+      work_city = #{record.workCity,jdbcType=VARCHAR},
+      expect_course = #{record.expectCourse,jdbcType=VARCHAR},
+      expect_salary = #{record.expectSalary,jdbcType=DECIMAL},
+      other_explain = #{record.otherExplain,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  <update id="updateByExample" parameterType="map" >
+    update teacher_resume
+    set teacher_resume_id = #{record.teacherResumeId,jdbcType=INTEGER},
+      pt_teacher_id = #{record.ptTeacherId,jdbcType=INTEGER},
+      place_school = #{record.placeSchool,jdbcType=VARCHAR},
+      work_province = #{record.workProvince,jdbcType=VARCHAR},
+      work_city = #{record.workCity,jdbcType=VARCHAR},
+      expect_course = #{record.expectCourse,jdbcType=VARCHAR},
+      expect_salary = #{record.expectSalary,jdbcType=DECIMAL}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.TeacherResume" >
+    update teacher_resume
+    set pt_teacher_id = #{ptTeacherId,jdbcType=INTEGER},
+      place_school = #{placeSchool,jdbcType=VARCHAR},
+      work_province = #{workProvince,jdbcType=VARCHAR},
+      work_city = #{workCity,jdbcType=VARCHAR},
+      expect_course = #{expectCourse,jdbcType=VARCHAR},
+      expect_salary = #{expectSalary,jdbcType=DECIMAL},
+      other_explain = #{otherExplain,jdbcType=LONGVARCHAR}
+    where teacher_resume_id = #{teacherResumeId,jdbcType=INTEGER}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.TeacherResume" >
+    update teacher_resume
+    set pt_teacher_id = #{ptTeacherId,jdbcType=INTEGER},
+      place_school = #{placeSchool,jdbcType=VARCHAR},
+      work_province = #{workProvince,jdbcType=VARCHAR},
+      work_city = #{workCity,jdbcType=VARCHAR},
+      expect_course = #{expectCourse,jdbcType=VARCHAR},
+      expect_salary = #{expectSalary,jdbcType=DECIMAL}
+    where teacher_resume_id = #{teacherResumeId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

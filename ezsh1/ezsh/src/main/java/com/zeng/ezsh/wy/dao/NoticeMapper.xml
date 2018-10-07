@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.NoticeMapper" >
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.Notice" >
+	  <id column="notice_id" property="noticeId" jdbcType="INTEGER" />
+	  <result column="pt_manager_id" property="ptManagerId" jdbcType="INTEGER" />
+	  <result column="manager_name" property="managerName" jdbcType="VARCHAR" />
+	  <result column="notice_title" property="noticeTitle" jdbcType="VARCHAR" />
+	  <result column="notice_time" property="noticeTime" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap id="ResultMapWithBLOBs" type="com.zeng.ezsh.wy.entity.Notice" extends="BaseResultMap" >
+	  <result column="notice_content" property="noticeContent" jdbcType="LONGVARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List" >
+	  notice_id, pt_manager_id, manager_name, notice_title, notice_time
+	</sql>
+	<sql id="Blob_Column_List" >
+	  notice_content
+	</sql>
+  
+  	<!-- 添加公告信息 -->
+  	<insert id="insert" parameterType="com.zeng.ezsh.wy.entity.Notice" >
+	insert into notice (notice_id, pt_manager_id, manager_name, notice_title, 
+	  notice_time, notice_content)
+	values (#{noticeId,jdbcType=INTEGER}, #{ptManagerId,jdbcType=INTEGER}, #{managerName,jdbcType=VARCHAR}, 
+	#{noticeTitle,jdbcType=VARCHAR}, #{noticeTime,jdbcType=VARCHAR}, #{noticeContent,jdbcType=LONGVARCHAR})
+  	</insert>
+  	
+  	<!-- 删除公告信息 -->
+  	<delete id="deleteByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.Notice" >
+    delete from notice
+    where notice_id = #{noticeId,jdbcType=INTEGER}
+  	</delete>
+  	
+  	<!-- 获取公告信息列表 -->
+	<select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.Notice" >
+	  select
+	  <include refid="Base_Column_List" />
+	  ,
+	  <include refid="Blob_Column_List" />
+	  from notice
+	  <where>
+		<if test="ptManagerId != null" >
+		   and pt_manager_id = #{ptManagerId,jdbcType=INTEGER}
+		</if>
+		<if test="noticeTitle != null" >
+	      and notice_title like CONCAT('%',#{noticeTitle},'%')
+	    </if>
+	  </where>
+	</select>
+	
+  	<!-- 更新公告信息 -->
+	<update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.Notice" >
+	  update notice
+	  <set >
+	    <if test="ptManagerId != null" >
+	      pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+	    </if>
+	    <if test="managerName != null" >
+	      manager_name = #{managerName,jdbcType=VARCHAR},
+	    </if>
+	    <if test="noticeTitle != null" >
+	      notice_title = #{noticeTitle,jdbcType=VARCHAR},
+	    </if>
+	    <!-- <if test="noticeTime != null" >
+	      notice_time = #{noticeTime,jdbcType=VARCHAR},
+	    </if> -->
+	    <if test="noticeContent != null" >
+	      notice_content = #{noticeContent,jdbcType=LONGVARCHAR},
+	    </if>
+	  </set>
+	  where notice_id = #{noticeId,jdbcType=INTEGER}
+	</update>
+	
+  <!-- 
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.NoticeExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from notice
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from notice
+    where notice_id = #{noticeId,jdbcType=INTEGER}
+  </select>
+  
+  <delete id="deleteByExample" parameterType="com.zeng.ezsh.wy.entity.NoticeExample" >
+    delete from notice
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.Notice" >
+    insert into notice
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="noticeId != null" >
+        notice_id,
+      </if>
+      <if test="ptManagerId != null" >
+        pt_manager_id,
+      </if>
+      <if test="noticeTitle != null" >
+        notice_title,
+      </if>
+      <if test="noticeTime != null" >
+        notice_time,
+      </if>
+      <if test="noticeContent != null" >
+        notice_content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="noticeId != null" >
+        #{noticeId,jdbcType=INTEGER},
+      </if>
+      <if test="ptManagerId != null" >
+        #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="noticeTitle != null" >
+        #{noticeTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="noticeTime != null" >
+        #{noticeTime,jdbcType=VARCHAR},
+      </if>
+      <if test="noticeContent != null" >
+        #{noticeContent,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.NoticeExample" resultType="java.lang.Integer" >
+    select count(*) from notice
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update notice
+    <set >
+      <if test="record.noticeId != null" >
+        notice_id = #{record.noticeId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptManagerId != null" >
+        pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="record.noticeTitle != null" >
+        notice_title = #{record.noticeTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="record.noticeTime != null" >
+        notice_time = #{record.noticeTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.noticeContent != null" >
+        notice_content = #{record.noticeContent,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update notice
+    set notice_id = #{record.noticeId,jdbcType=INTEGER},
+      pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      notice_title = #{record.noticeTitle,jdbcType=VARCHAR},
+      notice_time = #{record.noticeTime,jdbcType=VARCHAR},
+      notice_content = #{record.noticeContent,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update notice
+    set notice_id = #{record.noticeId,jdbcType=INTEGER},
+      pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      notice_title = #{record.noticeTitle,jdbcType=VARCHAR},
+      notice_time = #{record.noticeTime,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.Notice" >
+    update notice
+    set pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      notice_title = #{noticeTitle,jdbcType=VARCHAR},
+      notice_time = #{noticeTime,jdbcType=VARCHAR},
+      notice_content = #{noticeContent,jdbcType=LONGVARCHAR}
+    where notice_id = #{noticeId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.Notice" >
+    update notice
+    set pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      notice_title = #{noticeTitle,jdbcType=VARCHAR},
+      notice_time = #{noticeTime,jdbcType=VARCHAR}
+    where notice_id = #{noticeId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.HkItemMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.HkItem" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="hk_id" property="hkId" jdbcType="INTEGER" />
+    <result column="type_id" property="typeId" jdbcType="INTEGER" />
+    <result column="item" property="item" jdbcType="VARCHAR" />
+    <result column="item_property" property="itemProperty" jdbcType="VARCHAR" />
+    <result column="price" property="price" jdbcType="DECIMAL" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ItemMap" type="com.zeng.ezsh.wy.entity.HkItem" >
+    <result column="item" property="item" jdbcType="VARCHAR" />
+    <result column="item_property" property="itemProperty" jdbcType="VARCHAR" />
+    <result column="price" property="price" jdbcType="DECIMAL" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, hk_id, type_id, item, item_property, price, comment, img
+  </sql>
+  <sql id="Item_List" >
+  	item, item_property, price, comment
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from hk_item
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from hk_item
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.HkItem" >
+    insert into hk_item (id, hk_id, type_id, 
+      item, item_property, price, 
+      comment, img)
+    values (#{id,jdbcType=INTEGER}, #{hkId,jdbcType=INTEGER}, #{typeId,jdbcType=INTEGER}, 
+      #{item,jdbcType=VARCHAR}, #{itemProperty,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, 
+      #{comment,jdbcType=VARCHAR}, #{img,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.HkItem" >
+    insert into hk_item
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="hkId != 0" >
+        hk_id,
+      </if>
+      <if test="typeId != 0" >
+        type_id,
+      </if>
+      <if test="item != null" >
+        item,
+      </if>
+      <if test="itemProperty != null" >
+        item_property,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+      <if test="comment != null" >
+        comment,
+      </if>
+     
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+     
+      <if test="hkId != 0" >
+        #{hkId,jdbcType=INTEGER},
+      </if>
+      <if test="typeId != 0" >
+        #{typeId,jdbcType=INTEGER},
+      </if>
+      <if test="item != null" >
+        #{item,jdbcType=VARCHAR},
+      </if>
+      <if test="itemProperty != null" >
+        #{itemProperty,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="comment != null" >
+        #{comment,jdbcType=VARCHAR},
+      </if>
+      
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.HkItem" >
+    update hk_item
+    <set >
+      <if test="hkId != null" >
+        hk_id = #{hkId,jdbcType=INTEGER},
+      </if>
+      <if test="typeId != null" >
+        type_id = #{typeId,jdbcType=INTEGER},
+      </if>
+      <if test="item != null" >
+        item = #{item,jdbcType=VARCHAR},
+      </if>
+      <if test="itemProperty != null" >
+        item_property = #{itemProperty,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="comment != null" >
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="img != null" >
+        img = #{img,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.HkItem" >
+    update hk_item
+    set hk_id = #{hkId,jdbcType=INTEGER},
+      type_id = #{typeId,jdbcType=INTEGER},
+      item = #{item,jdbcType=VARCHAR},
+      item_property = #{itemProperty,jdbcType=VARCHAR},
+      price = #{price,jdbcType=DECIMAL},
+      comment = #{comment,jdbcType=VARCHAR},
+      img = #{img,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!-- 根据id和typeId查询项目 -->
+  <select id="getHkItemById" parameterType="map" resultMap="BaseResultMap">
+  	select
+  	<include refid="Base_Column_List" />
+    from hk_item
+    where id = #{id} and type_id = #{typeId}
+  </select>
+  <!-- 分页获取项目列表 -->
+  <select id="getItemList" parameterType="map" resultMap="BaseResultMap">
+  	select
+  	<include refid="Base_Column_List" />
+    from hk_item
+   	limit #{start},#{pagesize}
+  </select>
+  <!-- 根据服务类型id获取服务项目 -->
+  <select id="getItemByHkType" parameterType="int" resultMap="ItemMap">
+  	select 
+  	<include refid="Item_List" />
+    from hk_item
+    where type_id = #{typeId}
+  </select>
+</mapper>

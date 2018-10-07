@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.HousekeepingMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.Housekeeping" >
+    <id column="hk_id" property="hkId" jdbcType="INTEGER" />
+    <result column="community_id" property="communityId"></result>
+    <result column="hk_name" property="hkName" jdbcType="VARCHAR" />
+    <result column="hk_leader" property="hkLeader" jdbcType="VARCHAR" />
+    <result column="hk_phone" property="hkPhone" jdbcType="VARCHAR" />
+    <result column="hk_staff" property="hkStaff" jdbcType="INTEGER" />
+    <result column="introduction" property="introduction" jdbcType="VARCHAR"></result>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    hk_id,community_id, hk_name, hk_leader, hk_phone, hk_staff, introduction
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from housekeeping
+    where hk_id = #{hkId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from housekeeping
+    where hk_id = #{hkId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.Housekeeping" >
+    insert into housekeeping ( community_id,hk_name, hk_leader, 
+      hk_phone, hk_staff)
+    values (#{communityId,jdbcType=INTEGER} #{hkName,jdbcType=VARCHAR}, #{hkLeader,jdbcType=VARCHAR}, 
+      #{hkPhone,jdbcType=VARCHAR}, #{hkStaff,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.Housekeeping" >
+    insert into housekeeping
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="hkId != null" >
+        hk_id,
+      </if>
+     <if test="communityId != null">
+      	community_id,
+     </if>
+      <if test="hkName != null" >
+        hk_name,
+      </if>
+      <if test="hkLeader != null" >
+        hk_leader,
+      </if>
+      <if test="hkPhone != null" >
+        hk_phone,
+      </if>
+      <if test="hkStaff != null" >
+        hk_staff,
+      </if>
+      <if test="introduction != null">
+      	introduction,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="hkId != null" >
+        #{hkId,jdbcType=INTEGER},
+      </if>
+      <if test="communityId != null">
+      	#{communityId,jdbcType=INTEGER},
+      </if>
+      <if test="hkName != null" >
+        #{hkName,jdbcType=VARCHAR},
+      </if>
+      <if test="hkLeader != null" >
+        #{hkLeader,jdbcType=VARCHAR},
+      </if>
+      <if test="hkPhone != null" >
+        #{hkPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="hkStaff != null" >
+        #{hkStaff,jdbcType=INTEGER},
+      </if>
+      <if test="introduction != null">
+      	#{introduction,jdbcType=VARCHAR}
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.Housekeeping" >
+    update housekeeping
+    <set >
+      <if test="hkName != null" >
+        hk_name = #{hkName,jdbcType=VARCHAR},
+      </if>
+      <if test="hkLeader != null" >
+        hk_leader = #{hkLeader,jdbcType=VARCHAR},
+      </if>
+      <if test="hkPhone != null" >
+        hk_phone = #{hkPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="hkStaff != null" >
+        hk_staff = #{hkStaff,jdbcType=INTEGER},
+      </if>
+      <if test="introduction != null">
+      	introduction = #{introduction,jdbcType=VARCHAR},
+	  </if>
+    </set>
+    where hk_id = #{hkId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.Housekeeping" >
+    update housekeeping
+    set hk_name = #{hkName,jdbcType=VARCHAR},
+      hk_leader = #{hkLeader,jdbcType=VARCHAR},
+      hk_phone = #{hkPhone,jdbcType=VARCHAR},
+      hk_staff = #{hkStaff,jdbcType=INTEGER},
+      introduction = #{introduction,jdbcType=VARCHAR}
+    where hk_id = #{hkId,jdbcType=INTEGER}
+  </update>
+  <!-- 查询未审核的家政服务登记信息 -->
+  <select id="selectNoAuditedByPage" parameterType="map" resultMap="BaseResultMap">
+  	select
+  	<include refid="Base_Column_List" />
+    from housekeeping
+  	limit #{start},#{pagesize}
+  </select>
+  <!-- 查询已通过审核的家政服务公司 -->
+  <select id="selectAuditedList" parameterType="map" resultMap="BaseResultMap">
+  	select 
+  	<include refid="Base_Column_List" />
+  	from housekeeping
+  	where community_id = #{communityId}
+  	limit #{start},#{pagesize}
+  </select>
+  <select id="selectNoAuditedCount" resultType="int">
+  	select count(*)
+  	from housekeeping
+  </select>
+  <select id="selectAuditedCount" resultType="int">
+  	select count(*)
+  	from housekeeping
+  </select>
+  <!-- 根据公司id查询公司名称 -->
+  <select id="getHkNameById" parameterType="int" resultType="String">
+  	select hk_name
+  	from housekeeping
+  	where hk_id = #{hkId}
+  </select>
+</mapper>

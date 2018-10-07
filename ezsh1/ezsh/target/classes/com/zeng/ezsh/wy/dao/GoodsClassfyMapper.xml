@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.GoodsClassfyMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.GoodsClassfy" >
+    <id column="classfy_id" property="classfyId" jdbcType="INTEGER" />
+    <result column="classfy_name" property="classfyName" jdbcType="VARCHAR" />
+    <result column="p_classfy_id" property="pClassfyId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    classfy_id, classfy_name, p_classfy_id
+  </sql>
+  
+  <!--根据分类ID获取分类详细信息 -->
+  <select id="getGoodsClassfyInfoById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_classfy
+    where classfy_id = #{classfyId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 获取商品分类集合 -->
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_classfy
+    where p_classfy_id = #{classfyId,jdbcType=INTEGER}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from goods_classfy
+    where classfy_id = #{classfyId,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.GoodsClassfy" >
+    insert into goods_classfy (classfy_id, classfy_name, p_classfy_id
+      )
+    values (#{classfyId,jdbcType=VARCHAR}, #{classfyName,jdbcType=VARCHAR}, #{pClassfyId,jdbcType=VARCHAR}
+      )
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.GoodsClassfy" >
+    insert into goods_classfy
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="classfyId != null" >
+        classfy_id,
+      </if>
+      <if test="classfyName != null" >
+        classfy_name,
+      </if>
+      <if test="pClassfyId != null" >
+        p_classfy_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="classfyId != null" >
+        #{classfyId,jdbcType=VARCHAR},
+      </if>
+      <if test="classfyName != null" >
+        #{classfyName,jdbcType=VARCHAR},
+      </if>
+      <if test="pClassfyId != null" >
+        #{pClassfyId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.GoodsClassfy" >
+    update goods_classfy
+    <set >
+      <if test="classfyName != null" >
+        classfy_name = #{classfyName,jdbcType=VARCHAR},
+      </if>
+      <if test="pClassfyId != null" >
+        p_classfy_id = #{pClassfyId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where classfy_id = #{classfyId,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.GoodsClassfy" >
+    update goods_classfy
+    set classfy_name = #{classfyName,jdbcType=VARCHAR},
+      p_classfy_id = #{pClassfyId,jdbcType=VARCHAR}
+    where classfy_id = #{classfyId,jdbcType=VARCHAR}
+  </update>
+</mapper>

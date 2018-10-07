@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.RoleMapper" >
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.Role" >
+		<id column="ro_id" property="roId" jdbcType="INTEGER" />
+		<id column="pt_manager_id" property="ptManagerId" jdbcType="INTEGER" />
+		<result column="ro_name" property="roName" jdbcType="VARCHAR" />
+		<result column="ro_descr" property="roDescr" jdbcType="VARCHAR" />
+		<result column="ro_prev_names" property="roPrevNames" jdbcType="LONGVARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List" >
+    	ro_id, pt_manager_id, ro_name, ro_descr,ro_prev_names
+  	</sql>
+  	
+	<!-- 添加角色 -->
+	<insert id="insert" parameterType="com.zeng.ezsh.wy.entity.Role" >
+	  insert into role (ro_id, pt_manager_id, ro_name, ro_descr,ro_prev_names)
+	  values (#{roId,jdbcType=INTEGER}, #{ptManagerId,jdbcType=INTEGER}, #{roName,jdbcType=VARCHAR},
+	  #{roDescr,jdbcType=VARCHAR}, #{roPrevNames,jdbcType=LONGVARCHAR})
+	</insert>
+	
+	<!-- 根据角色ID更新角色信息 -->
+	<update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.Role" >
+	  update role
+	  <set >
+	    <if test="roName != null" >
+	      ro_name = #{roName,jdbcType=VARCHAR},
+	    </if>
+	    <if test="ptManagerId != null" >
+	      pt_manager_id = #{ptManagerId,jdbcType=VARCHAR},
+	    </if>
+	    <if test="roDescr != null" >
+	      ro_descr = #{roDescr,jdbcType=VARCHAR},
+	    </if>
+	    <if test="roPrevNames != null" >
+	      ro_prev_names = #{roPrevNames,jdbcType=LONGVARCHAR},
+	    </if>
+	  </set>
+	  where ro_id = #{roId,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 根据ID获取角色信息 -->
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+	    select 
+	    <include refid="Base_Column_List" />
+	    from role where ro_id = #{roId,jdbcType=INTEGER}
+  	</select>
+  	
+  	<!-- 检测角色名字是否相同 -->
+  	<select id="selectCountByRoleName" resultType="java.lang.Integer" parameterType="com.zeng.ezsh.wy.entity.Role" >
+	    select count(*)
+	    from role where pt_manager_id = #{ptManagerId,jdbcType=INTEGER} and ro_name = #{roName,jdbcType=VARCHAR}
+	    <if test="roId != null" >
+	      and ro_Id != #{roId,jdbcType=INTEGER}
+	    </if> 
+  	</select>
+  	
+	<!-- 根据条件获取角色信息 -->
+	<select id="selectByCondition" resultMap="BaseResultMap" parameterType="java.util.Map" >
+	    select
+	    <include refid="Base_Column_List" />
+	    from role
+	    <where>
+	    	<if test="ptManagerId !=null">
+	    	and	pt_manager_id = #{ptManagerId,jdbcType=INTEGER}
+	    	</if>
+	    	<if test="keyWord != null" >
+	      	and ro_name like CONCAT('%',#{keyWord},'%') 
+	    	</if>
+	    </where> 
+  	</select>
+</mapper>

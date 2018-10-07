@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.BuildingMapper">
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.Building">
+		<id column="build_id" property="buildId" jdbcType="INTEGER" />
+		<result column="build_manager_id" property="buildManagerId"
+			jdbcType="INTEGER" />
+		<result column="build_name" property="buildName" jdbcType="VARCHAR" />
+		<result column="build_addr" property="buildAddr" jdbcType="VARCHAR" />
+		<result column="build_type" property="buildType" jdbcType="VARCHAR" />
+		<result column="structure" property="structure" jdbcType="VARCHAR" />
+		<result column="toward" property="toward" jdbcType="VARCHAR" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="buildingMapper" type="com.zeng.ezsh.wy.entity.Building"
+		extends="BaseResultMap">
+		<association property="management" column="build_manager_id"
+			select="getManagemnt">
+		</association>
+	</resultMap>
+
+	<resultMap id="buildingBaseMapperToBuidTree" type="com.zeng.ezsh.wy.entity.Building"
+		extends="BaseResultMap">
+		<collection property="roomList" javaType="ArrayList"
+			column="build_id" select="com.zeng.ezsh.wy.dao.RoomMapper.findRoomToBuildTree">
+		</collection>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		build_id, build_manager_id, build_name, build_addr, build_type, structure,
+		toward,
+		remark
+	</sql>
+
+	<select id="getManagemnt" parameterType="string"
+		resultMap="com.zeng.ezsh.wy.dao.ManagementMapper.managementMapper">
+		SELECT *
+		FROM management WHERE manager_id=#{buildManagerId }
+	</select>
+
+	<select id="selectAll" parameterType="building" resultMap="buildingMapper">
+		select
+		<include refid="Base_Column_List" />
+		from building
+		<where>
+			<if test="buildManagerId!=null">and build_manager_id = #{buildManagerId}</if>
+			<if test="buildName!=null">and build_name like #{buildName}</if>
+			<if test="buildAddr!=null">and build_addr like #{buildAddr}</if>
+			<if test="buildType!=null">and build_type like #{buildType}</if>
+			<if test="buildId!=null">and build_id = #{buildId}</if>
+			<if test="toward!=null">and toward like #{toward}</if>
+			<if test="remark!=null">and remark like #{remark}</if>
+		</where>
+	</select>
+
+	<!-- 获取所有的楼宇 -->
+	<select id="findAll" resultMap="buildingMapper">
+		select * from building
+	</select>
+
+	<!-- 通过楼宇名字获取楼宇ID -->
+	<select id="findIdByName" parameterType="string" resultType="Integer">
+		select t.build_id from building t where build_name = #{buildName}
+	</select>
+
+	<!-- 通过多条件分页查询，返回数据集(后台查询楼宇列表) -->
+	<select id="selectPageListUseDyc" parameterType="page"
+		resultMap="buildingMapper">
+		select * from building
+		<where>
+			<if
+				test="paramEntity.buildManagerId!=null and paramEntity.buildManagerId!=''">and build_manager_id = #{paramEntity.buildManagerId}</if>
+			<if test="paramEntity.buildName!=null and paramEntity.buildName!=''">and build_name like
+				CONCAT("%",#{paramEntity.buildName},"%")</if>
+			<if test="paramEntity.buildAddr!=null and paramEntity.buildAddr!=''">and build_addr like
+				CONCAT("%",#{paramEntity.buildAddr},"%")</if>
+			<if test="paramEntity.buildType!=null and paramEntity.buildType!=''">and build_type like
+				CONCAT("%",#{paramEntity.buildType},"%")</if>
+			<if test="paramEntity.toward!=null and paramEntity.toward!=''">and toward like CONCAT("%",#{paramEntity.toward},"%")
+			</if>
+			<if test="paramEntity.remark!=null and paramEntity.remark!=''">and remark like CONCAT("%",#{paramEntity.remark},"%")
+			</if>
+		</where>
+		limit #{start},#{rows}
+	</select>
+
+	<!-- 通过多条件分页查询，返回总记录数(后台查询楼宇列表统计数量) -->
+	<select id="selectPageCountUseDyc" parameterType="page"
+		resultType="Integer">
+		select count(1) from building
+		<where>
+			<if
+				test="paramEntity.buildManagerId!=null and paramEntity.buildManagerId!=''">and build_manager_id = #{paramEntity.buildManagerId}</if>
+			<if test="paramEntity.buildName!=null and paramEntity.buildName!=''">and build_name like
+				CONCAT("%",#{paramEntity.buildName},"%")</if>
+			<if test="paramEntity.buildAddr!=null and paramEntity.buildAddr!=''">and build_addr like
+				CONCAT("%",#{paramEntity.buildAddr},"%")</if>
+			<if test="paramEntity.buildType!=null and paramEntity.buildType!=''">and build_type like
+				CONCAT("%",#{paramEntity.buildType},"%")</if>
+			<if test="paramEntity.toward!=null and paramEntity.toward!=''">and toward like CONCAT("%",#{paramEntity.toward},"%")
+			</if>
+			<if test="paramEntity.remark!=null and paramEntity.remark!=''">and remark like CONCAT("%",#{paramEntity.remark},"%")
+			</if>
+		</where>
+	</select>
+
+	<!-- 根据条件查询楼栋（移动端） -->
+	<select id="findBuildingByParam" parameterType="java.util.Map"
+		resultMap="buildingMapper">
+		select * from building
+		<where>
+			<if test="buildManagerId!=null">and build_manager_id = #{buildManagerId}</if>
+			<if test="buildName!=null and buildName!=''">and build_name like #{buildName}</if>
+		</where>
+	</select>
+
+	<!-- 根据条件查询楼栋集合（后台） -->
+	<select id="findBuildingByParamToAdmin" parameterType="java.util.Map"
+		resultMap="BaseResultMap">
+		select * from building
+		<where>
+			<if test="buildManagerId!=null">and build_manager_id = #{buildManagerId}</if>
+		</where>
+	</select>
+
+	<!-- 根据条件查询楼栋集合（后台） -->
+	<select id="findBuildingByParamToAdminBuidTree" parameterType="java.lang.Integer"
+		resultMap="buildingBaseMapperToBuidTree">
+		select * from building
+		<where>
+			build_manager_id = #{buildManagerId}
+		</where>
+	</select>
+
+	<!-- 根据楼栋ID获取单个楼栋的信息 -->
+	<select id="getBuildingInfoByParam" parameterType="java.lang.Integer"
+		resultMap="buildingMapper">
+		select * from building
+		<where>
+			<if test="#{0}!=null">
+				build_id = #{0}
+			</if>
+		</where>
+	</select>
+
+	<!-- 根据楼宇ID获取楼宇信息（后台：客户迁入迁出嵌套查询等） -->
+	<select id="getBuildingInfoById" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select * from building
+		<where>
+			<if test="#{0}!=null">
+				build_id = #{0}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 检测楼宇名称是否存在 (后台)-->
+	<select id="checkNameHasOn" parameterType="com.zeng.ezsh.wy.entity.Building"
+		resultType="java.lang.Integer">
+		select count(*) from building
+		<where>
+			build_manager_id = #{buildManagerId,jdbcType=INTEGER}
+			<if test="buildName != null">
+				and build_name = #{buildName,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+	
+	<insert id="insert" parameterType="com.zeng.ezsh.wy.entity.Building">
+		insert into building (build_manager_id, build_name,
+		build_addr, build_type, structure,
+		toward, remark)
+		values ( #{buildManagerId,jdbcType=INTEGER},
+		#{buildName,jdbcType=VARCHAR},
+		#{buildAddr,jdbcType=VARCHAR}, #{buildType,jdbcType=VARCHAR}, #{structure,jdbcType=VARCHAR},
+		#{toward,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR})
+	</insert>
+
+	<update id="update" parameterType="com.zeng.ezsh.wy.entity.Building">
+		update building
+		set build_manager_id =
+		#{buildManagerId,jdbcType=INTEGER},
+		build_name = #{buildName,jdbcType=VARCHAR},
+		build_addr = #{buildAddr,jdbcType=VARCHAR},
+		build_type = #{buildType,jdbcType=VARCHAR},
+		structure = #{structure,jdbcType=VARCHAR},
+		toward = #{toward,jdbcType=VARCHAR},
+		remark = #{remark,jdbcType=VARCHAR}
+		where build_id =
+		#{buildId,jdbcType=INTEGER}
+	</update>
+
+	<delete id="deleteList">
+		delete from building where build_id in
+		<foreach collection="array" open="(" close=")" separator=","
+			item="pk">
+			#{pk}
+		</foreach>
+	</delete>
+</mapper>

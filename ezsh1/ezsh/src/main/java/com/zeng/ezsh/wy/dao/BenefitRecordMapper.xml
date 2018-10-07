@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.BenefitRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.BenefitRecord" >
+    <id column="benefit_record_id" property="benefitRecordId" jdbcType="INTEGER" />
+    <result column="pt_manager_id" property="ptManagerId" jdbcType="INTEGER" />
+    <result column="manager_name" property="managerName" jdbcType="VARCHAR" />
+    <result column="pt_build_id" property="ptBuildId" jdbcType="INTEGER" />
+    <result column="build_name" property="buildName" jdbcType="VARCHAR" />
+    <result column="pt_room_id" property="ptRoomId" jdbcType="INTEGER" />
+    <result column="room_num" property="roomNum" jdbcType="INTEGER" />
+    <result column="pt_user_id" property="ptUserId" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="INTEGER" />
+    <result column="out_trade_no" property="outTradeNo" jdbcType="VARCHAR" />
+    <result column="trade_num" property="tradeNum" jdbcType="VARCHAR" />
+    <result column="benefit_fee" property="benefitFee" jdbcType="DECIMAL" />
+    <result column="pay_time" property="payTime" jdbcType="VARCHAR" />
+    <result column="pay_status" property="payStatus" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    benefit_record_id, pt_manager_id, manager_name, pt_build_id, build_name, pt_room_id, 
+    room_num, pt_user_id, user_name, out_trade_no, trade_num, benefit_fee, pay_time, pay_status
+  </sql>
+  
+	<!-- 添加公益基金支付记录（移动端） -->
+	<insert id="insert" parameterType="com.zeng.ezsh.wy.entity.BenefitRecord" >
+	  insert into benefit_record
+	  <trim prefix="(" suffix=")" suffixOverrides="," >
+	    <if test="benefitRecordId != null" >
+	      benefit_record_id,
+	    </if>
+	    <if test="ptManagerId != null" >
+	      pt_manager_id,
+	    </if>
+	    <if test="managerName != null" >
+	      manager_name,
+	    </if>
+	    <if test="ptBuildId != null" >
+	      pt_build_id,
+	    </if>
+	    <if test="buildName != null" >
+	      build_name,
+	    </if>
+	    <if test="ptRoomId != null" >
+	      pt_room_id,
+	    </if>
+	    <if test="roomNum != null" >
+	      room_num,
+	    </if>
+	    <if test="ptUserId != null" >
+	      pt_user_id,
+	    </if>
+	    <if test="outTradeNo != null" >
+	      out_trade_no,
+	    </if>
+	    <if test="tradeNum != null" >
+	      trade_num,
+	    </if>
+	    <if test="benefitFee != null" >
+	      benefit_fee,
+	    </if>
+	    <if test="payTime != null" >
+	      pay_time,
+	    </if>
+	  </trim>
+	  <trim prefix="values (" suffix=")" suffixOverrides="," >
+	    <if test="benefitRecordId != null" >
+	      #{benefitRecordId,jdbcType=INTEGER},
+	    </if>
+	    <if test="ptManagerId != null" >
+	      #{ptManagerId,jdbcType=INTEGER},
+	    </if>
+	    <if test="managerName != null" >
+	      #{managerName,jdbcType=VARCHAR},
+	    </if>
+	    <if test="ptBuildId != null" >
+	      #{ptBuildId,jdbcType=INTEGER},
+	    </if>
+	    <if test="buildName != null" >
+	      #{buildName,jdbcType=VARCHAR},
+	    </if>
+	    <if test="ptRoomId != null" >
+	      #{ptRoomId,jdbcType=INTEGER},
+	    </if>
+	    <if test="roomNum != null" >
+	      #{roomNum,jdbcType=INTEGER},
+	    </if>
+	    <if test="ptUserId != null" >
+	      #{ptUserId,jdbcType=INTEGER},
+	    </if>
+	    <if test="outTradeNo != null" >
+	      #{outTradeNo,jdbcType=VARCHAR},
+	    </if>
+	    <if test="tradeNum != null" >
+	      #{tradeNum,jdbcType=VARCHAR},
+	    </if>
+	    <if test="benefitFee != null" >
+	     #{benefitFee,jdbcType=DECIMAL},
+	 </if>
+	    <if test="payTime != null" >
+	      #{payTime,jdbcType=VARCHAR},
+	    </if>
+	  </trim>
+	</insert>
+  
+	<!-- 获取公益基金支付记录(移动端) -->
+	<select id="selectByParam" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+	  select 
+	  <include refid="Base_Column_List" />
+	  from benefit_record
+	  where benefit_record_id = #{benefitRecordId,jdbcType=INTEGER}
+	</select>
+	
+  	<!-- 获取公益基金支付记录集合(后台) -->
+	<select id="selectListByParamA" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+	  select 
+	  <include refid="Base_Column_List" />
+	  from benefit_record
+	  <where>
+	  	  <if test="ptManagerId != null" >
+	        and pt_manager_id = #{ptManagerId,jdbcType=INTEGER}
+	      </if>
+	      <if test="ptBuildId != null" >
+	        and pt_build_id = #{ptBuildId,jdbcType=INTEGER}
+	      </if>
+	      <if test="ptUserId != null" >
+	        and pt_user_id = #{ptUserId,jdbcType=INTEGER}
+	      </if>
+	      <if test="userName != null and userName !=''" >
+	        and user_name = #{userName,jdbcType=VARCHAR}
+	      </if>
+	      
+	  </where>
+	</select>
+	
+	<!-- 更新公益基金支付记录(移动端) -->
+	<update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.BenefitRecord" >
+		update benefit_record
+		<set >
+		  <if test="tradeNum != null" >
+		    trade_num = #{tradeNum,jdbcType=VARCHAR},
+		  </if>
+		  <if test="payTime != null" >
+		    pay_time = #{payTime,jdbcType=VARCHAR},
+		  </if>
+		  <if test="payStatus != null" >
+		    pay_status = #{payStatus,jdbcType=INTEGER},
+		  </if>
+		</set>
+		<where>
+			<if test="outTradeNo != null" >
+		     out_trade_no = #{outTradeNo,jdbcType=VARCHAR},
+		  </if>
+		</where>
+	</update>
+  
+  	<!-- 批量添加公益基金使用记录（后台） -->
+  	<insert id="insertBenefitRecordBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="chargeRecordId">
+		insert into benefit_record (benefit_record_id, pt_manager_id, manager_name, 
+	      pt_build_id, build_name, pt_room_id, 
+	      room_num, pt_user_id, out_trade_no, 
+	      trade_num, pay_time)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+		    values (#{item.benefitRecordId,jdbcType=INTEGER}, #{item.ptManagerId,jdbcType=INTEGER}, #{item.managerName,jdbcType=VARCHAR}, 
+	      #{item.ptBuildId,jdbcType=INTEGER}, #{item.buildName,jdbcType=VARCHAR}, #{item.ptRoomId,jdbcType=INTEGER}, 
+	      #{item.roomNum,jdbcType=INTEGER}, #{item.ptUserId,jdbcType=INTEGER}, #{item.outTradeNo,jdbcType=VARCHAR}, 
+	      #{item.tradeNum,jdbcType=VARCHAR}, #{item.payTime,jdbcType=VARCHAR})
+		</foreach>
+  	</insert>
+	 
+  <!-- 
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from benefit_record
+    where benefit_record_id = #{benefitRecordId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from benefit_record
+    where benefit_record_id = #{benefitRecordId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.zeng.ezsh.wy.entity.BenefitRecordExample" >
+    delete from benefit_record
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.BenefitRecord" >
+    insert into benefit_record (benefit_record_id, pt_manager_id, manager_name, 
+      pt_build_id, build_name, pt_room_id, 
+      room_num, pt_user_id, out_trade_no, 
+      trade_num, pay_time)
+    values (#{benefitRecordId,jdbcType=INTEGER}, #{ptManagerId,jdbcType=INTEGER}, #{managerName,jdbcType=VARCHAR}, 
+      #{ptBuildId,jdbcType=INTEGER}, #{buildName,jdbcType=VARCHAR}, #{ptRoomId,jdbcType=INTEGER}, 
+      #{roomNum,jdbcType=INTEGER}, #{ptUserId,jdbcType=INTEGER}, #{outTradeNo,jdbcType=VARCHAR}, 
+      #{tradeNum,jdbcType=VARCHAR}, #{payTime,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.BenefitRecord" >
+    insert into benefit_record
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="benefitRecordId != null" >
+        benefit_record_id,
+      </if>
+      <if test="ptManagerId != null" >
+        pt_manager_id,
+      </if>
+      <if test="managerName != null" >
+        manager_name,
+      </if>
+      <if test="ptBuildId != null" >
+        pt_build_id,
+      </if>
+      <if test="buildName != null" >
+        build_name,
+      </if>
+      <if test="ptRoomId != null" >
+        pt_room_id,
+      </if>
+      <if test="roomNum != null" >
+        room_num,
+      </if>
+      <if test="ptUserId != null" >
+        pt_user_id,
+      </if>
+      <if test="outTradeNo != null" >
+        out_trade_no,
+      </if>
+      <if test="tradeNum != null" >
+        trade_num,
+      </if>
+      <if test="payTime != null" >
+        pay_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="benefitRecordId != null" >
+        #{benefitRecordId,jdbcType=INTEGER},
+      </if>
+      <if test="ptManagerId != null" >
+        #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="managerName != null" >
+        #{managerName,jdbcType=VARCHAR},
+      </if>
+      <if test="ptBuildId != null" >
+        #{ptBuildId,jdbcType=INTEGER},
+      </if>
+      <if test="buildName != null" >
+        #{buildName,jdbcType=VARCHAR},
+      </if>
+      <if test="ptRoomId != null" >
+        #{ptRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="roomNum != null" >
+        #{roomNum,jdbcType=INTEGER},
+      </if>
+      <if test="ptUserId != null" >
+        #{ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="outTradeNo != null" >
+        #{outTradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeNum != null" >
+        #{tradeNum,jdbcType=VARCHAR},
+      </if>
+      <if test="payTime != null" >
+        #{payTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.BenefitRecordExample" resultType="java.lang.Integer" >
+    select count(*) from benefit_record
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update benefit_record
+    <set >
+      <if test="record.benefitRecordId != null" >
+        benefit_record_id = #{record.benefitRecordId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptManagerId != null" >
+        pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="record.managerName != null" >
+        manager_name = #{record.managerName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ptBuildId != null" >
+        pt_build_id = #{record.ptBuildId,jdbcType=INTEGER},
+      </if>
+      <if test="record.buildName != null" >
+        build_name = #{record.buildName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ptRoomId != null" >
+        pt_room_id = #{record.ptRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="record.roomNum != null" >
+        room_num = #{record.roomNum,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptUserId != null" >
+        pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="record.outTradeNo != null" >
+        out_trade_no = #{record.outTradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.tradeNum != null" >
+        trade_num = #{record.tradeNum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.payTime != null" >
+        pay_time = #{record.payTime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update benefit_record
+    set benefit_record_id = #{record.benefitRecordId,jdbcType=INTEGER},
+      pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      manager_name = #{record.managerName,jdbcType=VARCHAR},
+      pt_build_id = #{record.ptBuildId,jdbcType=INTEGER},
+      build_name = #{record.buildName,jdbcType=VARCHAR},
+      pt_room_id = #{record.ptRoomId,jdbcType=INTEGER},
+      room_num = #{record.roomNum,jdbcType=INTEGER},
+      pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+      out_trade_no = #{record.outTradeNo,jdbcType=VARCHAR},
+      trade_num = #{record.tradeNum,jdbcType=VARCHAR},
+      pay_time = #{record.payTime,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.BenefitRecord" >
+    update benefit_record
+    <set >
+      <if test="ptManagerId != null" >
+        pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="managerName != null" >
+        manager_name = #{managerName,jdbcType=VARCHAR},
+      </if>
+      <if test="ptBuildId != null" >
+        pt_build_id = #{ptBuildId,jdbcType=INTEGER},
+      </if>
+      <if test="buildName != null" >
+        build_name = #{buildName,jdbcType=VARCHAR},
+      </if>
+      <if test="ptRoomId != null" >
+        pt_room_id = #{ptRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="roomNum != null" >
+        room_num = #{roomNum,jdbcType=INTEGER},
+      </if>
+      <if test="ptUserId != null" >
+        pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="outTradeNo != null" >
+        out_trade_no = #{outTradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeNum != null" >
+        trade_num = #{tradeNum,jdbcType=VARCHAR},
+      </if>
+      <if test="payTime != null" >
+        pay_time = #{payTime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where benefit_record_id = #{benefitRecordId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.BenefitRecord" >
+    update benefit_record
+    set pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      manager_name = #{managerName,jdbcType=VARCHAR},
+      pt_build_id = #{ptBuildId,jdbcType=INTEGER},
+      build_name = #{buildName,jdbcType=VARCHAR},
+      pt_room_id = #{ptRoomId,jdbcType=INTEGER},
+      room_num = #{roomNum,jdbcType=INTEGER},
+      pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      out_trade_no = #{outTradeNo,jdbcType=VARCHAR},
+      trade_num = #{tradeNum,jdbcType=VARCHAR},
+      pay_time = #{payTime,jdbcType=VARCHAR}
+    where benefit_record_id = #{benefitRecordId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

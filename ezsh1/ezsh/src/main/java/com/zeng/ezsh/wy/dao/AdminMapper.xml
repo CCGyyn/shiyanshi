@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.AdminMapper" >
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.Admin" >
+		<id column="ad_id" property="adId" jdbcType="INTEGER" />
+		<result column="ad_name" property="adName" jdbcType="VARCHAR" />
+		<result column="ad_account" property="adAccount" jdbcType="VARCHAR" />
+		<result column="ad_password" property="adPassword" jdbcType="VARCHAR" />
+		<result column="ad_telephone" property="adTelephone" jdbcType="VARCHAR" />
+		<result column="ad_manager_id" property="adManagerId" jdbcType="INTEGER" />
+		<result column="ad_role_id" property="adRoleId" jdbcType="INTEGER" />
+	</resultMap>
+	<sql id="Base_Column_List" >
+	  	ad_id, ad_name, ad_account, ad_password, ad_telephone, ad_manager_id, ad_role_id
+	</sql>
+	<sql id="Base_Column_List_Except_Password" >
+	  	ad_id, ad_name, ad_account, ad_telephone, ad_manager_id, ad_role_id
+	</sql>
+	
+	<!-- 添加管理员 -->
+	<insert id="insert" parameterType="com.zeng.ezsh.wy.entity.Admin" >
+	    insert into admin (ad_id, ad_name, ad_account, 
+	      ad_password, ad_telephone, ad_manager_id, 
+	      ad_role_id)
+	    values (#{adId,jdbcType=INTEGER}, #{adName,jdbcType=VARCHAR}, #{adAccount,jdbcType=VARCHAR}, 
+	      #{adPassword,jdbcType=VARCHAR}, #{adTelephone,jdbcType=VARCHAR}, #{adManagerId,jdbcType=INTEGER}, 
+	      #{adRoleId,jdbcType=INTEGER})
+  	</insert>
+  	
+  	<!-- 检测账号是否存在 -->
+  	<select id="checkAccountIsIn" resultType="java.lang.Integer" parameterType="com.zeng.ezsh.wy.entity.Admin" >
+	    select count(*)
+	    from admin
+	    where ad_account = #{adAccount,jdbcType=VARCHAR}
+    </select>
+    
+	<!-- 更新管理员信息（后台） -->
+	<update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.Admin" >
+		update admin
+		<set >
+			<if test="adName != null" >
+			  ad_name = #{adName,jdbcType=VARCHAR},
+			</if>
+			<if test="adTelephone != null" >
+			  ad_telephone = #{adTelephone,jdbcType=VARCHAR},
+			</if>
+			<if test="adManagerId != null" >
+			  ad_manager_id = #{adManagerId,jdbcType=INTEGER},
+			</if>
+			<if test="adRoleId != null" >
+			  ad_role_id = #{adRoleId,jdbcType=INTEGER},
+			</if>
+		</set>
+		where ad_id = #{adId,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 修改密码 -->
+	<update id="updatePassByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.Admin" >
+		update admin
+		<set >
+			<if test="adPassword != null" >
+			  ad_password = #{adPassword,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where ad_id = #{adId,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 获取管理员集合 -->
+	<select id="selectByParam" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.Admin" >
+	    select 
+	    <include refid="Base_Column_List_Except_Password" />
+	    from admin
+	    <where>
+	    	ad_id>0
+	    	<if test="adManagerId != null">
+	    		and ad_manager_id = #{adManagerId,jdbcType=INTEGER} 
+	    	</if>
+	    	<if test="adName != null and adName != ''">
+	    		and ad_name = #{adName,jdbcType=VARCHAR} 
+	    	</if>
+	    	
+	    </where>
+  	</select>
+  	
+  	<!-- 通过账号获取用户登录信息 -->
+  	<select id="selectByAccount" resultMap="BaseResultMap" parameterType="java.lang.String" >
+	    select 
+	    <include refid="Base_Column_List" />
+	    from admin
+	    <where>
+	    	ad_account = #{adAccount,jdbcType=VARCHAR}
+	    </where>
+  	</select>
+  	
+  <!-- 
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from admin
+    where ad_id = #{adId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.zeng.ezsh.wy.entity.AdminExample" >
+    delete from admin
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.Admin" >
+    insert into admin
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="adId != null" >
+        ad_id,
+      </if>
+      <if test="adName != null" >
+        ad_name,
+      </if>
+      <if test="adAccount != null" >
+        ad_account,
+      </if>
+      <if test="adPassword != null" >
+        ad_password,
+      </if>
+      <if test="adTelephone != null" >
+        ad_telephone,
+      </if>
+      <if test="adManagerId != null" >
+        ad_manager_id,
+      </if>
+      <if test="adRoleId != null" >
+        ad_role_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="adId != null" >
+        #{adId,jdbcType=INTEGER},
+      </if>
+      <if test="adName != null" >
+        #{adName,jdbcType=VARCHAR},
+      </if>
+      <if test="adAccount != null" >
+        #{adAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="adPassword != null" >
+        #{adPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="adTelephone != null" >
+        #{adTelephone,jdbcType=VARCHAR},
+      </if>
+      <if test="adManagerId != null" >
+        #{adManagerId,jdbcType=VARCHAR},
+      </if>
+      <if test="adRoleId != null" >
+        #{adRoleId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateByExampleSelective" parameterType="map" >
+    update admin
+    <set >
+      <if test="record.adId != null" >
+        ad_id = #{record.adId,jdbcType=INTEGER},
+      </if>
+      <if test="record.adName != null" >
+        ad_name = #{record.adName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.adAccount != null" >
+        ad_account = #{record.adAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.adPassword != null" >
+        ad_password = #{record.adPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="record.adTelephone != null" >
+        ad_telephone = #{record.adTelephone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.adManagerId != null" >
+        ad_manager_id = #{record.adManagerId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.adRoleId != null" >
+        ad_role_id = #{record.adRoleId,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update admin
+    set ad_id = #{record.adId,jdbcType=INTEGER},
+      ad_name = #{record.adName,jdbcType=VARCHAR},
+      ad_account = #{record.adAccount,jdbcType=VARCHAR},
+      ad_password = #{record.adPassword,jdbcType=VARCHAR},
+      ad_telephone = #{record.adTelephone,jdbcType=VARCHAR},
+      ad_manager_id = #{record.adManagerId,jdbcType=VARCHAR},
+      ad_role_id = #{record.adRoleId,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.Admin" >
+    update admin
+    set ad_name = #{adName,jdbcType=VARCHAR},
+      ad_account = #{adAccount,jdbcType=VARCHAR},
+      ad_password = #{adPassword,jdbcType=VARCHAR},
+      ad_telephone = #{adTelephone,jdbcType=VARCHAR},
+      ad_manager_id = #{adManagerId,jdbcType=VARCHAR},
+      ad_role_id = #{adRoleId,jdbcType=INTEGER}
+    where ad_id = #{adId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

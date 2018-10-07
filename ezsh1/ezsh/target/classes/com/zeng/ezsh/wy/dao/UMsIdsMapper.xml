@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.UMsIdsMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.UMsIds" >
+    <id column="u_ms_id" property="uMsId" jdbcType="INTEGER" />
+    <result column="p_user_id" property="pUserId" jdbcType="INTEGER" />
+    <result column="p_manager_id" property="pManagerId" jdbcType="INTEGER" />
+    <result column="p_build_id" property="pBuildId" jdbcType="INTEGER" />
+    <result column="p_room_id" property="pRoomId" jdbcType="INTEGER" />
+    <result column="p_owner_id" property="pOwnerId" jdbcType="INTEGER" />
+    <result column="register_name" property="registerName" jdbcType="VARCHAR" />
+    <result column="register_telephone" property="registerTelephone" jdbcType="VARCHAR" />
+    <result column="identify_classify" property="identifyClassify" jdbcType="TINYINT" />
+    <result column="apply_time" property="applyTime" jdbcType="VARCHAR" />
+    <result column="check_status" property="checkStatus" jdbcType="TINYINT" />
+    <result column="failure_info" property="failureInfo" jdbcType="VARCHAR" />
+    <result column="privilege" property="privilege" jdbcType="TINYINT" />
+    <result column="welfare_fund" property="welfareFund" jdbcType="DECIMAL" />
+  </resultMap>
+  
+  <!-- 用于登录时返回用户的小区信息 -->
+  <resultMap id="gtUserManagersNamesInfoBaseResultMap" type="com.zeng.ezsh.wy.entity.UMsIds" extends="BaseResultMap">
+    <association property="managerName" javaType="java.lang.String">
+    	<result column="manager_name" property="managerName" jdbcType="VARCHAR" />
+    </association>
+  </resultMap>
+  
+  <!-- 用于业主获取房下用户 -->
+  <resultMap id="getRoomUsersBaseResultMap" type="com.zeng.ezsh.wy.entity.UMsIds" extends="BaseResultMap">
+    <collection property="managerInfo" javaType="com.zeng.ezsh.wy.entity.Management" column="p_manager_id" ofType="com.zeng.ezsh.wy.entity.UMsIds" select="com.zeng.ezsh.wy.dao.UMsIdsMapper.gtUserManagerInfoByManagerId">	
+    </collection>
+    <collection property="BuildInfo" javaType="com.zeng.ezsh.wy.entity.Building" column="p_build_id" ofType="com.zeng.ezsh.wy.entity.UMsIds" select="com.zeng.ezsh.wy.dao.UMsIdsMapper.gtUserBuildInfoByBuildId">     	
+    </collection>
+    <collection property="RoomInfo" javaType="com.zeng.ezsh.wy.entity.Room" column="p_room_id" ofType="com.zeng.ezsh.wy.entity.UMsIds" select="com.zeng.ezsh.wy.dao.UMsIdsMapper.gtUserRoomInfoByRoomId">
+    </collection>
+  </resultMap>
+  
+  <resultMap id="getAccountListBaseResultMap" type="com.zeng.ezsh.wy.entity.UMsIds" extends="BaseResultMap">
+    <collection property="managerInfo" javaType="com.zeng.ezsh.wy.entity.Management" column="p_manager_id" ofType="com.zeng.ezsh.wy.entity.UMsIds" select="com.zeng.ezsh.wy.dao.UMsIdsMapper.gtUserManagerInfoByManagerId">	
+    </collection>
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    u_ms_id, p_user_id, p_manager_id, p_build_id, p_room_id, p_owner_id,register_name, 
+    register_telephone, identify_classify, apply_time, check_status, failure_info,
+    privilege, welfare_fund
+  </sql>
+  
+  <sql id="gtUserManagersInfo_Base_Column_List" >
+    a.u_ms_id, a.p_user_id, a.p_manager_id, a.p_build_id, a.p_room_id, a.identify_classify, a.apply_time, a.check_status, a.failure_info ,b.manager_name
+  </sql>
+  
+  <!-- 通过用户ID获取用户所在的小区集合(用于登录) -->
+  <select id="gtUserManagersInfoByUserId" resultMap="gtUserManagersNamesInfoBaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="gtUserManagersInfo_Base_Column_List" />
+    from u_ms_ids a left join management b on a.p_manager_id = b.manager_id
+    where a.p_user_id = #{0}
+  </select>
+  
+  <!-- 通过ID获取所添加的房屋信息 -->
+  <select id="gtUserUmsInfoById" resultMap="getRoomUsersBaseResultMap" parameterType="com.zeng.ezsh.wy.entity.UMsIds" >
+    select
+    <include refid="gtUserManagersInfo_Base_Column_List" />
+    from u_ms_ids a left join management b on a.p_manager_id = b.manager_id
+    where a.u_ms_id=#{uMsId,jdbcType=INTEGER}
+  </select>
+
+  <!-- 通过房间号获取房屋信息 -->
+  <select id="gtUserUmsInfoByPRoomId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="gtUserManagersInfo_Base_Column_List" />
+    from u_ms_ids
+    where p_room_id=#{pRoomId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 检测是否重复添加房屋认证 -->
+  <select id="checkIsOn" resultType="java.lang.Integer" parameterType="com.zeng.ezsh.wy.entity.UMsIds" >
+    select count(*)
+    from u_ms_ids
+    where p_user_id=#{pUserId} and p_manager_id=#{pManagerId} and p_build_id=#{pBuildId} and p_room_id=#{pRoomId} 
+  </select>
+  
+  <!-- 检测用户是否有一处房屋认证通过审核 -->
+  <select id="checkHasOneCommunityPass" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+    select count(*)
+    from u_ms_ids
+    where p_user_id=#{0} and check_status=1
+  </select>
+
+  <select id="selectByRoomId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from u_ms_ids
+    where p_room_id=#{0} and check_status=1
+  </select>
+  
+  <!-- 检测用户所添加的房屋认证是否通过审核 -->
+  <select id="checkHasPassByUserIdAndCommunity" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+    select count(*)
+    from u_ms_ids
+    where p_user_id=#{0} and p_manager_id=#{1} and check_status=1
+  </select>
+  
+  <!-- 用于蓝牙开门前检测是否有开门权限（移动端） -->
+  <select id="checkHasOpenDoorPermission" resultType="java.lang.Integer" parameterType="com.zeng.ezsh.wy.entity.UMsIds" >
+    select
+	count(*)
+    from u_ms_ids
+    where p_user_id = #{pUserId,jdbcType=INTEGER}  and check_status =1
+    <!-- <if test="identifyClassify != null">
+		<choose>
+			<when test="identifyClassify == 1">
+				and p_build_id = #{pBuildId,jdbcType=INTEGER}
+			</when>
+			<otherwise>
+				and p_build_id = #{pBuildId,jdbcType=INTEGER} and privilege =#{privilege,jdbcType=TINYINT}
+			</otherwise>
+		</choose>
+    </if> -->
+    and p_build_id = #{pBuildId,jdbcType=INTEGER} and privilege = 1
+  </select>
+  
+  <!-- 获取账号列表【移动端】（用于账号切换） -->
+  <select id="selectAccountList" resultMap="getAccountListBaseResultMap" parameterType="com.zeng.ezsh.wy.entity.UMsIds" >
+    select
+	<include refid="Base_Column_List" />
+    from u_ms_ids
+    where p_user_id = #{pUserId} group by p_manager_id,identify_classify
+  </select>
+  
+  <!-- 获取每个小区账号的数量（用于公益基金金额批量更新）-->
+  <select id="selectAccountAmount" resultType="java.lang.Integer" parameterType="com.zeng.ezsh.wy.entity.UMsIds" >
+    select
+	count(*)
+    from u_ms_ids
+    where p_manager_id = #{pManagerId,jdbcType=INTEGER} and check_status = 1 group by p_manager_id,p_user_id
+  </select>
+  
+  <!-- 获取每个小区账号的公益基金总数额-->
+  <select id="sumBenefitFee" resultType="java.math.BigDecimal" parameterType="com.zeng.ezsh.wy.entity.UMsIds" >
+    select 
+    sum(welfare_fund)
+   	from u_ms_ids
+    where p_manager_id = #{pManagerId,jdbcType=INTEGER} and check_status = 1 group by p_manager_id,p_user_id
+  </select>
+  
+  <!-- 获取个人剩余公益基金列表（移动端，用于更新公益基金） -->
+  <select id="selectBenefitList" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.UMsIds" >
+    select
+	<include refid="Base_Column_List"/>
+    from u_ms_ids
+    where check_status = 1 and p_manager_id = #{pManagerId,jdbcType=INTEGER}
+    group by p_manager_id,p_build_id
+  </select>
+  
+  <!-- 后台获取账号列表（用于审核） -->
+  <select id="selectAccountListA" resultMap="getAccountListBaseResultMap" parameterType="com.zeng.ezsh.wy.entity.ResidentialUser" >
+    select
+	<include refid="Base_Column_List" />
+    from u_ms_ids
+    where p_user_id=#{userId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 添加房屋认证 （移动端）-->  
+  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.UMsIds" >
+    insert into u_ms_ids (u_ms_id, p_user_id, p_manager_id,p_build_id,p_room_id,p_owner_id,register_name,
+    register_telephone,apply_time,failure_info,identify_classify,privilege
+      )
+    values (#{uMsId,jdbcType=INTEGER}, #{pUserId,jdbcType=INTEGER}, #{pManagerId,jdbcType=INTEGER},
+      #{pBuildId,jdbcType=INTEGER}, #{pRoomId,jdbcType=INTEGER}, #{pOwnerId,jdbcType=INTEGER}, #{registerName,jdbcType=VARCHAR},
+      #{registerTelephone,jdbcType=VARCHAR},#{applyTime,jdbcType=VARCHAR},#{failureInfo,jdbcType=VARCHAR},
+      #{identifyClassify,jdbcType=TINYINT},#{privilege,jdbcType=TINYINT}
+      )
+  </insert>
+  
+  <!-- 小区审核失败，再次提交审核（移动端） -->
+  <update id="agSubCommunityCheck" parameterType="java.lang.Integer" >
+    update u_ms_ids
+    set check_status = 2
+    where p_user_id = #{0,jdbcType=INTEGER} and p_manager_id = #{1,jdbcType=INTEGER} and check_status=0
+  </update>
+  
+  <!-- 检测房下用户是否已添加 （移动端）-->
+  <select id="checkRoomUserIsOn" parameterType="com.zeng.ezsh.wy.entity.UMsIds" resultType="java.lang.Integer" >
+    select count(*) from u_ms_ids
+    where p_user_id=#{pUserId,jdbcType=INTEGER} and p_manager_id=#{pManagerId,jdbcType=INTEGER} 
+    and p_build_id=#{pBuildId,jdbcType=INTEGER} and p_room_id=#{pRoomId,jdbcType=INTEGER} 
+    and p_owner_id=#{pOwnerId,jdbcType=INTEGER} and identify_classify=#{identifyClassify,jdbcType=INTEGER}
+  </select>
+  
+  <!--批量更新用户账号公益基金数额（后台）-->
+  <update id="updateUMsBenefitBatch" parameterType="java.util.List">  
+     <foreach collection="list" item="item" index="index" open="" close="" separator=";" >   
+		update u_ms_ids
+		<set >
+		  <if test="item.welfareFund != null" >
+		    welfare_fund = #{item.welfareFund,jdbcType=DECIMAL},
+		  </if>
+		</set>
+		<where>
+			p_manager_id = #{item.pManagerId,jdbcType=INTEGER}
+			and  u_ms_id = #{uMsId,jdbcType=INTEGER}
+			<!-- <if test="item.pBuildingId != null">
+			and p_building_id = #{item.pBuildingId,jdbcType=INTEGER}
+			</if>
+			<if test="item.pRoomId != null">
+			and p_room_id=#{item.pRoomId,jdbcType=INTEGER}
+			</if>  -->
+		</where>
+     </foreach>  
+  </update>
+  
+  <!-- 选择性的更新小区用户信息（移动端） -->
+  <update id="updateUMsSelective" parameterType="com.zeng.ezsh.wy.entity.UMsIds" >
+    update u_ms_ids
+    <set>
+      <if test="pUserId != null" >
+        p_user_id = #{pUserId,jdbcType=INTEGER},
+      </if>
+      <if test="pManagerId != null" >
+        p_manager_id = #{pManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="applyTime != null" >
+        apply_time = #{applyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null" >
+        check_status = #{checkStatus,jdbcType=TINYINT},
+      </if>
+      <if test="failureInfo != null" >
+        failure_info = #{failureInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="privilege != null" >
+        privilege = #{privilege,jdbcType=TINYINT},
+      </if>
+    </set>
+    where u_ms_id = #{uMsId,jdbcType=INTEGER} and p_owner_id=#{pOwnerId,jdbcType=INTEGER}
+  </update>
+  
+  <!-- 获取房下用户列表（移动端） -->
+  <select id="selectUMsList" resultMap="getRoomUsersBaseResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from u_ms_ids
+    where p_owner_id = #{userId,jdbcType=INTEGER} and p_room_id=#{pRoomId,jdbcType=INTEGER}
+    and identify_classify>1
+  </select>
+  
+  <!-- 业主获取自己房间集合 （移动端）-->
+  <select id="selectUMsRoomList" resultMap="getRoomUsersBaseResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from u_ms_ids
+    where p_user_id = #{pUserId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 业主删除房下用户 -->
+  <delete id="deleteByParam" parameterType="java.util.Map" >
+    delete from u_ms_ids
+    where u_ms_id = #{uMsId,jdbcType=INTEGER} and p_owner_id = #{ownerId,jdbcType=INTEGER}
+  </delete>
+  
+  <!-- 根据管理处ID来获取manager信息 -->
+  <select id="gtUserManagerInfoByManagerId"  parameterType="java.lang.Integer" resultMap="com.zeng.ezsh.wy.dao.ManagementMapper.managementMapper">
+    select manager_id,manager_name from management 
+    where manager_id=#{0}
+  </select>
+    
+  <!-- 根据楼栋ID获取楼栋信息 -->
+  <select id="gtUserBuildInfoByBuildId" resultMap="com.zeng.ezsh.wy.dao.BuildingMapper.buildingMapper" parameterType="java.lang.Integer" >
+    select distinct
+    build_id,build_name
+    from building
+    where build_id=#{0}
+  </select>
+  
+  <!-- 根据房间号ID获取房间信息 -->
+  <select id="gtUserRoomInfoByRoomId" resultMap="com.zeng.ezsh.wy.dao.RoomMapper.roomMapper" parameterType="java.lang.Integer" >
+    select distinct
+    room_id,room_num,room_floor
+    from room
+    where room_id=#{0}
+  </select>
+  
+  <!--更新用户账号信息（后台审核） -->
+  <update id="updateByPrimaryKeySelectiveForCheck" parameterType="com.zeng.ezsh.wy.entity.UMsIds" >
+    update u_ms_ids
+    <set >
+      <if test="applyTime != null" >
+        apply_time = #{applyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null" >
+        check_status = #{checkStatus,jdbcType=TINYINT},
+      </if>
+      <if test="failureInfo != null" >
+        failure_info = #{failureInfo,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where u_ms_id = #{uMsId,jdbcType=INTEGER}
+  </update>
+  
+  <!-- 
+  <delete id="deleteByExample" parameterType="com.zeng.ezsh.wy.entity.UMsIdsExample" >
+    delete from u_ms_ids
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+
+  
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.UMsIds" >
+    insert into u_ms_ids
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="uMsId != null" >
+        u_ms_id,
+      </if>
+      <if test="pUserId != null" >
+        p_user_id,
+      </if>
+      <if test="pManagerId != null" >
+        p_manager_id,
+      </if>
+      <if test="applyTime != null" >
+        apply_time,
+      </if>
+      <if test="checkStatus != null" >
+        check_status,
+      </if>
+      <if test="failureInfo != null" >
+        failure_info,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="uMsId != null" >
+        #{uMsId,jdbcType=INTEGER},
+      </if>
+      <if test="pUserId != null" >
+        #{pUserId,jdbcType=INTEGER},
+      </if>
+      <if test="pManagerId != null" >
+        #{pManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="applyTime != null" >
+        #{applyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null" >
+        #{checkStatus,jdbcType=TINYINT},
+      </if>
+      <if test="failureInfo != null" >
+        #{failureInfo,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+ 
+  
+   -->
+  
+ <!-- 
+  
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.UMsIds" >
+    update u_ms_ids
+    set p_user_id = #{pUserId,jdbcType=INTEGER},
+      p_manager_id = #{pManagerId,jdbcType=INTEGER},
+      apply_time = #{applyTime,jdbcType=VARCHAR},
+      check_status = #{checkStatus,jdbcType=TINYINT},
+      failure_info = #{failureInfo,jdbcType=VARCHAR}
+    where u_ms_id = #{uMsId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

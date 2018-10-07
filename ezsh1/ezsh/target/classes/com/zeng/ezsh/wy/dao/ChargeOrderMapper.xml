@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.ChargeOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.ChargeOrder" >
+    <id column="charge_order_id" property="chargeOrderId" jdbcType="INTEGER" />
+    <result column="pt_manager_id" property="ptManagerId" jdbcType="INTEGER" />
+    <result column="manager_name" property="managerName" jdbcType="VARCHAR" />
+    <result column="pt_user_id" property="ptUserId" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="pt_charge_info_id" property="ptChargeInfoId" jdbcType="INTEGER" />
+    <result column="trade_num" property="tradeNum" jdbcType="VARCHAR" />
+    <result column="out_trade_no" property="outTradeNo" jdbcType="VARCHAR" />
+    <result column="pay_fee" property="payFee" jdbcType="DECIMAL" />
+    <result column="pay_time" property="payTime" jdbcType="VARCHAR" />
+    <result column="pay_classify" property="payClassify" jdbcType="TINYINT" />
+    <result column="pay_status" property="payStatus" jdbcType="TINYINT" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    charge_order_id, pt_manager_id, manager_name, pt_user_id, user_name, pt_charge_info_id, 
+    trade_num, out_trade_no, pay_fee, pay_time, pay_classify, pay_status
+  </sql>
+  
+  <!-- 生成物业费支付订单记录【移动端】 -->
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.ChargeOrder" >
+    insert into charge_order
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="chargeOrderId != null" >
+        charge_order_id,
+      </if>
+      <if test="ptManagerId != null" >
+        pt_manager_id,
+      </if>
+      <if test="managerName != null" >
+        manager_name,
+      </if>
+      <if test="ptUserId != null" >
+        pt_user_id,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="ptChargeInfoId != null" >
+        pt_charge_info_id,
+      </if>
+      <if test="tradeNum != null" >
+        trade_num,
+      </if>
+      <if test="outTradeNo != null" >
+        out_trade_no,
+      </if>
+      <if test="payFee != null" >
+        pay_fee,
+      </if>
+      <if test="payTime != null" >
+        pay_time,
+      </if>
+      <if test="payClassify != null" >
+        pay_classify,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="chargeOrderId != null" >
+        #{chargeOrderId,jdbcType=INTEGER},
+      </if>
+      <if test="ptManagerId != null" >
+        #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="managerName != null" >
+        #{managerName,jdbcType=VARCHAR},
+      </if>
+      <if test="ptUserId != null" >
+        #{ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="ptChargeInfoId != null" >
+        #{ptChargeInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="tradeNum != null" >
+        #{tradeNum,jdbcType=VARCHAR},
+      </if>
+      <if test="outTradeNo != null" >
+        #{outTradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="payFee != null" >
+        #{payFee,jdbcType=DECIMAL},
+      </if>
+      <if test="payTime != null" >
+        #{payTime,jdbcType=VARCHAR},
+      </if>
+      <if test="payClassify != null" >
+        #{payClassify,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 获取物业费支付订单记录【移动端】 -->
+  <select id="selectByParam" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.ChargeOrder" >
+    select 
+    <include refid="Base_Column_List" />
+    from charge_order
+    where trade_num = #{tradeNum,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 更新物业费支付订单记录【移动端】 -->
+  <update id="updateByParamSelective" parameterType="com.zeng.ezsh.wy.entity.ChargeOrder" >
+    update charge_order
+    <set >
+      <if test="ptManagerId != null" >
+        pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="managerName != null" >
+        manager_name = #{managerName,jdbcType=VARCHAR},
+      </if>
+      <if test="ptUserId != null" >
+        pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="ptChargeInfoId != null" >
+        pt_charge_info_id = #{ptChargeInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="tradeNum != null" >
+        trade_num = #{tradeNum,jdbcType=VARCHAR},
+      </if>
+      <if test="outTradeNo != null" >
+        out_trade_no = #{outTradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="payFee != null" >
+        pay_fee = #{payFee,jdbcType=DECIMAL},
+      </if>
+      <if test="payTime != null" >
+        pay_time = #{payTime,jdbcType=VARCHAR},
+      </if>
+      <if test="payClassify != null" >
+        pay_classify = #{payClassify,jdbcType=TINYINT},
+      </if>
+      <if test="payStatus != null" >
+        pay_status = #{payStatus,jdbcType=TINYINT},
+      </if>
+    </set>
+    where charge_order_id = #{chargeOrderId,jdbcType=INTEGER}
+  </update>
+<!--   
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from charge_order
+    where charge_order_id = #{chargeOrderId,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.ChargeOrder" >
+    insert into charge_order (charge_order_id, pt_manager_id, manager_name, 
+      pt_user_id, user_name, pt_charge_info_id, 
+      trade_num, out_trade_no, pay_fee, 
+      pay_time, pay_classify)
+    values (#{chargeOrderId,jdbcType=INTEGER}, #{ptManagerId,jdbcType=INTEGER}, #{managerName,jdbcType=VARCHAR}, 
+      #{ptUserId,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, #{ptChargeInfoId,jdbcType=INTEGER}, 
+      #{tradeNum,jdbcType=VARCHAR}, #{outTradeNo,jdbcType=VARCHAR}, #{payFee,jdbcType=DECIMAL}, 
+      #{payTime,jdbcType=VARCHAR}, #{payClassify,jdbcType=TINYINT})
+  </insert>
+  
+  <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.ChargeOrderExample" resultType="java.lang.Integer" >
+    select count(*) from charge_order
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update charge_order
+    <set >
+      <if test="record.chargeOrderId != null" >
+        charge_order_id = #{record.chargeOrderId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptManagerId != null" >
+        pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="record.managerName != null" >
+        manager_name = #{record.managerName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ptUserId != null" >
+        pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="record.userName != null" >
+        user_name = #{record.userName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ptChargeInfoId != null" >
+        pt_charge_info_id = #{record.ptChargeInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="record.tradeNum != null" >
+        trade_num = #{record.tradeNum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.outTradeNo != null" >
+        out_trade_no = #{record.outTradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.payFee != null" >
+        pay_fee = #{record.payFee,jdbcType=DECIMAL},
+      </if>
+      <if test="record.payTime != null" >
+        pay_time = #{record.payTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.payClassify != null" >
+        pay_classify = #{record.payClassify,jdbcType=TINYINT},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update charge_order
+    set charge_order_id = #{record.chargeOrderId,jdbcType=INTEGER},
+      pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      manager_name = #{record.managerName,jdbcType=VARCHAR},
+      pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+      user_name = #{record.userName,jdbcType=VARCHAR},
+      pt_charge_info_id = #{record.ptChargeInfoId,jdbcType=INTEGER},
+      trade_num = #{record.tradeNum,jdbcType=VARCHAR},
+      out_trade_no = #{record.outTradeNo,jdbcType=VARCHAR},
+      pay_fee = #{record.payFee,jdbcType=DECIMAL},
+      pay_time = #{record.payTime,jdbcType=VARCHAR},
+      pay_classify = #{record.payClassify,jdbcType=TINYINT}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.ChargeOrder" >
+    update charge_order
+    set pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      manager_name = #{managerName,jdbcType=VARCHAR},
+      pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      user_name = #{userName,jdbcType=VARCHAR},
+      pt_charge_info_id = #{ptChargeInfoId,jdbcType=INTEGER},
+      trade_num = #{tradeNum,jdbcType=VARCHAR},
+      out_trade_no = #{outTradeNo,jdbcType=VARCHAR},
+      pay_fee = #{payFee,jdbcType=DECIMAL},
+      pay_time = #{payTime,jdbcType=VARCHAR},
+      pay_classify = #{payClassify,jdbcType=TINYINT}
+    where charge_order_id = #{chargeOrderId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

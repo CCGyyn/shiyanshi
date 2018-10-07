@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.FamilyEducateInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.FamilyEducateInfo" >
+    <id column="family_educate_info_id" property="familyEducateInfoId" jdbcType="INTEGER" />
+    <result column="pt_manager_id" property="ptManagerId" jdbcType="INTEGER" />
+    <result column="manager_name" property="managerName" jdbcType="VARCHAR" />
+    <result column="pt_user_id" property="ptUserId" jdbcType="INTEGER" />
+    <result column="parent_name" property="parentName" jdbcType="VARCHAR" />
+    <result column="place_province" property="placeProvince" jdbcType="VARCHAR" />
+    <result column="place_city" property="placeCity" jdbcType="VARCHAR" />
+    <result column="place_district" property="placeDistrict" jdbcType="VARCHAR" />
+    <result column="expect_sex" property="expectSex" jdbcType="VARCHAR" />
+    <result column="teacher_lesson" property="teacherLesson" jdbcType="VARCHAR" />
+    <result column="teacher_grade" property="teacherGrade" jdbcType="VARCHAR" />
+    <result column="times_week" property="timesWeek" jdbcType="INTEGER" />
+    <result column="lesson_charge" property="lessonCharge" jdbcType="DECIMAL" />
+    <result column="link_phone" property="linkPhone" jdbcType="VARCHAR" />
+    <result column="find_status" property="findStatus" jdbcType="TINYINT" />
+    <result column="add_time" property="addTime" jdbcType="VARCHAR" />
+    <result column="del_status" property="delStatus" jdbcType="TINYINT" />
+  </resultMap>
+  
+  <resultMap id="ResultMapWithBLOBs" type="com.zeng.ezsh.wy.entity.FamilyEducateInfo" extends="BaseResultMap" >
+    <result column="other_explain" property="otherExplain" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    family_educate_info_id, pt_manager_id, manager_name, pt_user_id, parent_name, place_province, 
+    place_city, place_district, expect_sex, teacher_lesson, teacher_grade, times_week, lesson_charge, 
+    link_phone, find_status, add_time, del_status
+  </sql>
+  <sql id="Blob_Column_List" >
+    other_explain
+  </sql>
+  
+  <!-- 添加家教信息 -->
+  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.FamilyEducateInfo" >
+   insert into family_educate_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="familyEducateInfoId != null" >
+        family_educate_info_id,
+      </if>
+      <if test="ptManagerId != null" >
+        pt_manager_id,
+      </if>
+      <if test="managerName != null" >
+        manager_name,
+      </if>
+      <if test="ptUserId != null" >
+        pt_user_id,
+      </if>
+      <if test="parentName != null" >
+        parent_name,
+      </if>
+      <if test="placeProvince != null" >
+        place_province,
+      </if>
+      <if test="placeCity != null" >
+        place_city,
+      </if>
+      <if test="placeDistrict != null" >
+        place_district,
+      </if>
+      <if test="expectSex != null" >
+        expect_sex,
+      </if>
+      <if test="teacherLesson != null" >
+        teacher_lesson,
+      </if>
+      <if test="teacherGrade != null">
+      	teacher_grade,
+      </if>
+      <if test="timesWeek != null" >
+        times_week,
+      </if>
+      <if test="lessonCharge != null" >
+        lesson_charge,
+      </if>
+      <if test="linkPhone != null" >
+        link_phone,
+      </if>
+      <if test="findStatus != null" >
+        find_status,
+      </if>
+      <if test="otherExplain != null" >
+        other_explain,
+      </if>
+      <if test="addTime !=null">
+      	add_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="familyEducateInfoId != null" >
+        #{familyEducateInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="ptManagerId != null" >
+        #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="managerName != null" >
+        #{managerName,jdbcType=VARCHAR},
+      </if>
+      <if test="ptUserId != null" >
+        #{ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="parentName != null" >
+        #{parentName,jdbcType=VARCHAR},
+      </if>
+      <if test="placeProvince != null" >
+        #{placeProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="placeCity != null" >
+        #{placeCity,jdbcType=VARCHAR},
+      </if>
+      <if test="placeDistrict != null" >
+        #{placeDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="expectSex != null" >
+        #{expectSex,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherLesson != null" >
+        #{teacherLesson,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherGrade != null">
+      	#{teacherGrade,jdbcType=VARCHAR},
+      </if>
+      <if test="timesWeek != null" >
+        #{timesWeek,jdbcType=INTEGER},
+      </if>
+      <if test="lessonCharge != null" >
+        #{lessonCharge,jdbcType=DECIMAL},
+      </if>
+      <if test="linkPhone != null" >
+        #{linkPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="findStatus != null" >
+        #{findStatus,jdbcType=TINYINT},
+      </if>
+      <if test="otherExplain != null" >
+        #{otherExplain,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="addTime != null">
+        #{addTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+ </insert>
+  
+  <!-- 获取家教需求信息列表（微信端、移动端【ptUserId不为空时】）-->
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.FamilyEducateInfo" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from family_educate_info
+    <where>
+      <if test="ptManagerId != null" >
+        and pt_manager_id = #{ptManagerId,jdbcType=INTEGER}
+      </if>
+      <if test="ptUserId != null" >
+        and pt_user_id = #{ptUserId,jdbcType=INTEGER}
+      </if>
+      <if test="placeProvince != null" >
+        and place_province like CONCAT('%',#{placeProvince},'%') 
+      </if>
+      <if test="placeCity != null" >
+        and place_city like CONCAT('%',#{placeCity},'%') 
+      </if>
+      <if test="placeDistrict != null" >
+        and place_district like CONCAT('%',#{placeDistrict},'%')
+      </if>
+      <if test="otherExplain != null and otherExplain !=''" >
+        and other_explain like CONCAT('%',#{otherExplain},'%')
+      </if>
+      <if test="teacherLesson != null" >
+        and teacher_lesson like CONCAT('%',#{teacherLesson},'%')
+      </if>
+      <if test="teacherGrade != null">
+      	and teacher_grade like CONCAT('%',#{teacherGrade},'%')
+      </if>
+      and del_status = 0
+    </where>
+    Order By add_time DESC
+  </select>
+  
+  <!-- 家长删除家教需求 -->
+  <update id="deleteById" parameterType="com.zeng.ezsh.wy.entity.FamilyEducateInfo" >
+    update family_educate_info
+    <set >
+      <if test="delStatus != null" >
+        del_status = #{delStatus,jdbcType=INTEGER},
+      </if>
+    </set>
+    where family_educate_info_id = #{familyEducateInfoId,jdbcType=INTEGER}
+    and pt_user_id = #{ptUserId,jdbcType=INTEGER}
+  </update>
+  
+  <!-- 
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.FamilyEducateInfoExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from family_educate_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.FamilyEducateInfoExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from family_educate_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from family_educate_info
+    where family_educate_info_id = #{familyEducateInfoId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.zeng.ezsh.wy.entity.FamilyEducateInfoExample" >
+    delete from family_educate_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.FamilyEducateInfo" >
+    insert into family_educate_info (family_educate_info_id, pt_manager_id, 
+      manager_name, pt_user_id, place_province, 
+      place_city, expect_sex, teacher_lesson, 
+      times_week, lesson_charge, link_phone, 
+      other_explain)
+    values (#{familyEducateInfoId,jdbcType=INTEGER}, #{ptManagerId,jdbcType=INTEGER}, 
+      #{managerName,jdbcType=VARCHAR}, #{ptUserId,jdbcType=INTEGER}, #{placeProvince,jdbcType=VARCHAR}, 
+      #{placeCity,jdbcType=VARCHAR}, #{expectSex,jdbcType=VARCHAR}, #{teacherLesson,jdbcType=VARCHAR}, 
+      #{timesWeek,jdbcType=INTEGER}, #{lessonCharge,jdbcType=DECIMAL}, #{linkPhone,jdbcType=VARCHAR}, 
+      #{otherExplain,jdbcType=LONGVARCHAR})
+  </insert>
+ 
+  <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.FamilyEducateInfoExample" resultType="java.lang.Integer" >
+    select count(*) from family_educate_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update family_educate_info
+    <set >
+      <if test="record.familyEducateInfoId != null" >
+        family_educate_info_id = #{record.familyEducateInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptManagerId != null" >
+        pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="record.managerName != null" >
+        manager_name = #{record.managerName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ptUserId != null" >
+        pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="record.placeProvince != null" >
+        place_province = #{record.placeProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="record.placeCity != null" >
+        place_city = #{record.placeCity,jdbcType=VARCHAR},
+      </if>
+      <if test="record.expectSex != null" >
+        expect_sex = #{record.expectSex,jdbcType=VARCHAR},
+      </if>
+      <if test="record.teacherLesson != null" >
+        teacher_lesson = #{record.teacherLesson,jdbcType=VARCHAR},
+      </if>
+      <if test="record.timesWeek != null" >
+        times_week = #{record.timesWeek,jdbcType=INTEGER},
+      </if>
+      <if test="record.lessonCharge != null" >
+        lesson_charge = #{record.lessonCharge,jdbcType=DECIMAL},
+      </if>
+      <if test="record.linkPhone != null" >
+        link_phone = #{record.linkPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.otherExplain != null" >
+        other_explain = #{record.otherExplain,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update family_educate_info
+    set family_educate_info_id = #{record.familyEducateInfoId,jdbcType=INTEGER},
+      pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      manager_name = #{record.managerName,jdbcType=VARCHAR},
+      pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+      place_province = #{record.placeProvince,jdbcType=VARCHAR},
+      place_city = #{record.placeCity,jdbcType=VARCHAR},
+      expect_sex = #{record.expectSex,jdbcType=VARCHAR},
+      teacher_lesson = #{record.teacherLesson,jdbcType=VARCHAR},
+      times_week = #{record.timesWeek,jdbcType=INTEGER},
+      lesson_charge = #{record.lessonCharge,jdbcType=DECIMAL},
+      link_phone = #{record.linkPhone,jdbcType=VARCHAR},
+      other_explain = #{record.otherExplain,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update family_educate_info
+    set family_educate_info_id = #{record.familyEducateInfoId,jdbcType=INTEGER},
+      pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      manager_name = #{record.managerName,jdbcType=VARCHAR},
+      pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+      place_province = #{record.placeProvince,jdbcType=VARCHAR},
+      place_city = #{record.placeCity,jdbcType=VARCHAR},
+      expect_sex = #{record.expectSex,jdbcType=VARCHAR},
+      teacher_lesson = #{record.teacherLesson,jdbcType=VARCHAR},
+      times_week = #{record.timesWeek,jdbcType=INTEGER},
+      lesson_charge = #{record.lessonCharge,jdbcType=DECIMAL},
+      link_phone = #{record.linkPhone,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.FamilyEducateInfo" >
+    update family_educate_info
+    <set >
+      <if test="ptManagerId != null" >
+        pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="managerName != null" >
+        manager_name = #{managerName,jdbcType=VARCHAR},
+      </if>
+      <if test="ptUserId != null" >
+        pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="placeProvince != null" >
+        place_province = #{placeProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="placeCity != null" >
+        place_city = #{placeCity,jdbcType=VARCHAR},
+      </if>
+      <if test="expectSex != null" >
+        expect_sex = #{expectSex,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherLesson != null" >
+        teacher_lesson = #{teacherLesson,jdbcType=VARCHAR},
+      </if>
+      <if test="timesWeek != null" >
+        times_week = #{timesWeek,jdbcType=INTEGER},
+      </if>
+      <if test="lessonCharge != null" >
+        lesson_charge = #{lessonCharge,jdbcType=DECIMAL},
+      </if>
+      <if test="linkPhone != null" >
+        link_phone = #{linkPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="otherExplain != null" >
+        other_explain = #{otherExplain,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where family_educate_info_id = #{familyEducateInfoId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.FamilyEducateInfo" >
+    update family_educate_info
+    set pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      manager_name = #{managerName,jdbcType=VARCHAR},
+      pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      place_province = #{placeProvince,jdbcType=VARCHAR},
+      place_city = #{placeCity,jdbcType=VARCHAR},
+      expect_sex = #{expectSex,jdbcType=VARCHAR},
+      teacher_lesson = #{teacherLesson,jdbcType=VARCHAR},
+      times_week = #{timesWeek,jdbcType=INTEGER},
+      lesson_charge = #{lessonCharge,jdbcType=DECIMAL},
+      link_phone = #{linkPhone,jdbcType=VARCHAR},
+      other_explain = #{otherExplain,jdbcType=LONGVARCHAR}
+    where family_educate_info_id = #{familyEducateInfoId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.FamilyEducateInfo" >
+    update family_educate_info
+    set pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      manager_name = #{managerName,jdbcType=VARCHAR},
+      pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      place_province = #{placeProvince,jdbcType=VARCHAR},
+      place_city = #{placeCity,jdbcType=VARCHAR},
+      expect_sex = #{expectSex,jdbcType=VARCHAR},
+      teacher_lesson = #{teacherLesson,jdbcType=VARCHAR},
+      times_week = #{timesWeek,jdbcType=INTEGER},
+      lesson_charge = #{lessonCharge,jdbcType=DECIMAL},
+      link_phone = #{linkPhone,jdbcType=VARCHAR}
+    where family_educate_info_id = #{familyEducateInfoId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

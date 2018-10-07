@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.GoodsCommentMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.GoodsComment" >
+    <id column="g_comment_id" property="gCommentId" jdbcType="INTEGER" />
+    <result column="p_appraise_id" property="pAppraiseId" jdbcType="INTEGER" />
+    <result column="p_user_id" property="pUserId" jdbcType="INTEGER" />
+    <result column="comment_content" property="commentContent" jdbcType="VARCHAR" />
+    <result column="comment_time" property="commentTime" jdbcType="VARCHAR" />
+    <collection property="userInfo" column="p_user_id" select="com.zeng.ezsh.wy.dao.ResidentialUserMapper.selectByPrimaryKeyToGoodsComment">
+       	
+    </collection>
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    g_comment_id, p_appraise_id, p_user_id, comment_content, comment_time
+  </sql>
+  
+  <select id="getGoodsCommentAmountByGoodsAppraiseId" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+    select count(*)
+    from goods_comment
+    where p_appraise_id = #{0}
+  </select>
+  
+  <!-- 获取商品的评价的回复集合 -->
+  <select id="selectGoodsCommentList" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.GoodsComment" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_comment
+    where p_appraise_id = #{pAppraiseId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 添加评价的回复 -->
+  <insert id="addComment" parameterType="com.zeng.ezsh.wy.entity.GoodsComment" >
+    insert into goods_comment (g_comment_id, p_appraise_id, p_user_id, 
+      comment_content, comment_time)
+    values (#{gCommentId,jdbcType=INTEGER}, #{pAppraiseId,jdbcType=INTEGER}, #{pUserId,jdbcType=INTEGER}, 
+      #{commentContent,jdbcType=VARCHAR}, #{commentTime,jdbcType=VARCHAR})
+  </insert>
+    
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from goods_comment
+    where g_comment_id = #{gCommentId,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.GoodsComment" >
+    insert into goods_comment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="gCommentId != null" >
+        g_comment_id,
+      </if>
+      <if test="pAppraiseId != null" >
+        p_appraise_id,
+      </if>
+      <if test="pUserId != null" >
+        p_user_id,
+      </if>
+      <if test="commentContent != null" >
+        comment_content,
+      </if>
+      <if test="commentTime != null" >
+        comment_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="gCommentId != null" >
+        #{gCommentId,jdbcType=INTEGER},
+      </if>
+      <if test="pAppraiseId != null" >
+        #{pAppraiseId,jdbcType=INTEGER},
+      </if>
+      <if test="pUserId != null" >
+        #{pUserId,jdbcType=INTEGER},
+      </if>
+      <if test="commentContent != null" >
+        #{commentContent,jdbcType=VARCHAR},
+      </if>
+      <if test="commentTime != null" >
+        #{commentTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.GoodsComment" >
+    update goods_comment
+    <set >
+      <if test="pGoodsId != null" >
+        p_appraise_id = #{pAppraiseId,jdbcType=INTEGER},
+      </if>
+      <if test="pUserId != null" >
+        p_user_id = #{pUserId,jdbcType=INTEGER},
+      </if>
+      <if test="commentContent != null" >
+        comment_content = #{commentContent,jdbcType=VARCHAR},
+      </if>
+      <if test="commentTime != null" >
+        comment_time = #{commentTime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where g_comment_id = #{gCommentId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.GoodsComment" >
+    update goods_comment
+    set p_appraise_id = #{pAppraiseId,jdbcType=INTEGER},
+      p_user_id = #{pUserId,jdbcType=INTEGER},
+      comment_content = #{commentContent,jdbcType=VARCHAR},
+      comment_time = #{commentTime,jdbcType=VARCHAR}
+    where g_comment_id = #{gCommentId,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.RentMapper" >
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.Rent" >
+	    <id column="rent_id" property="rentId" jdbcType="INTEGER" />
+	    <result column="pt_manager_id" property="ptManagerId" jdbcType="INTEGER" />
+	    <result column="manager_name" property="managerName" jdbcType="VARCHAR" />
+	    <result column="pt_build_id" property="ptBuildId" jdbcType="INTEGER" />
+	    <result column="build_name" property="buildName" jdbcType="VARCHAR" />
+	    <result column="pt_room_id" property="ptRoomId" jdbcType="INTEGER" />
+	    <result column="room_num" property="roomNum" jdbcType="VARCHAR" />
+	    <result column="rent_telephone" property="rentTelephone" jdbcType="VARCHAR" />
+	    <result column="rent_name" property="rentName" jdbcType="VARCHAR" />
+	    <result column="rent_classify" property="rentClassify" jdbcType="VARCHAR" />
+	    <result column="rent_descr" property="rentDescr" jdbcType="VARCHAR" />
+	    <result column="rent_status" property="rentStatus" jdbcType="TINYINT" />
+	    <result column="rent_time" property="rentTime" jdbcType="VARCHAR" />
+	    <result column="del_status" property="delStatus" jdbcType="TINYINT" />
+  	</resultMap>
+	<sql id="Base_Column_List" >
+	    rent_id, pt_manager_id, manager_name, pt_build_id, build_name, pt_room_id, room_num, 
+	    rent_telephone, rent_name, rent_classify, rent_descr, rent_status, rent_time, del_status
+  	</sql>
+	
+	<!-- 添加出租记录 -->
+	<insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.Rent" >
+	    insert into rent
+	    <trim prefix="(" suffix=")" suffixOverrides="," >
+	      <if test="rentId != null" >
+	        rent_id,
+	      </if>
+	      <if test="ptManagerId != null" >
+	        pt_manager_id,
+	      </if>
+	      <if test="managerName != null" >
+	        manager_name,
+	      </if>
+	      <if test="ptBuildId != null" >
+	        pt_build_id,
+	      </if>
+	      <if test="buildName != null" >
+	        build_name,
+	      </if>
+	      <if test="ptRoomId != null" >
+	        pt_room_id,
+	      </if>
+	      <if test="roomNum != null" >
+	        room_num,
+	      </if>
+	      <if test="rentTelephone != null" >
+	        rent_telephone,
+	      </if>
+	      <if test="rentName != null" >
+	        rent_name,
+	      </if>
+	      <if test="rentClassify != null" >
+	        rent_classify,
+	      </if>
+	      <if test="rentDescr != null" >
+	        rent_descr,
+	      </if>
+	      <if test="rentStatus != null" >
+	        rent_status,
+	      </if>
+	      <if test="rentTime != null" >
+	        rent_time,
+	      </if>
+	    </trim>
+	    <trim prefix="values (" suffix=")" suffixOverrides="," >
+	      <if test="rentId != null" >
+	        #{rentId,jdbcType=INTEGER},
+	      </if>
+	      <if test="ptManagerId != null" >
+	        #{ptManagerId,jdbcType=INTEGER},
+	      </if>
+	      <if test="managerName != null" >
+	        #{managerName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="ptBuildId != null" >
+	        #{ptBuildId,jdbcType=INTEGER},
+	      </if>
+	      <if test="buildName != null" >
+	        #{buildName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="ptRoomId != null" >
+	        #{ptRoomId,jdbcType=INTEGER},
+	      </if>
+	      <if test="roomNum != null" >
+	        #{roomNum,jdbcType=VARCHAR},
+	      </if>
+	      <if test="rentTelephone != null" >
+	        #{rentTelephone,jdbcType=VARCHAR},
+	      </if>
+	      <if test="rentName != null" >
+	        #{rentName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="rentClassify != null" >
+	        #{rentClassify,jdbcType=VARCHAR},
+	      </if>
+	      <if test="rentDescr != null" >
+	        #{rentDescr,jdbcType=VARCHAR},
+	      </if>
+	      <if test="rentStatus != null" >
+	        #{rentStatus,jdbcType=TINYINT},
+	      </if>
+	      <if test="rentTime != null" >
+	        #{rentTime,jdbcType=VARCHAR},
+	      </if>
+	    </trim>
+  	</insert>
+  	
+  	<!-- 获取出租记录集合 -->
+	<select id="selectRentList" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.Rent" >
+	    select
+	    <include refid="Base_Column_List" />
+	    from rent
+	    <where>
+	    	  del_status = 0
+			<if test="ptManagerId != null" >
+			  and pt_manager_id = #{ptManagerId,jdbcType=INTEGER}
+			</if>
+			<if test="ptRoomId != null" >
+			  and pt_room_id = #{ptRoomId,jdbcType=INTEGER}
+			</if>
+			<if test="rentTelephone != null and rentTelephone !=''" >
+			  and rent_telephone = #{rentTelephone,jdbcType=VARCHAR}
+			</if>
+			<if test="rentName != null and rentName !=''" >
+			  and rent_name like CONCAT('%',#{rentName},'%')
+			</if>
+			<if test="rentClassify != null and rentClassify !=''" >
+			  and rent_classify = #{rentClassify,jdbcType=VARCHAR}
+			</if>
+			<if test="rentStatus != null" >
+			  and rent_status = #{rentStatus,jdbcType=TINYINT}
+			</if>
+	    </where>
+  	</select>
+  	
+  	<!-- 删除出租记录 -->
+  	<delete id="delRent" parameterType="com.zeng.ezsh.wy.entity.Rent" >
+	    delete from rent
+	    where rent_id = #{rentId,jdbcType=INTEGER}
+	</delete>
+	
+	<update id="updateRent" parameterType="com.zeng.ezsh.wy.entity.Rent" >
+	    update rent
+	    <set >
+	      <!-- <if test="rentId != null" >
+	        rent_id = #{rentId,jdbcType=INTEGER},
+	      </if>
+	      <if test="ptManagerId != null" >
+	        pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+	      </if>
+	      <if test="managerName != null" >
+	        manager_name = #{managerName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="ptBuildId != null" >
+	        pt_build_id = #{ptBuildId,jdbcType=INTEGER},
+	      </if>
+	      <if test="buildName != null" >
+	        build_name = #{buildName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="ptRoomId != null" >
+	        pt_room_id = #{ptRoomId,jdbcType=INTEGER},
+	      </if>
+	      <if test="roomNum != null" >
+	        room_num = #{roomNum,jdbcType=VARCHAR},
+	      </if> -->
+	      <if test="rentTelephone != null" >
+	        rent_telephone = #{rentTelephone,jdbcType=VARCHAR},
+	      </if>
+	      <if test="rentName != null" >
+	        rent_name = #{rentName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="rentClassify != null" >
+	        rent_classify = #{rentClassify,jdbcType=VARCHAR},
+	      </if>
+	      <if test="rentDescr != null" >
+	        rent_descr = #{rentDescr,jdbcType=VARCHAR},
+	      </if>
+	      <if test="rentStatus != null" >
+	        rent_status = #{rentStatus,jdbcType=TINYINT},
+	      </if>
+	      <if test="rentTime != null" >
+	        rent_time = #{rentTime,jdbcType=VARCHAR},
+	      </if>
+	    </set>
+	     where rent_id = #{rentId,jdbcType=INTEGER}
+  	</update>
+  <!-- 
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.RentExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from rent
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from rent
+    where rent_id = #{rentId,jdbcType=INTEGER}
+  </select>
+  
+  <delete id="deleteByExample" parameterType="com.zeng.ezsh.wy.entity.RentExample" >
+    delete from rent
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.Rent" >
+    insert into rent (rent_id, pt_manager_id, manager_name, 
+      pt_build_id, build_name, pt_room_id, 
+      room_num, rent_telephone, rent_name, 
+      rent_classify, rent_descr, rent_status, 
+      rent_time)
+    values (#{rentId,jdbcType=INTEGER}, #{ptManagerId,jdbcType=INTEGER}, #{managerName,jdbcType=VARCHAR}, 
+      #{ptBuildId,jdbcType=INTEGER}, #{buildName,jdbcType=VARCHAR}, #{ptRoomId,jdbcType=INTEGER}, 
+      #{roomNum,jdbcType=VARCHAR}, #{rentTelephone,jdbcType=VARCHAR}, #{rentName,jdbcType=VARCHAR}, 
+      #{rentClassify,jdbcType=VARCHAR}, #{rentDescr,jdbcType=VARCHAR}, #{rentStatus,jdbcType=TINYINT}, 
+      #{rentTime,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.Rent" >
+    insert into rent
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="rentId != null" >
+        rent_id,
+      </if>
+      <if test="ptManagerId != null" >
+        pt_manager_id,
+      </if>
+      <if test="managerName != null" >
+        manager_name,
+      </if>
+      <if test="ptBuildId != null" >
+        pt_build_id,
+      </if>
+      <if test="buildName != null" >
+        build_name,
+      </if>
+      <if test="ptRoomId != null" >
+        pt_room_id,
+      </if>
+      <if test="roomNum != null" >
+        room_num,
+      </if>
+      <if test="rentTelephone != null" >
+        rent_telephone,
+      </if>
+      <if test="rentName != null" >
+        rent_name,
+      </if>
+      <if test="rentClassify != null" >
+        rent_classify,
+      </if>
+      <if test="rentDescr != null" >
+        rent_descr,
+      </if>
+      <if test="rentStatus != null" >
+        rent_status,
+      </if>
+      <if test="rentTime != null" >
+        rent_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="rentId != null" >
+        #{rentId,jdbcType=INTEGER},
+      </if>
+      <if test="ptManagerId != null" >
+        #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="managerName != null" >
+        #{managerName,jdbcType=VARCHAR},
+      </if>
+      <if test="ptBuildId != null" >
+        #{ptBuildId,jdbcType=INTEGER},
+      </if>
+      <if test="buildName != null" >
+        #{buildName,jdbcType=VARCHAR},
+      </if>
+      <if test="ptRoomId != null" >
+        #{ptRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="roomNum != null" >
+        #{roomNum,jdbcType=VARCHAR},
+      </if>
+      <if test="rentTelephone != null" >
+        #{rentTelephone,jdbcType=VARCHAR},
+      </if>
+      <if test="rentName != null" >
+        #{rentName,jdbcType=VARCHAR},
+      </if>
+      <if test="rentClassify != null" >
+        #{rentClassify,jdbcType=VARCHAR},
+      </if>
+      <if test="rentDescr != null" >
+        #{rentDescr,jdbcType=VARCHAR},
+      </if>
+      <if test="rentStatus != null" >
+        #{rentStatus,jdbcType=TINYINT},
+      </if>
+      <if test="rentTime != null" >
+        #{rentTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.RentExample" resultType="java.lang.Integer" >
+    select count(*) from rent
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  
+  <update id="updateByExample" parameterType="map" >
+    update rent
+    set rent_id = #{record.rentId,jdbcType=INTEGER},
+      pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      manager_name = #{record.managerName,jdbcType=VARCHAR},
+      pt_build_id = #{record.ptBuildId,jdbcType=INTEGER},
+      build_name = #{record.buildName,jdbcType=VARCHAR},
+      pt_room_id = #{record.ptRoomId,jdbcType=INTEGER},
+      room_num = #{record.roomNum,jdbcType=VARCHAR},
+      rent_telephone = #{record.rentTelephone,jdbcType=VARCHAR},
+      rent_name = #{record.rentName,jdbcType=VARCHAR},
+      rent_classify = #{record.rentClassify,jdbcType=VARCHAR},
+      rent_descr = #{record.rentDescr,jdbcType=VARCHAR},
+      rent_status = #{record.rentStatus,jdbcType=TINYINT},
+      rent_time = #{record.rentTime,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.Rent" >
+    update rent
+    <set >
+      <if test="ptManagerId != null" >
+        pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="managerName != null" >
+        manager_name = #{managerName,jdbcType=VARCHAR},
+      </if>
+      <if test="ptBuildId != null" >
+        pt_build_id = #{ptBuildId,jdbcType=INTEGER},
+      </if>
+      <if test="buildName != null" >
+        build_name = #{buildName,jdbcType=VARCHAR},
+      </if>
+      <if test="ptRoomId != null" >
+        pt_room_id = #{ptRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="roomNum != null" >
+        room_num = #{roomNum,jdbcType=VARCHAR},
+      </if>
+      <if test="rentTelephone != null" >
+        rent_telephone = #{rentTelephone,jdbcType=VARCHAR},
+      </if>
+      <if test="rentName != null" >
+        rent_name = #{rentName,jdbcType=VARCHAR},
+      </if>
+      <if test="rentClassify != null" >
+        rent_classify = #{rentClassify,jdbcType=VARCHAR},
+      </if>
+      <if test="rentDescr != null" >
+        rent_descr = #{rentDescr,jdbcType=VARCHAR},
+      </if>
+      <if test="rentStatus != null" >
+        rent_status = #{rentStatus,jdbcType=TINYINT},
+      </if>
+      <if test="rentTime != null" >
+        rent_time = #{rentTime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where rent_id = #{rentId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.Rent" >
+    update rent
+    set pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      manager_name = #{managerName,jdbcType=VARCHAR},
+      pt_build_id = #{ptBuildId,jdbcType=INTEGER},
+      build_name = #{buildName,jdbcType=VARCHAR},
+      pt_room_id = #{ptRoomId,jdbcType=INTEGER},
+      room_num = #{roomNum,jdbcType=VARCHAR},
+      rent_telephone = #{rentTelephone,jdbcType=VARCHAR},
+      rent_name = #{rentName,jdbcType=VARCHAR},
+      rent_classify = #{rentClassify,jdbcType=VARCHAR},
+      rent_descr = #{rentDescr,jdbcType=VARCHAR},
+      rent_status = #{rentStatus,jdbcType=TINYINT},
+      rent_time = #{rentTime,jdbcType=VARCHAR}
+    where rent_id = #{rentId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

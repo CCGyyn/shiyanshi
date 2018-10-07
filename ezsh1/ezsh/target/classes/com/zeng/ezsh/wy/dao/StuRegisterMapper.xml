@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.StuRegisterMapper">
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.StuRegister">
+		<id column="stu_id" property="stuId" jdbcType="INTEGER" />
+		<result column="telephone" property="telephone" jdbcType="VARCHAR" />
+		<result column="p_id" property="pId" jdbcType="INTEGER" />
+		<result column="test" property="test" jdbcType="VARCHAR" />
+		<result column="subject" property="subject" jdbcType="VARCHAR" />
+		<result column="stu_name" property="stuName" jdbcType="VARCHAR" />
+		<result column="stu_photo" property="stuPhoto" jdbcType="VARCHAR" />
+		<result column="stu_class" property="stuClass" jdbcType="VARCHAR" />
+		<result column="sex" property="sex" jdbcType="VARCHAR" />
+		<result column="question" property="question" jdbcType="VARCHAR" />
+		<result column="answer" property="answer" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+	</resultMap>
+
+
+	<sql id="Base_Column_List">
+		stu_id, telephone, p_id, test, subject, stu_name,
+		stu_photo, stu_class, sex,
+		question,
+		answer, create_time
+	</sql>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from stu_register
+		where stu_id = #{stuId,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		stu_register
+		where stu_id = #{stuId,jdbcType=INTEGER}
+	</delete>
+
+	<insert id="insert" parameterType="com.zeng.ezsh.wy.entity.StuRegister">
+		insert into stu_register
+		(stu_id, telephone, p_id,
+		test, subject, stu_name,
+		stu_photo, stu_class,
+		sex,
+		question, answer, create_time
+		)
+		values (#{stuId,jdbcType=INTEGER},
+		#{telephone,jdbcType=VARCHAR},
+		#{pId,jdbcType=INTEGER},
+		#{test,jdbcType=VARCHAR}, #{subject,jdbcType=VARCHAR},
+		#{stuName,jdbcType=VARCHAR},
+		#{stuPhoto,jdbcType=VARCHAR},
+		#{stuClass,jdbcType=VARCHAR},
+		#{sex,jdbcType=VARCHAR},
+		#{question,jdbcType=VARCHAR}, #{answer,jdbcType=VARCHAR},
+		#{createTime,jdbcType=VARCHAR}
+		)
+	</insert>
+
+
+
+
+
+	<update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.StuRegister">
+		update
+		stu_register
+		set telephone = #{telephone,jdbcType=VARCHAR},
+		p_id =
+		#{pId,jdbcType=INTEGER},
+		test = #{test,jdbcType=VARCHAR},
+		subject =
+		#{subject,jdbcType=VARCHAR},
+		stu_name = #{stuName,jdbcType=VARCHAR},
+		stu_photo = #{stuPhoto,jdbcType=VARCHAR},
+		stu_class =
+		#{stuClass,jdbcType=VARCHAR},
+		sex = #{sex,jdbcType=VARCHAR},
+		question =
+		#{question,jdbcType=VARCHAR},
+		answer = #{answer,jdbcType=VARCHAR},
+		create_time = #{createTime,jdbcType=VARCHAR}
+		where stu_id =
+		#{stuId,jdbcType=INTEGER}
+	</update>
+
+	<!-- 分页获取学生注册信息 -->
+	<select id="queryMessageListByPage" resultMap="BaseResultMap"
+		parameterType="com.zeng.ezsh.wy.entity.Page">
+		select
+		<include refid="Base_Column_List" />
+		from stu_register
+		where id > 0
+		<if test="paramEntity!=null and paramEntity.pId!=null">and
+			p_id= #{paramEntity.pId}
+		</if>
+		<if test="paramEntity!=null and paramEntity.subject!=null">and
+			subject= #{paramEntity.subject}
+		</if>
+		<if test="paramEntity!=null and paramEntity.stuName!=null"> and
+			stu_name= #{paramEntity.stuName}
+		</if>
+		<if test="paramEntity!=null and paramEntity.sex!=null"> and
+			sex= #{paramEntity.sex}
+		</if>
+		<if test="paramEntity!=null and paramEntity.stuClass!=null">
+			and
+			stu_class= #{paramEntity.stuClass}
+		</if>
+		order by create_time DESC
+		<if test="page> 0">
+			limit #{start},#{rows}
+		</if>
+
+	</select>
+	<!-- 根据条件计算学生数量数量 -->
+	<select id="getCount" resultType="java.lang.Integer"
+		parameterType="com.zeng.ezsh.wy.entity.Page">
+		select
+		count(*)
+		from stu_register
+		where 1=1
+		<if test="paramEntity!=null and paramEntity.pId!=null">and
+			p_id= #{paramEntity.pId}
+		</if>
+		<if test="paramEntity!=null and paramEntity.subject!=null">and
+			subject= #{paramEntity.subject}
+		</if>
+		<if test="paramEntity!=null and paramEntity.stuName!=null"> and
+			stu_name= #{paramEntity.stuName}
+		</if>
+		<if test="paramEntity!=null and paramEntity.sex!=null"> and
+			sex= #{paramEntity.sex}
+		</if>
+		<if test="paramEntity!=null and paramEntity.stuClass!=null">
+			and
+			stu_class= #{paramEntity.stuClass}
+		</if>
+	</select>
+	<!--批量删除 -->
+	<delete id="deleteList">
+		delete from stu_register where id in
+		<foreach collection="array" open="(" close=")" separator=","
+			item="pk">
+			#{pk}
+		</foreach>
+	</delete>
+</mapper>

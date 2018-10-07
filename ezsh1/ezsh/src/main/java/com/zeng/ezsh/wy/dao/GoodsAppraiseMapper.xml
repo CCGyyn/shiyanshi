@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.GoodsAppraiseMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.GoodsAppraise" >
+    <id column="appraise_id" property="appraiseId" jdbcType="INTEGER" />
+    <result column="p_goods_info_id" property="pGoodsInfoId" jdbcType="INTEGER" />
+    <result column="p_user_id" property="pUserId" jdbcType="INTEGER" />
+    <result column="p_manager_id" jdbcType="INTEGER" property="pManagerId" />
+    <result column="appraise_content" property="appraiseContent" jdbcType="VARCHAR" />
+    <result column="appraise_img" property="appraiseImg" jdbcType="VARCHAR" />
+    <result column="appraise_time" property="appraiseTime" jdbcType="VARCHAR" />
+    <collection property="appraiseReplyAmount"  column="appraise_id" select="com.zeng.ezsh.wy.dao.GoodsCommentMapper.getGoodsCommentAmountByGoodsAppraiseId">
+    </collection>
+    <collection property="userInfo" column="p_user_id" select="com.zeng.ezsh.wy.dao.ResidentialUserMapper.selectByPrimaryKeyToGoodsComment">
+    </collection>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    appraise_id, p_goods_info_id, p_user_id, p_manager_id, appraise_content, appraise_img, appraise_time
+  </sql>
+  
+  <!-- 获取商品评价列表 -->
+  <select id="getGoodsAppraiseList" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_appraise
+    where p_goods_info_id = #{pGoodsInfoId,jdbcType=INTEGER}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from goods_appraise
+    where appraise_id = #{appraiseId,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="addGoodsAppraise" parameterType="com.zeng.ezsh.wy.entity.GoodsAppraise" >
+    insert into goods_appraise (appraise_id, p_goods_info_id, p_user_id, 
+      p_manager_id,appraise_content, appraise_img, appraise_time
+      )
+    values (#{appraiseId,jdbcType=INTEGER}, #{pGoodsInfoId,jdbcType=INTEGER}, #{pUserId,jdbcType=INTEGER}, 
+      #{pManagerId,jdbcType=INTEGER},#{appraiseContent,jdbcType=VARCHAR}, #{appraiseImg,jdbcType=VARCHAR}, #{appraiseTime,jdbcType=VARCHAR}
+      )
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.GoodsAppraise" >
+    insert into goods_appraise
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="appraiseId != null" >
+        appraise_id,
+      </if>
+      <if test="pGoodsInfoId != null" >
+        p_goods_info_id,
+      </if>
+      <if test="pUserId != null" >
+        p_user_id,
+      </if>
+      <if test="pManagerId != null">
+        p_manager_id,
+      </if>
+      <if test="appraiseContent != null" >
+        appraise_content,
+      </if>
+      <if test="appraiseImg != null" >
+        appraise_img,
+      </if>
+      <if test="appraiseTime != null" >
+        appraise_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="appraiseId != null" >
+        #{appraiseId,jdbcType=INTEGER},
+      </if>
+      <if test="pGoodsId != null" >
+        #{pGoodsId,jdbcType=INTEGER},
+      </if>
+      <if test="pUserId != null" >
+        #{pUserId,jdbcType=INTEGER},
+      </if>
+      <if test="pManagerId != null">
+        #{pManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="appraiseContent != null" >
+        #{appraiseContent,jdbcType=VARCHAR},
+      </if>
+      <if test="appraiseImg != null" >
+        #{appraiseImg,jdbcType=VARCHAR},
+      </if>
+      <if test="appraiseTime != null" >
+        #{appraiseTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.GoodsAppraise" >
+    update goods_appraise
+    <set >
+      <if test="pGoodsInfoId != null" >
+        p_goods_info_id = #{pGoodsInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="pUserId != null" >
+        p_user_id = #{pUserId,jdbcType=INTEGER},
+      </if>
+      <if test="appraiseContent != null" >
+        appraise_content = #{appraiseContent,jdbcType=VARCHAR},
+      </if>
+      <if test="appraiseImg != null" >
+        appraise_img = #{appraiseImg,jdbcType=VARCHAR},
+      </if>
+      <if test="appraiseTime != null" >
+        appraise_time = #{appraiseTime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where appraise_id = #{appraiseId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.GoodsAppraise" >
+    update goods_appraise
+    set p_goods_info_id = #{pGoodsInfoId,jdbcType=INTEGER},
+      p_user_id = #{pUserId,jdbcType=INTEGER},
+      appraise_content = #{appraiseContent,jdbcType=VARCHAR},
+      appraise_img = #{appraiseImg,jdbcType=VARCHAR},
+      appraise_time = #{appraiseTime,jdbcType=VARCHAR}
+    where appraise_id = #{appraiseId,jdbcType=INTEGER}
+  </update>
+</mapper>

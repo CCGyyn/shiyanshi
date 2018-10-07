@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.GoodsSlideShowMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.GoodsSlideShow" >
+    <id column="goods_slide_show_id" property="goodsSlideShowId" jdbcType="INTEGER" />
+    <result column="slide_show_img_url" property="slideShowImgUrl" jdbcType="VARCHAR" />
+    <result column="p_manager_id" property="pManagerId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    goods_slide_show_id, slide_show_img_url, p_manager_id
+  </sql>
+  
+  <!-- 添加轮播图 （后台）-->
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.GoodsSlideShow" >
+    insert into goods_slide_show
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="goodsSlideShowId != null" >
+        goods_slide_show_id,
+      </if>
+      <if test="slideShowImgUrl != null" >
+        slide_show_img_url,
+      </if>
+      <if test="pManagerId != null" >
+        p_manager_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="goodsSlideShowId != null" >
+        #{goodsSlideShowId,jdbcType=INTEGER},
+      </if>
+      <if test="slideShowImgUrl != null" >
+        #{slideShowImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="pManagerId != null" >
+        #{pManagerId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 按小区获取轮播图列表 （前台）-->
+  <select id="getGoodsSlideShowsByParam" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_slide_show
+    where p_manager_id = #{managerId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 按小区获取轮播图列表（后台） -->
+  <select id="getGoodsSlideShowsA" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.GoodsSlideShow" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_slide_show
+    where p_manager_id = #{pManagerId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 删除商城首页轮播图（后台） -->
+  <delete id="deleteShowImageUrl" parameterType="java.lang.Integer" >
+    delete from goods_slide_show
+    where goods_slide_show_id = #{goodsSlideShowId,jdbcType=INTEGER}
+    <if test="pManagerId != null">
+    and p_manager_id = #{pManagerId,jdbcType=INTEGER}
+    </if>
+  </delete>
+  
+  <!-- 更新商城首页轮播图 （后台）-->
+  <update id="updateShowImageUrl" parameterType="com.zeng.ezsh.wy.entity.GoodsSlideShow" >
+    update goods_slide_show
+    <set >
+      <if test="slideShowImgUrl != null and slideShowImgUrl != ''" >
+        slide_show_img_url = #{slideShowImgUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where goods_slide_show_id = #{goodsSlideShowId,jdbcType=INTEGER}
+    <if test="pManagerId != null" >
+        and p_manager_id = #{pManagerId,jdbcType=INTEGER},
+     </if>
+  </update>
+  
+    
+  <!-- <insert id="addSlideShowImg" parameterType="java.util.List" >
+    insert into goods_slide_show (slide_show_img_url, p_manager_id) values
+    <foreach collection="list" item="item" index="index" separator=",">
+    (#{item.slideShowImgUrl,jdbcType=VARCHAR},  #{item.pManagerId,jdbcType=INTEGER})
+    </foreach>
+  </insert> -->
+  
+  <!-- <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.GoodsSlideShowExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from goods_slide_show
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  
+  
+  <delete id="deleteByExample" parameterType="com.zeng.ezsh.wy.entity.GoodsSlideShowExample" >
+    delete from goods_slide_show
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.GoodsSlideShow" >
+    insert into goods_slide_show
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="goodsSlideShowId != null" >
+        goods_slide_show_id,
+      </if>
+      <if test="slideShowImgUrl != null" >
+        slide_show_img_url,
+      </if>
+      <if test="pManagerId != null" >
+        p_manager_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="goodsSlideShowId != null" >
+        #{goodsSlideShowId,jdbcType=INTEGER},
+      </if>
+      <if test="slideShowImgUrl != null" >
+        #{slideShowImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="pManagerId != null" >
+        #{pManagerId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.GoodsSlideShowExample" resultType="java.lang.Integer" >
+    select count(*) from goods_slide_show
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update goods_slide_show
+    <set >
+      <if test="record.goodsSlideShowId != null" >
+        goods_slide_show_id = #{record.goodsSlideShowId,jdbcType=INTEGER},
+      </if>
+      <if test="record.slideShowImgUrl != null" >
+        slide_show_img_url = #{record.slideShowImgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="record.pManagerId != null" >
+        p_manager_id = #{record.pManagerId,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update goods_slide_show
+    set goods_slide_show_id = #{record.goodsSlideShowId,jdbcType=INTEGER},
+      slide_show_img_url = #{record.slideShowImgUrl,jdbcType=VARCHAR},
+      p_manager_id = #{record.pManagerId,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.GoodsSlideShow" >
+    update goods_slide_show
+    set slide_show_img_url = #{slideShowImgUrl,jdbcType=VARCHAR},
+      p_manager_id = #{pManagerId,jdbcType=INTEGER}
+    where goods_slide_show_id = #{goodsSlideShowId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

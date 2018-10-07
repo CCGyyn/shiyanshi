@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.NewsMapper" >
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.News" >
+	  <id column="news_id" property="newsId" jdbcType="INTEGER" />
+	  <result column="pt_user_id" property="ptUserId" jdbcType="INTEGER" />
+	  <result column="pt_manager_id" property="ptManagerId" jdbcType="INTEGER" />
+	  <result column="news_title" property="newsTitle" jdbcType="VARCHAR" />
+	  <result column="news_content" property="newsContent" jdbcType="LONGVARCHAR" />
+	  <result column="news_time" property="newsTime" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List" >
+	  news_id, pt_user_id, pt_manager_id, news_title, news_content, news_time
+	</sql>
+  
+	<!-- 添加个人消息 -->
+	<insert id="insert" parameterType="com.zeng.ezsh.wy.entity.News" >
+	  insert into news (news_id, pt_user_id, pt_manager_id, 
+	    news_title, news_content, news_time
+	    )
+	  values (#{newsId,jdbcType=INTEGER}, #{ptUserId,jdbcType=INTEGER}, #{ptManagerId,jdbcType=INTEGER}, 
+	    #{newsTitle,jdbcType=VARCHAR}, #{newsContent,jdbcType=LONGVARCHAR}, #{newsTime,jdbcType=VARCHAR}
+	    )
+	</insert>
+  
+	<!-- 删除个人消息 -->
+	<delete id="deleteByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.News" >
+	  delete from news
+	  where news_id = #{newsId,jdbcType=INTEGER}
+	</delete>
+  
+	<!-- 获取个人消息 （后台）-->
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.News" >
+	  select 
+	  <include refid="Base_Column_List" />
+	  from news
+	  <where>
+		<if test="ptUserId != null" >
+		     and pt_user_id = #{ptUserId,jdbcType=INTEGER}
+		</if>
+		<if test="newsTitle != null and newsTitle !=''">
+			and news_title like CONCAT('%',#{newsTitle},'%')
+		</if>
+	  </where>	 
+	</select>
+	
+	<!-- 获取个人消息（移动端）-->
+	<select id="selectByPrimaryKeyM" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.News" >
+	  select 
+	  <include refid="Base_Column_List" />
+	  from news
+	  <where>
+		<if test="ptUserId != null" >
+		     and pt_user_id = #{ptUserId,jdbcType=INTEGER}
+		</if>
+		<if test="ptManagerId != null" >
+	       pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+	     </if>
+		<if test="newsTitle != null and newsTitle !=''">
+			and news_title like CONCAT('%',#{newsTitle},'%')
+		</if>
+	  </where>	 
+	</select>
+	
+  	<!-- 更新个人消息 -->
+	<update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.News" >
+	   update news
+	   <set >
+	     <if test="ptUserId != null" >
+	       pt_user_id = #{ptUserId,jdbcType=INTEGER},
+	     </if>
+	     <if test="ptManagerId != null" >
+	       pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+	     </if>
+	     <if test="newsTitle != null" >
+	       news_title = #{newsTitle,jdbcType=VARCHAR},
+	     </if>
+	     <if test="newsContent != null" >
+	       news_content = #{newsContent,jdbcType=LONGVARCHAR},
+	     </if>
+	     <if test="newsTime != null" >
+	       news_time = #{newsTime,jdbcType=VARCHAR},
+	     </if>
+	   </set>
+	   where news_id = #{newsId,jdbcType=INTEGER}
+	</update>
+<!--   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.NewsExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from news
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+
+  
+  <delete id="deleteByExample" parameterType="com.zeng.ezsh.wy.entity.NewsExample" >
+    delete from news
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.News" >
+    insert into news
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="newsId != null" >
+        news_id,
+      </if>
+      <if test="ptUserId != null" >
+        pt_user_id,
+      </if>
+      <if test="ptManagerId != null" >
+        pt_manager_id,
+      </if>
+      <if test="newsTitle != null" >
+        news_title,
+      </if>
+      <if test="newsContent != null" >
+        news_content,
+      </if>
+      <if test="newsTime != null" >
+        news_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="newsId != null" >
+        #{newsId,jdbcType=INTEGER},
+      </if>
+      <if test="ptUserId != null" >
+        #{ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="ptManagerId != null" >
+        #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="newsTitle != null" >
+        #{newsTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="newsContent != null" >
+        #{newsContent,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="newsTime != null" >
+        #{newsTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.NewsExample" resultType="java.lang.Integer" >
+    select count(*) from news
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+
+  <update id="updateByExample" parameterType="map" >
+    update news
+    set news_id = #{record.newsId,jdbcType=INTEGER},
+      pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+      pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      news_title = #{record.newsTitle,jdbcType=VARCHAR},
+      news_content = #{record.newsContent,jdbcType=LONGVARCHAR},
+      news_time = #{record.newsTime,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.News" >
+    update news
+    <set >
+      <if test="ptUserId != null" >
+        pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="ptManagerId != null" >
+        pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="newsTitle != null" >
+        news_title = #{newsTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="newsContent != null" >
+        news_content = #{newsContent,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="newsTime != null" >
+        news_time = #{newsTime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where news_id = #{newsId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.News" >
+    update news
+    set pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      news_title = #{newsTitle,jdbcType=VARCHAR},
+      news_content = #{newsContent,jdbcType=LONGVARCHAR},
+      news_time = #{newsTime,jdbcType=VARCHAR}
+    where news_id = #{newsId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

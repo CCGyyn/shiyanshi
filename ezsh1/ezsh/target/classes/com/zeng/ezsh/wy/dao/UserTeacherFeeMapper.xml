@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.UserTeacherFeeMapper" >
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.UserTeacherFee" >
+	  <id column="user_teacher_fee_id" property="userTeacherFeeId" jdbcType="INTEGER" />
+	  <result column="pt_manager_id" property="ptManagerId" jdbcType="INTEGER" />
+	  <result column="manager_name" property="managerName" jdbcType="VARCHAR" />
+	  <result column="pt_user_id" property="ptUserId" jdbcType="INTEGER" />
+	  <result column="user_name" property="userName" jdbcType="VARCHAR" />
+	  <result column="trade_num" property="tradeNum" jdbcType="VARCHAR" />
+	  <result column="out_trade_no" property="outTradeNo" jdbcType="VARCHAR" />
+	  <result column="teacher_fee" property="teacherFee" jdbcType="DECIMAL" />
+	  <result column="trade_time" property="tradeTime" jdbcType="VARCHAR" />
+	</resultMap>
+  
+	<sql id="Base_Column_List" >
+	  user_teacher_fee_id, pt_manager_id, manager_name, pt_user_id, user_name, trade_num, 
+	  out_trade_no, teacher_fee, trade_time
+	</sql>
+  
+	<!--根据交易流水号获取家教支付费用记录-->
+	<select id="selectByParam" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.UserTeacherFee" >
+		select 
+		<include refid="Base_Column_List" />
+		from user_teacher_fee
+		<where>
+			<if test="outTradeNo != null" >
+		     and out_trade_no = #{outTradeNo,jdbcType=VARCHAR}
+		   	</if>
+		   	<if test="tradeNum != null" >
+		     and trade_num = #{tradeNum,jdbcType=VARCHAR}
+		   	</if>
+		</where>
+	</select>
+	
+	<!--获取家教平台移动端支付记录(后台)-->
+	<select id="selectListByParamA" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.UserTeacherFee" >
+		select 
+		<include refid="Base_Column_List" />
+		from user_teacher_fee
+		<where>
+			<if test="ptManagerId != null" >
+			 and pt_manager_id = #{ptManagerId,jdbcType=INTEGER}
+			</if>
+			<if test="ptUserId != null" >
+			 and pt_user_id = #{ptUserId,jdbcType=INTEGER}
+			</if>
+			<if test="outTradeNo != null" >
+		     and out_trade_no = #{outTradeNo,jdbcType=VARCHAR}
+		   	</if>
+		   	<if test="tradeNum != null" >
+		     and trade_num = #{tradeNum,jdbcType=VARCHAR}
+		   	</if>
+		</where>
+	</select>
+	
+	<!--获取家教平台移动端支付记录(移动端)-->
+	<select id="selectListByParamM" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.UserTeacherFee" >
+		select 
+		<include refid="Base_Column_List" />
+		from user_teacher_fee
+		<where>
+			<if test="ptManagerId != null" >
+			 and pt_manager_id = #{ptManagerId,jdbcType=INTEGER}
+			</if>
+			<if test="ptUserId != null" >
+			 and pt_userId = #{ptUserId,jdbcType=INTEGER}
+			</if>
+			<if test="outTradeNo != null" >
+		     and out_trade_no = #{outTradeNo,jdbcType=VARCHAR}
+		   	</if>
+		   	<if test="tradeNum != null" >
+		     and trade_num = #{tradeNum,jdbcType=VARCHAR}
+		   	</if>
+		</where>
+	</select>
+	
+  	<!-- 更新家教平台移动端支付记录 -->
+    <update id="updateByPrimaryKeySelective" parameterType="map" >
+	    update user_teacher_fee
+	    <set >
+	      <if test="tradeNum != null" >
+	        trade_num = #{tradeNum,jdbcType=VARCHAR},
+	      </if>
+	      <if test="tradeTime != null" >
+	        trade_time = #{tradeTime,jdbcType=VARCHAR},
+	      </if>
+	    </set>
+	    where out_trade_no = #{outTradeNo,jdbcType=VARCHAR}
+    </update>
+    
+	<!-- 插入家教支付收费记录 -->  
+	<insert id="insert" parameterType="com.zeng.ezsh.wy.entity.UserTeacherFee" >
+	  insert into user_teacher_fee
+	  <trim prefix="(" suffix=")" suffixOverrides="," >
+	    <if test="userTeacherFeeId != null" >
+	      user_teacher_fee_id,
+	    </if>
+	    <if test="ptManagerId != null" >
+	      pt_manager_id,
+	    </if>
+	    <if test="managerName != null" >
+	      manager_name,
+	    </if>
+	    <if test="ptUserId != null" >
+	      pt_user_id,
+	    </if>
+	    <if test="userName != null" >
+	      user_name,
+	    </if>
+	    <if test="tradeNum != null" >
+	      trade_num,
+	    </if>
+	    <if test="outTradeNo != null" >
+	      out_trade_no,
+	    </if>
+	    <if test="teacherFee != null" >
+	      teacher_fee,
+	    </if>
+	    <if test="tradeTime != null" >
+	      trade_time,
+	    </if>
+	  </trim>
+	  <trim prefix="values (" suffix=")" suffixOverrides="," >
+	    <if test="userTeacherFeeId != null" >
+	      #{userTeacherFeeId,jdbcType=INTEGER},
+	    </if>
+	    <if test="ptManagerId != null" >
+	      #{ptManagerId,jdbcType=INTEGER},
+	    </if>
+	    <if test="managerName != null" >
+	      #{managerName,jdbcType=VARCHAR},
+	    </if>
+	    <if test="ptUserId != null" >
+	      #{ptUserId,jdbcType=INTEGER},
+	    </if>
+	    <if test="userName != null" >
+	      #{userName,jdbcType=VARCHAR},
+	    </if>
+	    <if test="tradeNum != null" >
+	      #{tradeNum,jdbcType=VARCHAR},
+	    </if>
+	    <if test="outTradeNo != null" >
+	      #{outTradeNo,jdbcType=VARCHAR},
+	    </if>
+	    <if test="teacherFee != null" >
+	      #{teacherFee,jdbcType=DECIMAL},
+	    </if>
+	    <if test="tradeTime != null" >
+	      #{tradeTime,jdbcType=VARCHAR},
+	    </if>
+	  </trim>
+	</insert>  
+	<!-- <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.UserTeacherFeeExample" resultType="java.lang.Integer" >
+	  select count(*) from user_teacher_fee
+	  <if test="_parameter != null" >
+	    <include refid="Example_Where_Clause" />
+	  </if>
+	</select>
+	<update id="updateByExampleSelective" parameterType="map" >
+	  update user_teacher_fee
+	  <set >
+	    <if test="record.userTeacherFeeId != null" >
+	      user_teacher_fee_id = #{record.userTeacherFeeId,jdbcType=INTEGER},
+	    </if>
+	    <if test="record.ptManagerId != null" >
+	      pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+	    </if>
+	    <if test="record.managerName != null" >
+	      manager_name = #{record.managerName,jdbcType=VARCHAR},
+	    </if>
+	    <if test="record.ptUserId != null" >
+	      pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+	    </if>
+	    <if test="record.userName != null" >
+	      user_name = #{record.userName,jdbcType=VARCHAR},
+	    </if>
+	    <if test="record.tradeNum != null" >
+	      trade_num = #{record.tradeNum,jdbcType=VARCHAR},
+	    </if>
+	    <if test="record.outTradeNo != null" >
+	      out_trade_no = #{record.outTradeNo,jdbcType=VARCHAR},
+	    </if>
+	    <if test="record.teacherFee != null" >
+	      teacher_fee = #{record.teacherFee,jdbcType=DECIMAL},
+	    </if>
+	    <if test="record.tradeTime != null" >
+	      trade_time = #{record.tradeTime,jdbcType=VARCHAR},
+	    </if>
+	  </set>
+	  <if test="_parameter != null" >
+	    <include refid="Update_By_Example_Where_Clause" />
+	  </if>
+	</update>
+	<update id="updateByExample" parameterType="map" >
+	  update user_teacher_fee
+	  set user_teacher_fee_id = #{record.userTeacherFeeId,jdbcType=INTEGER},
+	    pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+	    manager_name = #{record.managerName,jdbcType=VARCHAR},
+	    pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+	    user_name = #{record.userName,jdbcType=VARCHAR},
+	    trade_num = #{record.tradeNum,jdbcType=VARCHAR},
+	    out_trade_no = #{record.outTradeNo,jdbcType=VARCHAR},
+	    teacher_fee = #{record.teacherFee,jdbcType=DECIMAL},
+	    trade_time = #{record.tradeTime,jdbcType=VARCHAR}
+	  <if test="_parameter != null" >
+	    <include refid="Update_By_Example_Where_Clause" />
+	  </if>
+	</update>
+	<update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.UserTeacherFee" >
+	  update user_teacher_fee
+	  <set >
+	    <if test="ptManagerId != null" >
+	      pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+	    </if>
+	    <if test="managerName != null" >
+	      manager_name = #{managerName,jdbcType=VARCHAR},
+	    </if>
+	    <if test="ptUserId != null" >
+	      pt_user_id = #{ptUserId,jdbcType=INTEGER},
+	    </if>
+	    <if test="userName != null" >
+	      user_name = #{userName,jdbcType=VARCHAR},
+	    </if>
+	    <if test="tradeNum != null" >
+	      trade_num = #{tradeNum,jdbcType=VARCHAR},
+	    </if>
+	    <if test="outTradeNo != null" >
+	      out_trade_no = #{outTradeNo,jdbcType=VARCHAR},
+	    </if>
+	    <if test="teacherFee != null" >
+	      teacher_fee = #{teacherFee,jdbcType=DECIMAL},
+	    </if>
+	    <if test="tradeTime != null" >
+	      trade_time = #{tradeTime,jdbcType=VARCHAR},
+	    </if>
+	  </set>
+	  where user_teacher_fee_id = #{userTeacherFeeId,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.UserTeacherFee" >
+	  update user_teacher_fee
+	  set pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+	    manager_name = #{managerName,jdbcType=VARCHAR},
+	    pt_user_id = #{ptUserId,jdbcType=INTEGER},
+	    user_name = #{userName,jdbcType=VARCHAR},
+	    trade_num = #{tradeNum,jdbcType=VARCHAR},
+	    out_trade_no = #{outTradeNo,jdbcType=VARCHAR},
+	    teacher_fee = #{teacherFee,jdbcType=DECIMAL},
+	    trade_time = #{tradeTime,jdbcType=VARCHAR}
+	  where user_teacher_fee_id = #{userTeacherFeeId,jdbcType=INTEGER}
+	</update> -->
+</mapper>

@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.BenefitApplyMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.BenefitApply" >
+    <id column="benefit_apply_id" property="benefitApplyId" jdbcType="INTEGER" />
+    <result column="pt_manager_id" property="ptManagerId" jdbcType="INTEGER" />
+    <result column="pt_manager_name" property="ptManagerName" jdbcType="VARCHAR" />
+    <result column="pt_user_id" property="ptUserId" jdbcType="INTEGER" />
+    <result column="identify_card" property="identifyCard" jdbcType="VARCHAR" />
+    <result column="link_phone" property="linkPhone" jdbcType="VARCHAR" />
+    <result column="illness" property="illness" jdbcType="VARCHAR" />
+    <result column="identification_imgs" property="identificationImgs" jdbcType="VARCHAR" />
+    <result column="apply_money" property="applyMoney" jdbcType="DECIMAL" />
+    <result column="apply_time" property="applyTime" jdbcType="VARCHAR" />
+    <result column="check_status" property="checkStatus" jdbcType="TINYINT" />
+  </resultMap>
+  
+  <resultMap id="ResultMapWithBLOBs" type="com.zeng.ezsh.wy.entity.BenefitApplyWithBLOBs" extends="BaseResultMap" >
+    <result column="accident_explain" property="accidentExplain" jdbcType="LONGVARCHAR" />
+    <result column="failure_reason" property="failureReason" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    benefit_apply_id, pt_manager_id, pt_manager_name, pt_user_id, identify_card, link_phone, 
+    illness, identification_imgs, apply_money, apply_time, check_status
+  </sql>
+  
+  <sql id="Blob_Column_List" >
+    accident_explain, failure_reason
+  </sql>
+  
+  <!--公益基金申请（移动端） -->
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.BenefitApplyWithBLOBs" >
+    insert into benefit_apply
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="benefitApplyId != null" >
+        benefit_apply_id,
+      </if>
+      <if test="ptManagerId != null" >
+        pt_manager_id,
+      </if>
+      <if test="ptManagerName != null" >
+        pt_manager_name,
+      </if>
+      <if test="ptUserId != null" >
+        pt_user_id,
+      </if>
+      <if test="identifyCard != null" >
+        identify_card,
+      </if>
+      <if test="linkPhone != null" >
+        link_phone,
+      </if>
+      <if test="illness != null" >
+        illness,
+      </if>
+      <if test="identificationImgs != null" >
+        identification_imgs,
+      </if>
+      <if test="checkStatus != null" >
+        check_status,
+      </if>
+      <if test="accidentExplain != null" >
+        accident_explain,
+      </if>
+      <if test="failureReason != null" >
+        failure_reason,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="benefitApplyId != null" >
+        #{benefitApplyId,jdbcType=INTEGER},
+      </if>
+      <if test="ptManagerId != null" >
+        #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="ptManagerName != null" >
+        #{ptManagerName,jdbcType=VARCHAR},
+      </if>
+      <if test="ptUserId != null" >
+        #{ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="identifyCard != null" >
+        #{identifyCard,jdbcType=VARCHAR},
+      </if>
+      <if test="linkPhone != null" >
+        #{linkPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="illness != null" >
+        #{illness,jdbcType=VARCHAR},
+      </if>
+      <if test="identificationImgs != null" >
+        #{identificationImgs,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null" >
+        #{checkStatus,jdbcType=TINYINT},
+      </if>
+      <if test="accidentExplain != null" >
+        #{accidentExplain,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="failureReason != null" >
+        #{failureReason,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 根据获取单条公益基金记录(后台) -->
+  <select id="selectById" resultMap="ResultMapWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.BenefitApplyWithBLOBs" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from benefit_apply
+    where benefit_apply_id = #{benefitApplyId,jdbcType=INTEGER} for update
+  </select>
+  
+  <!-- 获取公益基金申请列表(后台) -->
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.BenefitApplyWithBLOBs" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from benefit_apply
+   	<where>
+	    <if test="ptManagerId != null" >
+	      and pt_manager_id = #{ptManagerId,jdbcType=INTEGER}
+	    </if>
+	    <if test="ptUserId != null" >
+	      and pt_user_id = #{ptUserId,jdbcType=INTEGER}
+	    </if>
+	    <if test="identifyCard != null" >
+         and identify_card = #{identifyCard,jdbcType=VARCHAR}
+      </if>
+   	</where>
+  </select>
+  
+  <!-- 获取公益基金申请列表(移动端) -->
+  <select id="selectListByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.BenefitApplyWithBLOBs" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from benefit_apply
+   	<where>
+	    <if test="ptUserId != null" >
+	      and pt_user_id = #{ptUserId,jdbcType=INTEGER}
+	    </if>
+   	</where>
+  </select>
+  
+  <!-- 审核公益基金申请(后台) -->
+  <update id="updateByPrimaryKeySelectiveForCheck" parameterType="com.zeng.ezsh.wy.entity.BenefitApplyWithBLOBs" >
+    update benefit_apply
+    <set>
+      <if test="checkStatus != null" >
+        check_status = #{checkStatus,jdbcType=TINYINT},
+      </if>
+      <if test="applyMoney != null" >
+        apply_money = #{applyMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="applyTime != null" >
+        apply_time = #{applyTime,jdbcType=VARCHAR},
+      </if>
+      <if test="failureReason != null" >
+        failure_reason = #{failureReason,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where benefit_apply_id = #{benefitApplyId,jdbcType=INTEGER} 
+    and pt_manager_id = #{ptManagerId,jdbcType=INTEGER}
+  </update>
+  
+  
+  <!-- 再次提交公益基金申请（审核失败后修改资料再次提交）-->
+  <update id="updateByPrimaryKeySelectiveForAgain" parameterType="com.zeng.ezsh.wy.entity.BenefitApplyWithBLOBs" >
+    update benefit_apply
+    <set>
+      <if test="identifyCard != null" >
+        identify_card = #{identifyCard,jdbcType=VARCHAR},
+      </if>
+      <if test="linkPhone != null" >
+        link_phone = #{linkPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="illness != null" >
+        illness = #{illness,jdbcType=VARCHAR},
+      </if>
+      <if test="identificationImgs != null" >
+        identification_imgs = #{identificationImgs,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null" >
+        check_status = #{checkStatus,jdbcType=TINYINT},
+      </if>
+      <if test="accidentExplain != null" >
+        accident_explain = #{accidentExplain,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="failureReason != null" >
+        failure_reason = #{failureReason,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where benefit_apply_id = #{benefitApplyId,jdbcType=INTEGER} and pt_user_id = #{ptUserId,jdbcType=INTEGER}
+    and check_status = 2
+  </update>
+  
+  <!-- 
+  
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.BenefitApplyExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from benefit_apply
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from benefit_apply
+    where benefit_apply_id = #{benefitApplyId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.zeng.ezsh.wy.entity.BenefitApplyExample" >
+    delete from benefit_apply
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.BenefitApplyWithBLOBs" >
+    insert into benefit_apply (benefit_apply_id, pt_manager_id, pt_manager_name, 
+      pt_user_id, identify_card, link_phone, 
+      illness, identification_imgs, check_status, 
+      accident_explain, failure_reason)
+    values (#{benefitApplyId,jdbcType=INTEGER}, #{ptManagerId,jdbcType=INTEGER}, #{ptManagerName,jdbcType=VARCHAR}, 
+      #{ptUserId,jdbcType=INTEGER}, #{identifyCard,jdbcType=VARCHAR}, #{linkPhone,jdbcType=VARCHAR}, 
+      #{illness,jdbcType=VARCHAR}, #{identificationImgs,jdbcType=VARCHAR}, #{checkStatus,jdbcType=TINYINT}, 
+      #{accidentExplain,jdbcType=LONGVARCHAR}, #{failureReason,jdbcType=LONGVARCHAR})
+  </insert>
+  
+  <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.BenefitApplyExample" resultType="java.lang.Integer" >
+    select count(*) from benefit_apply
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update benefit_apply
+    <set >
+      <if test="record.benefitApplyId != null" >
+        benefit_apply_id = #{record.benefitApplyId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptManagerId != null" >
+        pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptManagerName != null" >
+        pt_manager_name = #{record.ptManagerName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ptUserId != null" >
+        pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="record.identifyCard != null" >
+        identify_card = #{record.identifyCard,jdbcType=VARCHAR},
+      </if>
+      <if test="record.linkPhone != null" >
+        link_phone = #{record.linkPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.illness != null" >
+        illness = #{record.illness,jdbcType=VARCHAR},
+      </if>
+      <if test="record.identificationImgs != null" >
+        identification_imgs = #{record.identificationImgs,jdbcType=VARCHAR},
+      </if>
+      <if test="record.checkStatus != null" >
+        check_status = #{record.checkStatus,jdbcType=TINYINT},
+      </if>
+      <if test="record.accidentExplain != null" >
+        accident_explain = #{record.accidentExplain,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.failureReason != null" >
+        failure_reason = #{record.failureReason,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update benefit_apply
+    set benefit_apply_id = #{record.benefitApplyId,jdbcType=INTEGER},
+      pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      pt_manager_name = #{record.ptManagerName,jdbcType=VARCHAR},
+      pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+      identify_card = #{record.identifyCard,jdbcType=VARCHAR},
+      link_phone = #{record.linkPhone,jdbcType=VARCHAR},
+      illness = #{record.illness,jdbcType=VARCHAR},
+      identification_imgs = #{record.identificationImgs,jdbcType=VARCHAR},
+      check_status = #{record.checkStatus,jdbcType=TINYINT},
+      accident_explain = #{record.accidentExplain,jdbcType=LONGVARCHAR},
+      failure_reason = #{record.failureReason,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update benefit_apply
+    set benefit_apply_id = #{record.benefitApplyId,jdbcType=INTEGER},
+      pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      pt_manager_name = #{record.ptManagerName,jdbcType=VARCHAR},
+      pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+      identify_card = #{record.identifyCard,jdbcType=VARCHAR},
+      link_phone = #{record.linkPhone,jdbcType=VARCHAR},
+      illness = #{record.illness,jdbcType=VARCHAR},
+      identification_imgs = #{record.identificationImgs,jdbcType=VARCHAR},
+      check_status = #{record.checkStatus,jdbcType=TINYINT}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.BenefitApplyWithBLOBs" >
+    update benefit_apply
+    set pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      pt_manager_name = #{ptManagerName,jdbcType=VARCHAR},
+      pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      identify_card = #{identifyCard,jdbcType=VARCHAR},
+      link_phone = #{linkPhone,jdbcType=VARCHAR},
+      illness = #{illness,jdbcType=VARCHAR},
+      identification_imgs = #{identificationImgs,jdbcType=VARCHAR},
+      check_status = #{checkStatus,jdbcType=TINYINT},
+      accident_explain = #{accidentExplain,jdbcType=LONGVARCHAR},
+      failure_reason = #{failureReason,jdbcType=LONGVARCHAR}
+    where benefit_apply_id = #{benefitApplyId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.BenefitApply" >
+    update benefit_apply
+    set pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      pt_manager_name = #{ptManagerName,jdbcType=VARCHAR},
+      pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      identify_card = #{identifyCard,jdbcType=VARCHAR},
+      link_phone = #{linkPhone,jdbcType=VARCHAR},
+      illness = #{illness,jdbcType=VARCHAR},
+      identification_imgs = #{identificationImgs,jdbcType=VARCHAR},
+      check_status = #{checkStatus,jdbcType=TINYINT}
+    where benefit_apply_id = #{benefitApplyId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

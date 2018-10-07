@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.ChargeInfoMapper">
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.ChargeInfo">
+		<id column="charge_info_id" property="chargeInfoId" jdbcType="INTEGER" />
+		<result column="pt_room_id" property="ptRoomId" jdbcType="INTEGER" />
+		<result column="charge_of_month" property="chargeOfMonth"
+			jdbcType="VARCHAR" />
+		<result column="charge_pay_status" property="chargePayStatus"
+			jdbcType="TINYINT" />
+		<result column="charge_transaction_num" property="chargeTransactionNum"
+			jdbcType="VARCHAR" />
+		<result column="charge_pay_time" property="chargePayTime"
+			jdbcType="VARCHAR" />
+		<result column="charge_way" property="chargeWay" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="BaseResultMap_Info_Record" type="com.zeng.ezsh.wy.entity.ChargeInfo">
+		<id column="charge_info_id" property="chargeInfoId" jdbcType="INTEGER" />
+		<result column="pt_room_id" property="ptRoomId" jdbcType="INTEGER" />
+		<result column="charge_of_month" property="chargeOfMonth"
+			jdbcType="VARCHAR" />
+		<!-- <collection property="chargeRecordList" column="{pRoomId=pt_room_id,chargeOfMonth=charge_of_month}" 
+			javaType="ArrayList" select="com.zeng.ezsh.wy.dao.ChargeRecordMapper.selectByColumn"> -->
+		<!-- 分割线   -->	
+		<!-- <result column="charge_pay_status" property="chargePayStatus" jdbcType="INTEGER"/>
+		<result column="charge_transaction_num" property="chargeTransactionNum" jdbcType="VARCHAR"/>
+		<result column="charge_pay_time" property="chargePayTime" jdbcType="VARCHAR"/>
+		<result column="charge_way" property="chargeWay" jdbcType="VARCHAR"/> -->
+		<!-- 分割线   -->
+		<collection property="chargeRecordList" javaType="java.util.List"
+			ofType="com.zeng.ezsh.wy.entity.ChargeRecord">
+			<id column="charge_record_id" property="chargeRecordId" jdbcType="INTEGER" />
+			<result column="p_user_id" property="pUserId" jdbcType="INTEGER" />
+			<result column="p_manager_id" property="pManagerId" jdbcType="INTEGER" />
+			<result column="p_building_id" property="pBuildingId"
+				jdbcType="INTEGER" />
+			<result column="p_room_id" property="pRoomId" jdbcType="INTEGER" />
+			<result column="p_charge_item_id" property="pChargeItemId"
+				jdbcType="INTEGER" />
+			<result column="charge_item_name" property="chargeItemName"
+				jdbcType="VARCHAR" />
+			<result column="charge_amount" property="chargeAmount"
+				jdbcType="INTEGER" />
+			<result column="unit_price" property="unitPrice" jdbcType="DECIMAL" />
+			<result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+			<result column="charge_for_people" property="chargeForPeople"
+				jdbcType="VARCHAR" />
+			<result column="charge_time" property="chargeTime" jdbcType="VARCHAR" />
+			<result column="charge_of_date" property="chargeOfDate"
+				jdbcType="VARCHAR" />
+			<result column="charge_end_date" property="chargeEndDate"
+				jdbcType="VARCHAR" />
+			<result column="check_people" property="checkPeople" jdbcType="VARCHAR" />
+			<result column="check_time" property="checkTime" jdbcType="VARCHAR" />
+			<result column="check_status" property="checkStatus" jdbcType="TINYINT" />
+			<result column="overdue_time" property="overdueTime" jdbcType="VARCHAR" />
+			<result column="status" property="status" jdbcType="TINYINT" />
+		</collection>
+	</resultMap>
+
+	<resultMap id="BaseResultMap_Info_Record_For_Pay" type="com.zeng.ezsh.wy.entity.ChargeInfo">
+		<id column="charge_info_id" property="chargeInfoId" jdbcType="INTEGER" />
+		<result column="pt_room_id" property="ptRoomId" jdbcType="INTEGER" />
+		<result column="charge_of_month" property="chargeOfMonth"
+			jdbcType="VARCHAR" />
+		<collection property="chargeRecordList"
+			column="{pRoomId=pt_room_id,chargeOfMonth=charge_of_month}" javaType="ArrayList"
+			select="com.zeng.ezsh.wy.dao.ChargeRecordMapper.selectByColumn">
+		</collection>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		charge_info_id, pt_room_id, charge_of_month,
+		charge_pay_status,
+		charge_transaction_num,
+		charge_pay_time, charge_way
+	</sql>
+
+	<sql id="Base_Column_List_Info_Record">
+		c_info.charge_info_id, c_info.pt_room_id, c_info.charge_of_month,
+		c_info.charge_pay_status, c_info.charge_transaction_num,
+		c_info.charge_pay_time, c_info.charge_way,
+		c_r.charge_record_id,
+		c_r.p_user_id, c_r.p_manager_id, c_r.p_building_id, c_r.p_room_id,
+		c_r.p_charge_item_id, c_r.charge_item_name,
+		c_r.charge_amount,
+		c_r.unit_price, c_r.total_price, c_r.charge_for_people,
+		c_r.charge_time, c_r.charge_of_date, c_r.charge_end_date,
+		c_r.check_people, c_r.check_time, c_r.check_status, c_r.overdue_time,
+		c_r.status
+		<!-- c_i.charge_id,c_i.charge_name -->
+	</sql>
+
+	<!--获取房间详细收费记录 (关联查询charge_info、charge_record 和 charge_item 表 ) -->
+	<select id="selectChargeListByParam" resultMap="BaseResultMap_Info_Record"
+		parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List_Info_Record" />
+		from charge_info c_info
+		left join charge_record c_r on
+		c_info.charge_of_month=c_r.charge_of_date
+		<!-- left join charge_item c_i on c_r.p_charge_item_id=c_i.charge_id -->
+		<where>
+			<if test="ptRoomId != null">
+				and c_info.pt_room_id = #{ptRoomId,jdbcType=INTEGER}
+			</if>
+			<if test="status != null and status == 1 ">
+				and c_r.status = #{status,jdbcType=INTEGER}
+			</if>
+			<if test="status != null and status != 1 ">
+				and c_r.status = 0 or c_r.status = -1
+			</if>
+		</where>
+	</select>
+
+	<!-- 获取单个缴费信息 -->
+	<select id="selectChargeInfoReacord" resultMap="BaseResultMap_Info_Record_For_Pay"
+		parameterType="com.zeng.ezsh.wy.entity.ChargeInfo">
+		select
+		<include refid="Base_Column_List" />
+		from charge_info
+		<where>
+			<if test="chargeInfoId != null">
+				and charge_info_id = #{chargeInfoId,jdbcType=INTEGER}
+			</if>
+			<if test="ptRoomId != null">
+				and pt_room_id= #{ptRoomId,jdbcType=INTEGER}
+			</if>
+			<if test="chargeOfMonth != null">
+				and charge_of_month=#{chargeOfMonth,jdbcType=VARCHAR}
+			</if>
+			<if test="chargeTransactionNum != null">
+				and
+				charge_transaction_num=#{chargeTransactionNum,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+
+	<!-- 检测物业费缴费状态【移动端】 -->
+	<select id="checkPayStatus" resultType="java.lang.Integer"
+		parameterType="com.zeng.ezsh.wy.entity.ChargeInfo">
+		select count(*)
+		from charge_info
+		where charge_info_id =
+		#{chargeInfoId,jdbcType=INTEGER}
+		and pt_room_id =
+		#{ptRoomId,jdbcType=INTEGER}
+		and charge_of_month =
+		#{chargeOfMonth,jdbcType=VARCHAR}
+		and charge_pay_status = 1
+	</select>
+
+	<update id="updateChargeInfoPayStatus" parameterType="com.zeng.ezsh.wy.entity.ChargeInfo">
+		update charge_info
+		<set>
+			<if test="chargePayStatus != null">
+				charge_pay_status = #{chargePayStatus,jdbcType=TINYINT},
+			</if>
+		</set>
+		where charge_info_id = #{chargeInfoId,jdbcType=INTEGER}
+	</update>
+
+
+	<!-- 批量插入应收费记录基本信息 -->
+	<insert id="insertChargeInfoBatch" parameterType="java.util.List" keyProperty="chargeInfoId" useGeneratedKeys="true">
+		insert into charge_info (charge_info_id, pt_room_id, charge_of_month,
+		charge_pay_status, charge_transaction_num,
+		charge_pay_time, charge_way)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.chargeInfoId,jdbcType=INTEGER},
+			#{item.ptRoomId,jdbcType=INTEGER},
+			#{item.chargeOfMonth,jdbcType=VARCHAR},
+			#{item.chargePayStatus,jdbcType=TINYINT},
+			#{item.chargeTransactionNum,jdbcType=VARCHAR},
+			#{item.chargePayTime,jdbcType=VARCHAR},
+			#{item.chargeWay,jdbcType=VARCHAR})
+		</foreach>
+	</insert>
+
+	<!-- 插入应收费记录基本信息 -->
+	<insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.ChargeInfo"
+		useGeneratedKeys="true" keyProperty="chargeInfoId">
+		insert into charge_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="chargeInfoId != null">
+				charge_info_id,
+			</if>
+			<if test="ptRoomId != null">
+				pt_room_id,
+			</if>
+			<if test="chargeOfMonth != null">
+				charge_of_month,
+			</if>
+			<if test="chargePayStatus != null">
+				charge_pay_status,
+			</if>
+			<if test="chargeTransactionNum != null">
+				charge_transaction_num,
+			</if>
+			<if test="chargePayTime != null">
+				charge_pay_time,
+			</if>
+			<if test="chargeWay != null">
+				charge_way,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="chargeInfoId != null">
+				#{chargeInfoId,jdbcType=INTEGER},
+			</if>
+			<if test="ptRoomId != null">
+				#{ptRoomId,jdbcType=INTEGER},
+			</if>
+			<if test="chargeOfMonth != null">
+				#{chargeOfMonth,jdbcType=VARCHAR},
+			</if>
+			<if test="chargePayStatus != null">
+				#{chargePayStatus,jdbcType=VARCHAR},
+			</if>
+			<if test="chargeTransactionNum != null">
+				#{chargeTransactionNum,jdbcType=VARCHAR},
+			</if>
+			<if test="chargePayTime != null">
+				#{chargePayTime,jdbcType=VARCHAR},
+			</if>
+			<if test="chargeWay != null">
+				#{chargeWay,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<!-- <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" > 
+		delete from charge_info where charge_info_id = #{chargeInfoId,jdbcType=INTEGER} 
+		</delete> <delete id="deleteByExample" parameterType="com.zeng.ezsh.wy.entity.ChargeInfoExample" 
+		> delete from charge_info <if test="_parameter != null" > <include refid="Example_Where_Clause" 
+		/> </if> </delete> <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.ChargeInfo" 
+		> insert into charge_info (charge_info_id, pt_room_id, charge_of_month, charge_pay_status, 
+		charge_transaction_num, charge_pay_time, charge_way) values (#{chargeInfoId,jdbcType=INTEGER}, 
+		#{ptRoomId,jdbcType=INTEGER}, #{chargeOfMonth,jdbcType=VARCHAR}, #{chargePayStatus,jdbcType=TINYINT}, 
+		#{chargeTransactionNum,jdbcType=VARCHAR}, #{chargePayTime,jdbcType=VARCHAR}, 
+		#{chargeWay,jdbcType=VARCHAR}) </insert> <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.ChargeInfoExample" 
+		resultType="java.lang.Integer" > select count(*) from charge_info <if test="_parameter 
+		!= null" > <include refid="Example_Where_Clause" /> </if> </select> <update 
+		id="updateByExampleSelective" parameterType="map" > update charge_info <set 
+		> <if test="record.chargeInfoId != null" > charge_info_id = #{record.chargeInfoId,jdbcType=INTEGER}, 
+		</if> <if test="record.ptRoomId != null" > pt_room_id = #{record.ptRoomId,jdbcType=INTEGER}, 
+		</if> <if test="record.chargeOfMonth != null" > charge_of_month = #{record.chargeOfMonth,jdbcType=VARCHAR}, 
+		</if> <if test="record.chargePayStatus != null" > charge_pay_status = #{record.chargePayStatus,jdbcType=TINYINT}, 
+		</if> <if test="record.chargeTransactionNum != null" > charge_transaction_num 
+		= #{record.chargeTransactionNum,jdbcType=VARCHAR}, </if> <if test="record.chargePayTime 
+		!= null" > charge_pay_time = #{record.chargePayTime,jdbcType=VARCHAR}, </if> 
+		<if test="record.chargeWay != null" > charge_way = #{record.chargeWay,jdbcType=VARCHAR}, 
+		</if> </set> <if test="_parameter != null" > <include refid="Update_By_Example_Where_Clause" 
+		/> </if> </update> <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.ChargeInfo" 
+		> update charge_info <set > <if test="ptRoomId != null" > pt_room_id = #{ptRoomId,jdbcType=INTEGER}, 
+		</if> <if test="chargeOfMonth != null" > charge_of_month = #{chargeOfMonth,jdbcType=VARCHAR}, 
+		</if> <if test="chargePayStatus != null" > charge_pay_status = #{chargePayStatus,jdbcType=TINYINT}, 
+		</if> <if test="chargeTransactionNum != null" > charge_transaction_num = 
+		#{chargeTransactionNum,jdbcType=VARCHAR}, </if> <if test="chargePayTime != 
+		null" > charge_pay_time = #{chargePayTime,jdbcType=VARCHAR}, </if> <if test="chargeWay 
+		!= null" > charge_way = #{chargeWay,jdbcType=VARCHAR}, </if> </set> where 
+		charge_info_id = #{chargeInfoId,jdbcType=INTEGER} </update> <update id="updateByPrimaryKey" 
+		parameterType="com.zeng.ezsh.wy.entity.ChargeInfo" > update charge_info set 
+		pt_room_id = #{ptRoomId,jdbcType=INTEGER}, charge_of_month = #{chargeOfMonth,jdbcType=VARCHAR}, 
+		charge_pay_status = #{chargePayStatus,jdbcType=TINYINT}, charge_transaction_num 
+		= #{chargeTransactionNum,jdbcType=VARCHAR}, charge_pay_time = #{chargePayTime,jdbcType=VARCHAR}, 
+		charge_way = #{chargeWay,jdbcType=VARCHAR} where charge_info_id = #{chargeInfoId,jdbcType=INTEGER} 
+		</update> -->
+</mapper>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.GoodsReceiptAddressMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.GoodsReceiptAddress" >
+    <id column="receipt_address_id" property="receiptAddressId" jdbcType="INTEGER" />
+    <result column="p_user_id" property="pUserId" jdbcType="INTEGER" />
+    <result column="p_manager_id" jdbcType="INTEGER" property="pManagerId" />
+    <result column="receipt_address" property="receiptAddress" jdbcType="VARCHAR" />
+    <result column="link_man" property="linkMan" jdbcType="VARCHAR" />
+    <result column="link_phone" property="linkPhone" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    receipt_address_id, p_user_id, p_manager_id, receipt_address, link_man, link_phone
+  </sql>
+  
+  <!-- 获取收货地址数量 -->
+  <select id="getGoodsReceiptAddressAmount" resultType="java.lang.Integer" parameterType="com.zeng.ezsh.wy.entity.GoodsReceiptAddress" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_receipt_address
+    where p_user_id = #{pUserId,jdbcType=INTEGER} and p_manager_id= #{pManagerId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 获取收货地址列表 -->
+  <select id="selectGoodsReceiptAddressList" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.GoodsReceiptAddress" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_receipt_address
+    where p_user_id = #{pUserId,jdbcType=INTEGER} and p_manager_id= #{pManagerId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 添加个人收货地址 -->
+  <insert id="addGoodsReceiptAddress" parameterType="com.zeng.ezsh.wy.entity.GoodsReceiptAddress" >
+    insert into goods_receipt_address (receipt_address_id, p_user_id, p_manager_id, receipt_address, link_man, link_phone
+      )
+    values (#{receiptAddressId,jdbcType=INTEGER}, #{pUserId,jdbcType=INTEGER}, #{pManagerId,jdbcType=INTEGER}, #{receiptAddress,jdbcType=VARCHAR},
+    		#{linkMan,jdbcType=VARCHAR}, #{linkPhone,jdbcType=VARCHAR}
+      )
+  </insert>
+  
+  <!-- 更新收货地址 -->
+  <update id="updateGoodsReceiptAddress" parameterType="com.zeng.ezsh.wy.entity.GoodsReceiptAddress" >
+    update goods_receipt_address
+    <set >
+      <!-- <if test="pUserId != null" >
+        p_user_id = #{pUserId,jdbcType=INTEGER},
+      </if>
+      <if test="pManagerId != null">
+        #{pManagerId,jdbcType=INTEGER},
+      </if> -->
+      <if test="receiptAddress != null" >
+        receipt_address = #{receiptAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="linkMan != null" >
+        link_man = #{linkMan,jdbcType=VARCHAR},
+      </if>
+      <if test="linkPhone != null" >
+        link_phone = #{linkPhone,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where receipt_address_id = #{receiptAddressId,jdbcType=INTEGER}
+  </update>
+  
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.GoodsReceiptAddress" >
+    insert into goods_receipt_address
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="receiptAddressId != null" >
+        receipt_address_id,
+      </if>
+      <if test="pUserId != null" >
+        p_user_id,
+      </if>
+      <if test="receiptAddress != null" >
+        receipt_address,
+      </if>
+      <if test="linkMan != null" >
+        link_man,
+      </if>
+      <if test="linkPhone != null" >
+        link_phone,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="receiptAddressId != null" >
+        #{receiptAddressId,jdbcType=INTEGER},
+      </if>
+      <if test="pUserId != null" >
+        #{pUserId,jdbcType=INTEGER},
+      </if>
+      <if test="pManagerId != null">
+        p_manager_id,
+      </if>
+      <if test="receiptAddress != null" >
+        #{receiptAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="linkMan != null" >
+        #{linkMan,jdbcType=VARCHAR},
+      </if>
+      <if test="linkPhone != null" >
+        #{linkPhone,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from goods_receipt_address
+    where receipt_address_id = #{receiptAddressId,jdbcType=INTEGER}
+  </delete>
+</mapper>

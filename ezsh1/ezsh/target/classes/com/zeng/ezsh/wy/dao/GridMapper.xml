@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.GridMapper" >
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.Grid" >
+		<result column="grid_id" property="gridId" jdbcType="INTEGER" />
+		<result column="p_manager_id" property="pManagerId" jdbcType="INTEGER" />
+		<result column="grid_name" property="gridName" jdbcType="VARCHAR" />
+		<result column="p_charge_item_id" property="pChargeItemId" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<resultMap type="com.zeng.ezsh.wy.entity.Grid" id="BaseResultMap_Details" extends="BaseResultMap">
+		<collection property="chargeItemInfo" column="p_charge_item_id" ofType="com.zeng.ezsh.wy.entity.ChargeItem" select="com.zeng.ezsh.wy.dao.ChargeItemMapper.selectChargeItemsById">
+		</collection>
+	</resultMap>
+	
+	<resultMap id="BaseResultMap_Grid_Management" type="com.zeng.ezsh.wy.entity.Grid" extends="BaseResultMap">
+	</resultMap>
+	
+	<sql id="Base_Column_List" >
+	  grid_id, p_manager_id, grid_name, p_charge_item_id
+	</sql>
+	
+	<sql id="Base_Column_List_Grid_Management">
+	  gri.grid_id, gri.p_manager_id, gri.grid_name, gri.p_charge_item_id,
+	  manager.manager_id, manager.manager_name as managerName,
+	  charge_it.charge_id,charge_it.charge_name as chargeItemName
+	</sql>
+	
+	<!-- 添加抄表类别 -->
+	<insert id="insert" parameterType="com.zeng.ezsh.wy.entity.Grid" >
+		insert into grid (grid_id, p_manager_id, grid_name, p_charge_item_id
+		  )
+		values (#{gridId,jdbcType=INTEGER}, #{pManagerId,jdbcType=INTEGER}, #{gridName,jdbcType=VARCHAR}, #{pChargeItemId,jdbcType=INTEGER}
+		  )
+	</insert>
+	
+	<!-- 检测抄表类型是否已存在 (后台)-->
+	<select id="checkIsExist" parameterType="com.zeng.ezsh.wy.entity.Grid" resultType="java.lang.Integer" >
+	    select count(*) from grid
+	    <where>
+	    	<if test="gridName != null" >
+	      	and grid_name=#{gridName,jdbcType=VARCHAR}
+	    	</if>
+	    	<if test="pChargeItemId != null">
+	    	and p_charge_item_id=#{pChargeItemId,jdbcType=INTEGER}
+	    	</if>
+	    </where>
+  	</select>
+  	
+  	<!-- 修改抄表类别 (后台)-->
+	<update id="updateSelective" parameterType="com.zeng.ezsh.wy.entity.Grid" >
+		update grid
+		<set >
+		  <if test="gridName != null" >
+		    grid_name = #{gridName,jdbcType=VARCHAR},
+		  </if>
+		  <if test="pChargeItemId != null" >
+		    p_charge_item_id = #{pChargeItemId,jdbcType=INTEGER},
+		  </if>
+		</set>
+		where grid_id = #{gridId,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 获取抄表类别集合【后台】(包括类别所属的管理处名称和收费项目名称) -->
+	<select id="selectSelective" resultMap="BaseResultMap_Grid_Management" parameterType="com.zeng.ezsh.wy.entity.Grid" >
+		select
+		<include refid="Base_Column_List_Grid_Management" />
+		from grid gri left join management manager on manager.manager_id=gri.p_manager_id
+		left join charge_item charge_it on charge_it.charge_id=gri.p_charge_item_id
+		<where>
+			gri.grid_id>0
+			<if test="gridName != null" >
+			    and gri.grid_name like CONCAT('%','${gridName}','%' )
+			</if>
+			<if test="pChargeItemId != null" >
+			    and gri.p_charge_item_id = #{pChargeItemId,jdbcType=INTEGER}
+			</if>
+			<if test="pManagerId != null" >
+			    and gri.p_manager_id = #{pManagerId,jdbcType=INTEGER}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 获取抄表类别集合（用于后台下拉框列表展示） -->
+	<select id="selectSelectiveSimple" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.Grid" >
+		select		
+		<include refid="Base_Column_List" />
+		from grid
+		<where>
+			grid_id > 0
+			<if test="pManagerId != null" >
+			    and p_manager_id = #{pManagerId,jdbcType=INTEGER}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 获取单个抄表类型信息 -->
+	<select id="selectGrid" resultMap="BaseResultMap_Details" parameterType="com.zeng.ezsh.wy.entity.Grid" >
+		select
+		<include refid="Base_Column_List" />
+		from grid where grid_id=#{gridId,jdbcType=VARCHAR} and p_manager_id=#{pManagerId,jdbcType=VARCHAR}
+	</select>
+	
+	<delete id="deleteGrid" parameterType="com.zeng.ezsh.wy.entity.Grid" >
+	    delete from grid
+	    <where>
+	    	<if test="gridId!=null">
+	    		grid_id=#{gridId,jdbcType=INTEGER}
+	    	</if>
+	    </where>
+  	</delete>
+  	
+  <!-- 
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.Grid" >
+    insert into grid
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="gridId != null" >
+        grid_id,
+      </if>
+      <if test="gridName != null" >
+        grid_name,
+      </if>
+      <if test="pChargeItemId != null" >
+        p_charge_item_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="gridId != null" >
+        #{gridId,jdbcType=INTEGER},
+      </if>
+      <if test="gridName != null" >
+        #{gridName,jdbcType=VARCHAR},
+      </if>
+      <if test="pChargeItemId != null" >
+        #{pChargeItemId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  
+  
+  <update id="updateByExample" parameterType="map" >
+    update grid
+    set grid_id = #{record.gridId,jdbcType=INTEGER},
+      grid_name = #{record.gridName,jdbcType=VARCHAR},
+      p_charge_item_id = #{record.pChargeItemId,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update> -->
+</mapper>

@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.RepairRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.RepairRecord" >
+    <id column="repair_number" property="repairNumber" jdbcType="VARCHAR" />
+    <result column="community_id" property="communityId" jdbcType="INTEGER" />
+    <result column="community_name" property="communityName" jdbcType="VARCHAR" />
+    <result column="repair_time" property="repairTime" jdbcType="TIMESTAMP" />
+    <result column="expect_time" property="expectTime" jdbcType="VARCHAR"></result>
+    <result column="proprietor_name" property="proprietorName" jdbcType="VARCHAR" />
+    <result column="proprietor_phone" property="proprietorPhone" jdbcType="VARCHAR" />
+    <result column="room_number" property="roomNumber" jdbcType="VARCHAR" />
+    <result column="repair_status" property="repairStatus" jdbcType="INTEGER" />
+    <result column="repair_way" property="repairWay" jdbcType="VARCHAR" />
+    <result column="repair_title" property="repairTitle" jdbcType="VARCHAR" />
+    <result column="repair_desc" property="repairDesc" jdbcType="VARCHAR" />
+    <result column="repair_images" property="repairImages" jdbcType="VARCHAR" />
+    <result column="repair_unit" property="repairUnit" jdbcType="VARCHAR" />
+    <result column="repair_staff" property="repairStaff" jdbcType="VARCHAR" />
+    <result column="repair_sphone" property="repairSphone" jdbcType="VARCHAR" />
+    <result column="complete_status" property="completeStatus" jdbcType="VARCHAR" />
+    <result column="complete_time" property="completeTime" jdbcType="TIMESTAMP" />
+    <result column="repair_cost" property="repairCost" jdbcType="DECIMAL" />
+    <result column="feedback" property="feedback" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    repair_number, community_id, community_name, repair_time,expect_time, proprietor_name, proprietor_phone, 
+    room_number, repair_status, repair_way, repair_desc, repair_title, repair_images, repair_unit, 
+    repair_staff, repair_sphone, complete_status, complete_time, repair_cost, feedback
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from repair_management
+    where repair_number = #{repairNumber,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from repair_management
+    where repair_number = #{repairNumber,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.RepairRecord" >
+    insert into repair_management (repair_number, community_id, community_name, 
+      repair_time,expect_time, proprietor_name, proprietor_phone, 
+      room_number, repair_status, repair_way,repair_title, 
+      repair_desc, repair_images, repair_unit, 
+      repair_staff, repair_sphone, complete_status, 
+      complete_time, repair_cost, feedback
+      )
+    values (#{repairNumber,jdbcType=VARCHAR}, #{communityId,jdbcType=INTEGER}, #{communityName,jdbcType=VARCHAR}, 
+      #{repairTime,jdbcType=TIMESTAMP}, #{expectTime,jdbcType=VARCHAR},#{proprietorName,jdbcType=VARCHAR}, #{proprietorPhone,jdbcType=VARCHAR}, 
+      #{roomNumber,jdbcType=VARCHAR}, #{repairStatus,jdbcType=INTEGER}, #{repairWay,jdbcType=VARCHAR}, #{repairTitle,jdbcType=VARCHAR},
+      #{repairDesc,jdbcType=VARCHAR}, #{repairImages,jdbcType=VARCHAR}, #{repairUnit,jdbcType=VARCHAR}, 
+      #{repairStaff,jdbcType=VARCHAR}, #{repairSphone,jdbcType=VARCHAR}, #{completeStatus,jdbcType=VARCHAR}, 
+      #{completeTime,jdbcType=TIMESTAMP}, #{repairCost,jdbcType=DECIMAL}, #{feedback,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.RepairRecord" >
+    insert into repair_management
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="repairNumber != null" >
+        repair_number,
+      </if>
+      <if test="communityId != null" >
+        community_id,
+      </if>
+      <if test="communityName != null" >
+        community_name,
+      </if>
+      <if test="repairTime != null" >
+        repair_time,
+      </if>
+      <if test="expectTime != null">
+      	expect_time,
+      </if>
+      <if test="proprietorName != null" >
+        proprietor_name,
+      </if>
+      <if test="proprietorPhone != null" >
+        proprietor_phone,
+      </if>
+      <if test="roomNumber != null" >
+        room_number,
+      </if>
+      <if test="repairStatus != null" >
+        repair_status,
+      </if>
+      <if test="repairWay != null" >
+        repair_way,
+      </if>
+      <if test="repairTitle != null">
+      	repair_title,
+      </if>
+      <if test="repairDesc != null" >
+        repair_desc,
+      </if>
+      <if test="repairImages != null" >
+        repair_images,
+      </if>
+      <if test="repairUnit != null" >
+        repair_unit,
+      </if>
+      <if test="repairStaff != null" >
+        repair_staff,
+      </if>
+      <if test="repairSphone != null" >
+        repair_sphone,
+      </if>
+      <if test="completeStatus != null" >
+        complete_status,
+      </if>
+      <if test="completeTime != null" >
+        complete_time,
+      </if>
+      <if test="repairCost != null" >
+        repair_cost,
+      </if>
+      <if test="feedback != null" >
+        feedback,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="repairNumber != null" >
+        #{repairNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="communityId != null" >
+        #{communityId,jdbcType=INTEGER},
+      </if>
+      <if test="communityName != null" >
+        #{communityName,jdbcType=VARCHAR},
+      </if>
+      <if test="repairTime != null" >
+        #{repairTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expectTime != null">
+      	#{expectTime,jdbcType=VARCHAR},
+      </if>
+      <if test="proprietorName != null" >
+        #{proprietorName,jdbcType=VARCHAR},
+      </if>
+      <if test="proprietorPhone != null" >
+        #{proprietorPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="roomNumber != null" >
+        #{roomNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="repairStatus != null" >
+        #{repairStatus,jdbcType=INTEGER},
+      </if>
+      <if test="repairWay != null" >
+        #{repairWay,jdbcType=VARCHAR},
+      </if>
+      <if test="repairTitle != null">
+      	#{repairTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="repairDesc != null" >
+        #{repairDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="repairImages != null" >
+        #{repairImages,jdbcType=VARCHAR},
+      </if>
+      <if test="repairUnit != null" >
+        #{repairUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="repairStaff != null" >
+        #{repairStaff,jdbcType=VARCHAR},
+      </if>
+      <if test="repairSphone != null" >
+        #{repairSphone,jdbcType=VARCHAR},
+      </if>
+      <if test="completeStatus != null" >
+        #{completeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="completeTime != null" >
+        #{completeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="repairCost != null" >
+        #{repairCost,jdbcType=DECIMAL},
+      </if>
+      <if test="feedback != null" >
+        #{feedback,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.RepairRecord" >
+    update repair_management
+    <set >
+      <if test="communityId != null" >
+        community_id = #{communityId,jdbcType=INTEGER},
+      </if>
+      <if test="communityName != null" >
+        community_name = #{communityName,jdbcType=VARCHAR},
+      </if>
+      <if test="repairTime != null" >
+        repair_time = #{repairTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expectTime != null">
+      	expect_time = #{expectTime,jdbcType=VARCHAR},
+      </if>
+      <if test="proprietorName != null" >
+        proprietor_name = #{proprietorName,jdbcType=VARCHAR},
+      </if>
+      <if test="proprietorPhone != null" >
+        proprietor_phone = #{proprietorPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="roomNumber != null" >
+        room_number = #{roomNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="repairStatus != null" >
+        repair_status = #{repairStatus,jdbcType=INTEGER},
+      </if>
+      <if test="repairWay != null" >
+        repair_way = #{repairWay,jdbcType=VARCHAR},
+      </if>
+      <if test="repairTitle != null" >
+        repair_title = #{repairTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="repairDesc != null" >
+        repair_desc = #{repairDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="repairImages != null" >
+        repair_images = #{repairImages,jdbcType=VARCHAR},
+      </if>
+      <if test="repairUnit != null" >
+        repair_unit = #{repairUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="repairStaff != null" >
+        repair_staff = #{repairStaff,jdbcType=VARCHAR},
+      </if>
+      <if test="repairSphone != null" >
+        repair_sphone = #{repairSphone,jdbcType=VARCHAR},
+      </if>
+      <if test="completeStatus != null" >
+        complete_status = #{completeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="completeTime != null" >
+        complete_time = #{completeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="repairCost != null" >
+        repair_cost = #{repairCost,jdbcType=DECIMAL},
+      </if>
+      <if test="feedback != null" >
+        feedback = #{feedback,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where repair_number = #{repairNumber,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.RepairRecord" >
+    update repair_management
+    set community_id = #{communityId,jdbcType=INTEGER},
+      community_name = #{communityName,jdbcType=VARCHAR},
+      repair_time = #{repairTime,jdbcType=TIMESTAMP},
+      expect_time= #{expectTime,jdbcType=VARCHAR},
+      proprietor_name = #{proprietorName,jdbcType=VARCHAR},
+      proprietor_phone = #{proprietorPhone,jdbcType=VARCHAR},
+      room_number = #{roomNumber,jdbcType=VARCHAR},
+      repair_status = #{repairStatus,jdbcType=INTEGER},
+      repair_way = #{repairWay,jdbcType=VARCHAR},
+      repair_title = #{repairTitle,jdbcType=VARCHAR},
+      repair_desc = #{repairDesc,jdbcType=VARCHAR},
+      repair_images = #{repairImages,jdbcType=VARCHAR},
+      repair_unit = #{repairUnit,jdbcType=VARCHAR},
+      repair_staff = #{repairStaff,jdbcType=VARCHAR},
+      repair_sphone = #{repairSphone,jdbcType=VARCHAR},
+      complete_status = #{completeStatus,jdbcType=VARCHAR},
+      complete_time = #{completeTime,jdbcType=TIMESTAMP},
+      repair_cost = #{repairCost,jdbcType=DECIMAL},
+      feedback = #{feedback,jdbcType=VARCHAR}
+    where repair_number = #{repairNumber,jdbcType=VARCHAR}
+  </update>
+  <!-- 客服获取报单 -->
+  <select id="csGetRepair" parameterType="map" resultMap="BaseResultMap">
+  	select 
+  	<include refid="Base_Column_List" />
+    from repair_management
+    where community_id like #{communityId} and repair_status = #{repairStatus} and proprietor_phone like #{proprietorPhone} and community_name like #{communityName} and room_number like #{roomNumber} 
+    limit #{start},#{rows}
+  </select>
+  <!-- 修改报单状态 -->
+  <update id="changeRecordStatus" parameterType="map">
+  	update repair_management
+  	set 
+  	repair_status = #{result}
+  	where repair_number = #{repairNumber}
+  </update>
+  <!-- 根据报单号查询报单 -->
+  <select id="getRepairRecordById" parameterType="String" resultMap="BaseResultMap">
+  	select 
+  	<include refid="Base_Column_List" />
+  	from repair_management
+  	where repair_number = #{repairNumber}
+  </select>
+  <!-- 根据小区id查询报单数 -->
+  <select id="getCountBycommumityId" parameterType="int" resultType="int">
+  	select count(*) 
+  	from repair_management
+  	where community_id = #{communityId} and repair_status = 0
+  </select>
+  <!-- 根据小区id和状态号查询各状态报单数量 -->
+  <select id="getCountByCommunityIdAndStatus" parameterType="map" resultType="int"> 
+  	select count(*)
+  	from repair_management
+  	where community_id = #{communityId} and repair_status = #{repairStatus}
+  </select>
+  <!-- 根据小区id获取 报单总数-->
+  <select id="getAllCountByCommunityId" parameterType="int" resultType="int">
+  	select count(*)
+  	from repair_management
+  	where community_id = #{communityId}
+  </select>
+  <!-- 获取小区id号集 -->
+  <select id="getCommunityIds" parameterType="map" resultType="int">
+  	select community_id
+  	from repair_management
+  	where community_name like #{communityName}
+  	limit #{start},#{rows}
+  </select>
+  <!-- 根据小区id获取小区名 -->
+  <select id="getNameByCommunityId" parameterType="int" resultType="String">
+  	select community_name
+  	from repair_management
+  	where community_id = #{communityId}
+  </select>
+  <!-- 根据小区id和业主手机查询报单 -->
+  <select id="getRecordByCommunityIdAndPhone" parameterType="map" resultMap="BaseResultMap">
+  	select 
+  	<include refid="Base_Column_List" />
+  	from repair_management
+  	where community_id = #{communityId} and proprietor_phone = #{proprietorPhone}
+  </select>
+</mapper>

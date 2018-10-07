@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.TeacherMapper" >
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.Teacher" >
+	    <id column="teacher_id" property="teacherId" jdbcType="INTEGER" />
+	    <result column="teacher_name" property="teacherName" jdbcType="VARCHAR" />
+	    <result column="teacher_sex" property="teacherSex" jdbcType="TINYINT" />
+	    <result column="teacher_icon" property="teacherIcon" jdbcType="VARCHAR" />
+	    <result column="teacher_nick_name" property="teacherNickName" jdbcType="VARCHAR" />
+	    <result column="teacher_telephone" property="teacherTelephone" jdbcType="VARCHAR" />
+	    <result column="teacher_province" property="teacherProvince" jdbcType="VARCHAR" />
+	    <result column="teacher_city" property="teacherCity" jdbcType="VARCHAR" />
+	    <result column="teacher_district" property="teacherDistrict" jdbcType="VARCHAR" />
+	    <result column="teacher_wc_open_id" property="teacherWcOpenId" jdbcType="VARCHAR" />
+	    <result column="teacher_wc_union_id" property="teacherWcUnionId" jdbcType="VARCHAR" />
+	    <result column="identity_card_img" property="identityCardImg" jdbcType="VARCHAR" />
+	    <result column="student_card" property="studentCard" jdbcType="VARCHAR" />
+	    <result column="check_status" property="checkStatus" jdbcType="TINYINT" />
+	    <result column="complete_status" property="completeStatus" jdbcType="TINYINT" />
+	    <result column="failure_reason" property="failureReason" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap id="BaseResultMap_ResumeInfo" type="com.zeng.ezsh.wy.entity.Teacher" extends="BaseResultMap">
+	    <collection property="resumeInfo" column="teacher_id" javaType="com.zeng.ezsh.wy.entity.TeacherResume" ofType="com.zeng.ezsh.wy.entity.TeacherResume" select="com.zeng.ezsh.wy.dao.TeacherResumeMapper.selectByteacherId">
+	    </collection>
+	</resultMap>
+  
+	<sql id="Base_Column_List" >
+	    teacher_id, teacher_name, teacher_sex, teacher_icon, teacher_nick_name, teacher_telephone, teacher_province, 
+	    teacher_city, teacher_district, teacher_wc_open_id, teacher_wc_union_id, identity_card_img, 
+	    student_card, check_status, complete_status, failure_reason
+    </sql>
+	
+	<!-- 查询家教老师个人信息 -->
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.Teacher" >
+	  select 
+	  <include refid="Base_Column_List" />
+	  from teacher
+	  where teacher_wc_open_id = #{teacherWcOpenId,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 根据teacherId获取老师个人信息 -->
+	<select id="selectByTeacherId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+	  select 
+	  <include refid="Base_Column_List" />
+	  from teacher
+	  where teacher_id = #{0}
+	</select>
+	
+	<!-- 家教老师注册 -->
+	<insert id="insert" parameterType="com.zeng.ezsh.wy.entity.Teacher" useGeneratedKeys="true" keyProperty="teacherId">
+	  insert into teacher
+	  <trim prefix="(" suffix=")" suffixOverrides="," >
+	    <if test="teacherId != null" >
+	      teacher_id,
+	    </if>
+	    <if test="teacherName != null" >
+	      teacher_name,
+	    </if>
+	    <if test="teacherIcon != null" >
+	      teacher_icon,
+	    </if>
+	    <if test="teacherNickName != null" >
+	      teacher_nick_name,
+	    </if>
+	    <if test="teacherTelephone != null" >
+	      teacher_telephone,
+	    </if>
+	    <if test="teacherProvince != null" >
+	      teacher_province,
+	    </if>
+	    <if test="teacherCity != null" >
+	      teacher_city,
+	    </if>
+	    <if test="teacherDistrict != null" >
+	      teacher_district,
+	    </if>
+	    <if test="teacherWcOpenId != null" >
+	      teacher_wc_open_id,
+	    </if>
+	    <if test="teacherWcUnionId != null" >
+	      teacher_wc_union_id,
+	    </if>
+	  </trim>
+	  <trim prefix="values (" suffix=")" suffixOverrides="," >
+	    <if test="teacherId != null" >
+	      #{teacherId,jdbcType=INTEGER},
+	    </if>
+	    <if test="teacherName != null" >
+	      #{teacherName,jdbcType=VARCHAR},
+	    </if>
+	    <if test="teacherIcon != null" >
+	      #{teacherIcon,jdbcType=VARCHAR},
+	    </if>
+	    <if test="teacherNickName != null" >
+	      #{teacherNickName,jdbcType=VARCHAR},
+	    </if>
+	    <if test="teacherTelephone != null" >
+	      #{teacherTelephone,jdbcType=VARCHAR},
+	    </if>
+	    <if test="teacherProvince != null" >
+	      #{teacherProvince,jdbcType=VARCHAR},
+	    </if>
+	    <if test="teacherCity != null" >
+	      #{teacherCity,jdbcType=VARCHAR},
+	    </if>
+	    <if test="teacherDistrict != null" >
+	      #{teacherDistrict,jdbcType=VARCHAR},
+	    </if>
+	    <if test="teacherWcOpenId != null" >
+	      #{teacherWcOpenId,jdbcType=VARCHAR},
+	    </if>
+	    <if test="teacherWcUnionId != null" >
+	      #{teacherWcUnionId,jdbcType=VARCHAR},
+	    </if>
+	  </trim>
+	</insert>
+  	
+  	<!-- 获取家教老师列表 -->
+	<select id="selectTeacherList" resultMap="BaseResultMap_ResumeInfo" parameterType="com.zeng.ezsh.wy.entity.Teacher" >
+	   select 
+	   <include refid="Base_Column_List" />
+	   from teacher
+	   <where>
+	    <if test="teacherName != null and teacherName != ''" >
+	      and teacher_name = #{teacherName,jdbcType=VARCHAR}
+	    </if>
+	    <if test="teacherTelephone != null and teacherTelephone != ''" >
+	      and teacher_telephone = #{teacherTelephone,jdbcType=VARCHAR}
+	    </if>
+		<if test="teacherProvince != null and teacherProvince != ''" >
+		  and teacher_province = #{teacherProvince,jdbcType=VARCHAR}
+		</if>
+		<if test="teacherCity != null and teacherCity != ''" >
+		  and teacher_city = #{teacherCity,jdbcType=VARCHAR}
+		</if>
+		<if test="teacherDistrict != null and teacherDistrict != ''" >
+		  and teacher_district = #{teacherDistrict,jdbcType=VARCHAR}
+		</if>
+	   </where>
+	</select>
+	
+	<!-- 资料补充（微信端） -->
+	<update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.Teacher" >
+	    update teacher
+	    <set >
+	      <if test="teacherName != null" >
+	        teacher_name = #{teacherName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="teacherSex != null" >
+	        teacher_sex = #{teacherSex,jdbcType=TINYINT},
+	      </if>
+	      <if test="teacherIcon != null" >
+	        teacher_icon = #{teacherIcon,jdbcType=VARCHAR},
+	      </if>
+	      <if test="teacherNickName != null" >
+	        teacher_nick_name = #{teacherNickName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="teacherTelephone != null" >
+	        teacher_telephone = #{teacherTelephone,jdbcType=VARCHAR},
+	      </if>
+	      <if test="teacherProvince != null" >
+	        teacher_province = #{teacherProvince,jdbcType=VARCHAR},
+	      </if>
+	      <if test="teacherCity != null" >
+	        teacher_city = #{teacherCity,jdbcType=VARCHAR},
+	      </if>
+	      <if test="teacherDistrict != null" >
+	        teacher_district = #{teacherDistrict,jdbcType=VARCHAR},
+	      </if>
+	      <if test="teacherWcOpenId != null" >
+	        teacher_wc_open_id = #{teacherWcOpenId,jdbcType=VARCHAR},
+	      </if>
+	      <if test="teacherWcUnionId != null" >
+	        teacher_wc_union_id = #{teacherWcUnionId,jdbcType=VARCHAR},
+	      </if>
+	      <if test="identityCardImg != null" >
+	        identity_card_img = #{identityCardImg,jdbcType=VARCHAR},
+	      </if>
+	      <if test="studentCard != null" >
+	        student_card = #{studentCard,jdbcType=VARCHAR},
+	      </if>
+	      <if test="checkStatus != null" >
+	        check_status = #{checkStatus,jdbcType=TINYINT},
+	      </if>
+	      <if test="completeStatus != null" >
+	        complete_status = #{completeStatus,jdbcType=TINYINT},
+	      </if>
+	      <if test="failureReason != null" >
+	        failure_reason = #{failureReason,jdbcType=VARCHAR},
+	      </if>
+	    </set>
+	    where teacher_id = #{teacherId,jdbcType=INTEGER}
+	  </update>
+	  
+	  <!-- 审核（后台） -->
+	  <update id="updateCheck" parameterType="com.zeng.ezsh.wy.entity.Teacher" >
+	    update teacher
+	    <set >
+	      <if test="checkStatus != null" >
+	        check_status = #{checkStatus,jdbcType=TINYINT},
+	      </if>
+	      <if test="completeStatus != null" >
+	        complete_status = #{completeStatus,jdbcType=TINYINT},
+	      </if>
+	      <if test="failureReason != null" >
+	        failure_reason = #{failureReason,jdbcType=VARCHAR},
+	      </if>
+	    </set>
+	    where teacher_id = #{teacherId,jdbcType=INTEGER}
+	  </update>
+  <!-- 
+  <update id="updateByExampleSelective" parameterType="map" >
+    update teacher
+    <set >
+      <if test="record.teacherId != null" >
+        teacher_id = #{record.teacherId,jdbcType=INTEGER},
+      </if>
+      <if test="record.teacherName != null" >
+        teacher_name = #{record.teacherName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.teacherIcon != null" >
+        teacher_icon = #{record.teacherIcon,jdbcType=VARCHAR},
+      </if>
+      <if test="record.teacherNickName != null" >
+        teacher_nick_name = #{record.teacherNickName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.teacherTelephone != null" >
+        teacher_telephone = #{record.teacherTelephone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.teacherProvince != null" >
+        teacher_province = #{record.teacherProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="record.teacherCity != null" >
+        teacher_city = #{record.teacherCity,jdbcType=VARCHAR},
+      </if>
+      <if test="record.teacherDistrict != null" >
+        teacher_district = #{record.teacherDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="record.teacherWcOpenId != null" >
+        teacher_wc_open_id = #{record.teacherWcOpenId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.teacherWcUnionId != null" >
+        teacher_wc_union_id = #{record.teacherWcUnionId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.identityCardImg != null" >
+        identity_card_img = #{record.identityCardImg,jdbcType=VARCHAR},
+      </if>
+      <if test="record.studentCard != null" >
+        student_card = #{record.studentCard,jdbcType=VARCHAR},
+      </if>
+      <if test="record.checkStatus != null" >
+        check_status = #{record.checkStatus,jdbcType=TINYINT},
+      </if>
+      <if test="record.completeStatus != null" >
+        complete_status = #{record.completeStatus,jdbcType=TINYINT},
+      </if>
+      <if test="record.failureReason != null" >
+        failure_reason = #{record.failureReason,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update teacher
+    set teacher_id = #{record.teacherId,jdbcType=INTEGER},
+      teacher_name = #{record.teacherName,jdbcType=VARCHAR},
+      teacher_icon = #{record.teacherIcon,jdbcType=VARCHAR},
+      teacher_nick_name = #{record.teacherNickName,jdbcType=VARCHAR},
+      teacher_telephone = #{record.teacherTelephone,jdbcType=VARCHAR},
+      teacher_province = #{record.teacherProvince,jdbcType=VARCHAR},
+      teacher_city = #{record.teacherCity,jdbcType=VARCHAR},
+      teacher_district = #{record.teacherDistrict,jdbcType=VARCHAR},
+      teacher_wc_open_id = #{record.teacherWcOpenId,jdbcType=VARCHAR},
+      teacher_wc_union_id = #{record.teacherWcUnionId,jdbcType=VARCHAR},
+      identity_card_img = #{record.identityCardImg,jdbcType=VARCHAR},
+      student_card = #{record.studentCard,jdbcType=VARCHAR},
+      check_status = #{record.checkStatus,jdbcType=TINYINT},
+      complete_status = #{record.completeStatus,jdbcType=TINYINT},
+      failure_reason = #{record.failureReason,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.Teacher" >
+    update teacher
+    <set >
+      <if test="teacherName != null" >
+        teacher_name = #{teacherName,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherIcon != null" >
+        teacher_icon = #{teacherIcon,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherNickName != null" >
+        teacher_nick_name = #{teacherNickName,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherTelephone != null" >
+        teacher_telephone = #{teacherTelephone,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherProvince != null" >
+        teacher_province = #{teacherProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherCity != null" >
+        teacher_city = #{teacherCity,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherDistrict != null" >
+        teacher_district = #{teacherDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherWcOpenId != null" >
+        teacher_wc_open_id = #{teacherWcOpenId,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherWcUnionId != null" >
+        teacher_wc_union_id = #{teacherWcUnionId,jdbcType=VARCHAR},
+      </if>
+      <if test="identityCardImg != null" >
+        identity_card_img = #{identityCardImg,jdbcType=VARCHAR},
+      </if>
+      <if test="studentCard != null" >
+        student_card = #{studentCard,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null" >
+        check_status = #{checkStatus,jdbcType=TINYINT},
+      </if>
+      <if test="completeStatus != null" >
+        complete_status = #{completeStatus,jdbcType=TINYINT},
+      </if>
+      <if test="failureReason != null" >
+        failure_reason = #{failureReason,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where teacher_id = #{teacherId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.Teacher" >
+    update teacher
+    set teacher_name = #{teacherName,jdbcType=VARCHAR},
+      teacher_icon = #{teacherIcon,jdbcType=VARCHAR},
+      teacher_nick_name = #{teacherNickName,jdbcType=VARCHAR},
+      teacher_telephone = #{teacherTelephone,jdbcType=VARCHAR},
+      teacher_province = #{teacherProvince,jdbcType=VARCHAR},
+      teacher_city = #{teacherCity,jdbcType=VARCHAR},
+      teacher_district = #{teacherDistrict,jdbcType=VARCHAR},
+      teacher_wc_open_id = #{teacherWcOpenId,jdbcType=VARCHAR},
+      teacher_wc_union_id = #{teacherWcUnionId,jdbcType=VARCHAR},
+      identity_card_img = #{identityCardImg,jdbcType=VARCHAR},
+      student_card = #{studentCard,jdbcType=VARCHAR},
+      check_status = #{checkStatus,jdbcType=TINYINT},
+      complete_status = #{completeStatus,jdbcType=TINYINT},
+      failure_reason = #{failureReason,jdbcType=VARCHAR}
+    where teacher_id = #{teacherId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.GoodsShoppingCartMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.GoodsShoppingCart" >
+    <id column="shopping_cart_id" property="shoppingCartId" jdbcType="INTEGER" />
+    <result column="p_user_id" property="pUserId" jdbcType="INTEGER" />
+    <result column="p_goods_id" property="pGoodsId" jdbcType="INTEGER" />
+    <result column="p_manager_id" property="pManagerId" jdbcType="INTEGER" />
+    <result column="pt_merchant_id" property="ptMerchantId" jdbcType="INTEGER" />
+    <result column="goods_amount" property="goodsAmount" jdbcType="INTEGER" />
+  </resultMap>
+  <!-- 用于选取个人购物车 -->
+  <resultMap id="BaseResultMap_For_Select" type="com.zeng.ezsh.wy.entity.GoodsShoppingCart" >
+    <id column="shopping_cart_id" property="shoppingCartId" jdbcType="INTEGER" />
+    <result column="p_user_id" property="pUserId" jdbcType="INTEGER" />
+    <result column="p_goods_id" property="pGoodsId" jdbcType="INTEGER" />
+    <result column="p_manager_id" property="pManagerId" jdbcType="INTEGER" />
+    <result column="pt_merchant_id" property="ptMerchantId" jdbcType="INTEGER" />
+    <result column="goods_amount" property="goodsAmount" jdbcType="INTEGER" />
+    
+    <collection property="goods"  column="p_goods_id" select="com.zeng.ezsh.wy.dao.GoodsMapper.getGoodsListByIdsForOrder">
+        
+    </collection>
+    <collection property="goodsMerchantInfo" javaType="com.zeng.ezsh.wy.entity.GoodsMerchant" column="pt_merchant_id" ofType="com.zeng.ezsh.wy.entity.GoodsMerchant" select="com.zeng.ezsh.wy.dao.GoodsMerchantMapper.getMerchantInfoById">
+       
+    </collection>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    shopping_cart_id, p_user_id, p_goods_id, p_manager_id, pt_merchant_id, goods_amount
+  </sql>
+ <!-- 加入购物车 -->
+  <insert id="insertShoppingCart" parameterType="com.zeng.ezsh.wy.entity.GoodsShoppingCart" >
+    insert into goods_shopping_cart (shopping_cart_id, p_user_id, p_goods_id, 
+      p_manager_id, pt_merchant_id, goods_amount)
+    values (#{shoppingCartId,jdbcType=INTEGER}, #{pUserId,jdbcType=INTEGER}, #{pGoodsId,jdbcType=INTEGER}, 
+      #{pManagerId,jdbcType=INTEGER}, #{ptMerchantId,jdbcType=INTEGER}, #{goodsAmount,jdbcType=INTEGER})
+  </insert>
+  
+ <!-- 获取个人购物车 -->
+  <select id="selectShoppingCart" resultMap="BaseResultMap_For_Select" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_shopping_cart
+    where p_user_id = #{userId,jdbcType=INTEGER} and p_manager_id=#{managerId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 移出购物车【批量】 ,兼容单个-->
+  <delete id="deleteShoppingCart" parameterType="java.util.ArrayList" >
+    delete from goods_shopping_cart
+    where shopping_cart_id in
+    <foreach item="shoppingCartId" collection="list" open="(" separator="," close=")">
+        #{shoppingCartId.shoppingCartId}
+    </foreach>
+  </delete>
+  
+  <!-- 更新购物车 -->
+  <update id="updateShoppingCartSelective" parameterType="com.zeng.ezsh.wy.entity.GoodsShoppingCart" >
+    update goods_shopping_cart
+    <set >
+      <if test="pUserId != null" >
+        p_user_id = #{pUserId,jdbcType=INTEGER},
+      </if>
+      <if test="pGoodsId != null" >
+        p_goods_id = #{pGoodsId,jdbcType=INTEGER},
+      </if>
+      <if test="pManagerId != null" >
+        p_manager_id = #{pManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsAmount != null" >
+        goods_amount = #{goodsAmount,jdbcType=INTEGER},
+      </if>
+    </set>
+    where shopping_cart_id = #{shoppingCartId,jdbcType=INTEGER}
+  </update>
+  
+ <!--  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.GoodsShoppingCartExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from goods_shopping_cart
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+
+ 
+  <delete id="deleteByExample" parameterType="com.zeng.ezsh.wy.entity.GoodsShoppingCartExample" >
+    delete from goods_shopping_cart
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.GoodsShoppingCart" >
+    insert into goods_shopping_cart
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="shoppingCartId != null" >
+        shopping_cart_id,
+      </if>
+      <if test="pUserId != null" >
+        p_user_id,
+      </if>
+      <if test="pGoodsId != null" >
+        p_goods_id,
+      </if>
+      <if test="pManagerId != null" >
+        p_manager_id,
+      </if>
+      <if test="goodsAmount != null" >
+        goods_amount,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="shoppingCartId != null" >
+        #{shoppingCartId,jdbcType=INTEGER},
+      </if>
+      <if test="pUserId != null" >
+        #{pUserId,jdbcType=INTEGER},
+      </if>
+      <if test="pGoodsId != null" >
+        #{pGoodsId,jdbcType=INTEGER},
+      </if>
+      <if test="pManagerId != null" >
+        #{pManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsAmount != null" >
+        #{goodsAmount,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.GoodsShoppingCartExample" resultType="java.lang.Integer" >
+    select count(*) from goods_shopping_cart
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update goods_shopping_cart
+    <set >
+      <if test="record.shoppingCartId != null" >
+        shopping_cart_id = #{record.shoppingCartId,jdbcType=INTEGER},
+      </if>
+      <if test="record.pUserId != null" >
+        p_user_id = #{record.pUserId,jdbcType=INTEGER},
+      </if>
+      <if test="record.pGoodsId != null" >
+        p_goods_id = #{record.pGoodsId,jdbcType=INTEGER},
+      </if>
+      <if test="record.pManagerId != null" >
+        p_manager_id = #{record.pManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="record.goodsAmount != null" >
+        goods_amount = #{record.goodsAmount,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update goods_shopping_cart
+    set shopping_cart_id = #{record.shoppingCartId,jdbcType=INTEGER},
+      p_user_id = #{record.pUserId,jdbcType=INTEGER},
+      p_goods_id = #{record.pGoodsId,jdbcType=INTEGER},
+      p_manager_id = #{record.pManagerId,jdbcType=INTEGER},
+      goods_amount = #{record.goodsAmount,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.GoodsShoppingCart" >
+    update goods_shopping_cart
+    set p_user_id = #{pUserId,jdbcType=INTEGER},
+      p_goods_id = #{pGoodsId,jdbcType=INTEGER},
+      p_manager_id = #{pManagerId,jdbcType=INTEGER},
+      goods_amount = #{goodsAmount,jdbcType=INTEGER}
+    where shopping_cart_id = #{shoppingCartId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

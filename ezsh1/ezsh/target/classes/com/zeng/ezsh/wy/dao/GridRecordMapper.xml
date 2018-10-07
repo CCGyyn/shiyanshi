@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.GridRecordMapper" >
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.GridRecord" >
+	   <id column="grid_record_id" property="gridRecordId" jdbcType="INTEGER" />
+	   <result column="p_manager_id" property="pManagerId" jdbcType="INTEGER" />
+	   <result column="p_build_id" property="pBuildId" jdbcType="INTEGER" />
+	   <result column="p_room_id" property="pRoomId" jdbcType="INTEGER" />
+	   <result column="p_grid_id" property="pGridId" jdbcType="INTEGER" />
+	   <result column="build_name" property="buildName" jdbcType="VARCHAR" />
+	   <result column="room_num" property="roomNum" jdbcType="VARCHAR" />
+	   <result column="grid_num" property="gridNum" jdbcType="VARCHAR" />
+	   <result column="customer_name" property="customerName" jdbcType="VARCHAR" />
+	   <result column="grid_read_type" property="gridReadType" jdbcType="VARCHAR" />
+	   <result column="grid_read_people" property="gridReadPeople" jdbcType="VARCHAR" />
+	   <result column="grid_read_time" property="gridReadTime" jdbcType="VARCHAR" />
+	   <result column="entering_time" property="enteringTime" jdbcType="VARCHAR" />
+	   <result column="begin_dosage" property="beginDosage" jdbcType="DOUBLE" />
+	   <result column="dosage" property="dosage" jdbcType="DOUBLE" />
+	</resultMap>
+	<sql id="Base_Column_List" >
+	    grid_record_id, p_manager_id, p_build_id, p_room_id, p_grid_id, build_name, room_num, 
+	    grid_num, customer_name, grid_read_type, grid_read_people, grid_read_time, entering_time, 
+	    begin_dosage, dosage
+  	</sql>
+	
+	<!-- 添加单条抄表记录 -->
+	<insert id="insert" parameterType="com.zeng.ezsh.wy.entity.GridRecord" >
+	  insert into grid_record (grid_record_id, p_manager_id, p_build_id, 
+	      p_room_id, p_grid_id, build_name, 
+	      room_num, grid_num, customer_name, 
+	      grid_read_type, grid_read_people, grid_read_time, 
+	      entering_time, begin_dosage, dosage
+      )
+      values (#{gridRecordId,jdbcType=INTEGER}, #{pManagerId,jdbcType=INTEGER}, #{pBuildId,jdbcType=INTEGER}, 
+	      #{pRoomId,jdbcType=INTEGER}, #{pGridId,jdbcType=INTEGER}, #{buildName,jdbcType=VARCHAR}, 
+	      #{roomNum,jdbcType=VARCHAR}, #{gridNum,jdbcType=VARCHAR}, #{customerName,jdbcType=VARCHAR}, 
+	      #{gridReadType,jdbcType=VARCHAR}, #{gridReadPeople,jdbcType=VARCHAR}, #{gridReadTime,jdbcType=VARCHAR}, 
+	      #{enteringTime,jdbcType=VARCHAR}, #{beginDosage,jdbcType=DOUBLE}, #{dosage,jdbcType=DOUBLE}
+	      )
+	</insert>
+	
+	<!-- 批量添加应抄表记录（定时） -->
+  	<insert id="insertGridRecordBatch" parameterType="java.util.List">
+		insert into grid_record (grid_record_id, p_manager_id, p_build_id, 
+	      p_room_id, p_grid_id, build_name, 
+	      room_num, grid_num, customer_name, 
+	      grid_read_type, grid_read_people, grid_read_time, 
+	      entering_time, begin_dosage, dosage)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+		    (#{item.gridRecordId,jdbcType=INTEGER}, #{item.pManagerId,jdbcType=INTEGER}, #{item.pBuildId,jdbcType=INTEGER}, 
+	      #{item.pRoomId,jdbcType=INTEGER}, #{item.pGridId,jdbcType=INTEGER}, #{item.buildName,jdbcType=VARCHAR}, 
+	      #{item.roomNum,jdbcType=VARCHAR}, #{item.gridNum,jdbcType=VARCHAR}, #{item.customerName,jdbcType=VARCHAR}, 
+	      #{item.gridReadType,jdbcType=VARCHAR}, #{item.gridReadPeople,jdbcType=VARCHAR}, #{item.gridReadTime,jdbcType=VARCHAR}, 
+	      #{item.enteringTime,jdbcType=VARCHAR}, #{item.beginDosage,jdbcType=DOUBLE}, #{item.dosage,jdbcType=DOUBLE})
+		</foreach>
+  	</insert>
+  	
+	<!-- 获取抄表记录集合 -->
+	<select id="selectGridRecord" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.GridRecord" >
+	    select
+	    <include refid="Base_Column_List" />
+	    from grid_record
+		<where>
+			<if test="pManagerId != null" >
+				and p_manager_id=#{pManagerId,jdbcType=INTEGER}
+			</if>
+			<if test="pBuildId != null" >
+				and p_build_id=#{pBuildId,jdbcType=INTEGER}
+			</if>
+			<if test="pGridId != null">
+				and p_grid_id=#{pGridId,jdbcType=INTEGER}
+			</if>
+		ORDER BY
+			p_room_id DESC
+		</where>
+    </select>
+    
+    <!-- 批量更新抄表记录 -->
+    <update id="updateGridRecordBatch" parameterType="java.util.List">  
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";" >   
+            update grid_record
+		    <set>	    
+		      <if test="item.gridReadPeople != null" >
+		        grid_read_people = #{item.gridReadPeople,jdbcType=VARCHAR},
+		      </if>
+		      <if test="item.gridReadTime != null" >
+		        grid_read_time = #{item.gridReadTime,jdbcType=VARCHAR},
+		      </if>
+		      <if test="item.beginDosage != null and item.beginDosage!='0'" >
+		        begin_dosage = #{item.beginDosage,jdbcType=DOUBLE},
+		      </if>
+		      <if test="item.dosage != null and item.dosage != '0'" >
+		        dosage = #{item.dosage,jdbcType=DOUBLE},
+		      </if>
+		    </set> 
+		    <where>
+				grid_record_id=#{item.gridRecordId,jdbcType=INTEGER}
+				<!--and p_build_id = #{item.pBuildId,jdbcType=INTEGER}
+				<if test="item.roomNum != null">
+				and room_num=#{item.roomNum,jdbcType=VARCHAR}
+				</if> -->
+			</where>      
+        </foreach>  
+    </update>
+    
+    <!-- 更新单个抄表信息 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.GridRecord" >
+	    update grid_record
+	    <set >
+	      <!-- <if test="pRoomId != null" >
+	        p_room_id = #{pRoomId,jdbcType=INTEGER},
+	      </if>
+	      <if test="pGridId != null" >
+	        p_grid_id = #{pGridId,jdbcType=INTEGER},
+	      </if>
+	      <if test="buildName != null" >
+	        build_name = #{buildName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="roomNum != null" >
+	        room_num = #{roomNum,jdbcType=VARCHAR},
+	      </if>
+	      <if test="gridNum != null" >
+	        grid_num = #{gridNum,jdbcType=VARCHAR},
+	      </if>
+	      <if test="customerName != null" >
+	        customer_name = #{customerName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="gridReadType != null" >
+	        grid_read_type = #{gridReadType,jdbcType=VARCHAR},
+	      </if>
+	      <if test="gridReadPeople != null" >
+	        grid_read_people = #{gridReadPeople,jdbcType=VARCHAR},
+	      </if>
+	      <if test="gridReadTime != null" >
+	        grid_read_time = #{gridReadTime,jdbcType=VARCHAR},
+	      </if>
+	      <if test="enteringTime != null" >
+	        entering_time = #{enteringTime,jdbcType=VARCHAR},
+	      </if>
+	      <if test="beginDosage != null" >
+	        begin_dosage = #{beginDosage,jdbcType=DOUBLE},
+	      </if> -->
+	      <if test="dosage != null" >
+	        dosage = #{dosage,jdbcType=DOUBLE},
+	      </if>
+	    </set>
+	    where grid_record_id = #{gridRecordId,jdbcType=INTEGER}
+  	</update>
+  	
+  	<!-- 删除单条抄表记录 -->
+  	<delete id="deletePrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.GridRecord" >
+	    delete from grid_record
+	    <where>
+	    	<if test="gridRecordId!=null">
+	    	grid_record_id = #{gridRecordId,jdbcType=INTEGER}
+	    	</if>
+	    </where>
+  	</delete>  
+
+  
+  
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.GridRecord" >
+    insert into grid_record
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="gridRecordId != null" >
+        grid_record_id,
+      </if>
+      <if test="pManagerId != null" >
+        p_manager_id,
+      </if>
+      <if test="pBuildId != null" >
+        p_build_id,
+      </if>
+      <if test="pRoomId != null" >
+        p_room_id,
+      </if>
+      <if test="pGridId != null" >
+        p_grid_id,
+      </if>
+      <if test="buildName != null" >
+        build_name,
+      </if>
+      <if test="roomNum != null" >
+        room_num,
+      </if>
+      <if test="gridNum != null" >
+        grid_num,
+      </if>
+      <if test="customerName != null" >
+        customer_name,
+      </if>
+      <if test="gridReadType != null" >
+        grid_read_type,
+      </if>
+      <if test="gridReadPeople != null" >
+        grid_read_people,
+      </if>
+      <if test="gridReadTime != null" >
+        grid_read_time,
+      </if>
+      <if test="enteringTime != null" >
+        entering_time,
+      </if>
+      <if test="beginDosage != null" >
+        begin_dosage,
+      </if>
+      <if test="dosage != null" >
+        dosage,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="gridRecordId != null" >
+        #{gridRecordId,jdbcType=INTEGER},
+      </if>
+      <if test="pManagerId != null" >
+        #{pManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="pBuildId != null" >
+        #{pBuildId,jdbcType=INTEGER},
+      </if>
+      <if test="pRoomId != null" >
+        #{pRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="pGridId != null" >
+        #{pGridId,jdbcType=INTEGER},
+      </if>
+      <if test="buildName != null" >
+        #{buildName,jdbcType=VARCHAR},
+      </if>
+      <if test="roomNum != null" >
+        #{roomNum,jdbcType=VARCHAR},
+      </if>
+      <if test="gridNum != null" >
+        #{gridNum,jdbcType=VARCHAR},
+      </if>
+      <if test="customerName != null" >
+        #{customerName,jdbcType=VARCHAR},
+      </if>
+      <if test="gridReadType != null" >
+        #{gridReadType,jdbcType=VARCHAR},
+      </if>
+      <if test="gridReadPeople != null" >
+        #{gridReadPeople,jdbcType=VARCHAR},
+      </if>
+      <if test="gridReadTime != null" >
+        #{gridReadTime,jdbcType=VARCHAR},
+      </if>
+      <if test="enteringTime != null" >
+        #{enteringTime,jdbcType=VARCHAR},
+      </if>
+      <if test="beginDosage != null" >
+        #{beginDosage,jdbcType=DOUBLE},
+      </if>
+      <if test="dosage != null" >
+        #{dosage,jdbcType=DOUBLE},
+      </if>
+    </trim>
+  </insert>
+
+  <!--
+  <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.GridRecordExample" resultType="java.lang.Integer" >
+    select count(*) from grid_record
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update grid_record
+    <set >
+      <if test="record.gridRecordId != null" >
+        grid_record_id = #{record.gridRecordId,jdbcType=INTEGER},
+      </if>
+      <if test="record.pManagerId != null" >
+        p_manager_id = #{record.pManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="record.pBuildId != null" >
+        p_build_id = #{record.pBuildId,jdbcType=INTEGER},
+      </if>
+      <if test="record.pRoomId != null" >
+        p_room_id = #{record.pRoomId,jdbcType=INTEGER},
+      </if>
+      <if test="record.pGridId != null" >
+        p_grid_id = #{record.pGridId,jdbcType=INTEGER},
+      </if>
+      <if test="record.buildName != null" >
+        build_name = #{record.buildName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.roomNum != null" >
+        room_num = #{record.roomNum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gridNum != null" >
+        grid_num = #{record.gridNum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.customerName != null" >
+        customer_name = #{record.customerName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gridReadType != null" >
+        grid_read_type = #{record.gridReadType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gridReadPeople != null" >
+        grid_read_people = #{record.gridReadPeople,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gridReadTime != null" >
+        grid_read_time = #{record.gridReadTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.enteringTime != null" >
+        entering_time = #{record.enteringTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.beginDosage != null" >
+        begin_dosage = #{record.beginDosage,jdbcType=DOUBLE},
+      </if>
+      <if test="record.dosage != null" >
+        dosage = #{record.dosage,jdbcType=DOUBLE},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update grid_record
+    set grid_record_id = #{record.gridRecordId,jdbcType=INTEGER},
+      p_manager_id = #{record.pManagerId,jdbcType=INTEGER},
+      p_build_id = #{record.pBuildId,jdbcType=INTEGER},
+      p_room_id = #{record.pRoomId,jdbcType=INTEGER},
+      p_grid_id = #{record.pGridId,jdbcType=INTEGER},
+      build_name = #{record.buildName,jdbcType=VARCHAR},
+      room_num = #{record.roomNum,jdbcType=VARCHAR},
+      grid_num = #{record.gridNum,jdbcType=VARCHAR},
+      customer_name = #{record.customerName,jdbcType=VARCHAR},
+      grid_read_type = #{record.gridReadType,jdbcType=VARCHAR},
+      grid_read_people = #{record.gridReadPeople,jdbcType=VARCHAR},
+      grid_read_time = #{record.gridReadTime,jdbcType=VARCHAR},
+      entering_time = #{record.enteringTime,jdbcType=VARCHAR},
+      begin_dosage = #{record.beginDosage,jdbcType=DOUBLE},
+      dosage = #{record.dosage,jdbcType=DOUBLE}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.GridRecord" >
+    update grid_record
+    set p_manager_id = #{pManagerId,jdbcType=INTEGER},
+      p_build_id = #{pBuildId,jdbcType=INTEGER},
+      p_room_id = #{pRoomId,jdbcType=INTEGER},
+      p_grid_id = #{pGridId,jdbcType=INTEGER},
+      build_name = #{buildName,jdbcType=VARCHAR},
+      room_num = #{roomNum,jdbcType=VARCHAR},
+      grid_num = #{gridNum,jdbcType=VARCHAR},
+      customer_name = #{customerName,jdbcType=VARCHAR},
+      grid_read_type = #{gridReadType,jdbcType=VARCHAR},
+      grid_read_people = #{gridReadPeople,jdbcType=VARCHAR},
+      grid_read_time = #{gridReadTime,jdbcType=VARCHAR},
+      entering_time = #{enteringTime,jdbcType=VARCHAR},
+      begin_dosage = #{beginDosage,jdbcType=DOUBLE},
+      dosage = #{dosage,jdbcType=DOUBLE}
+    where grid_record_id = #{gridRecordId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

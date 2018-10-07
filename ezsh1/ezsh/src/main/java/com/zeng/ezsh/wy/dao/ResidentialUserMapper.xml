@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zeng.ezsh.wy.dao.ResidentialUserMapper">
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.ResidentialUser">
+		<id column="user_id" jdbcType="INTEGER" property="userId" />
+		<result column="user_icon" jdbcType="VARCHAR" property="userIcon" />
+		<result column="user_linkphone" jdbcType="VARCHAR" property="userLinkphone" />
+		<result column="user_account" jdbcType="VARCHAR" property="userAccount" />
+		<result column="user_password" jdbcType="VARCHAR" property="userPassword" />
+		<result column="user_name" jdbcType="VARCHAR" property="userName" />
+		<result column="user_sex" jdbcType="VARCHAR" property="userSex" />
+		<result column="user_nickname" jdbcType="VARCHAR" property="userNickname" />
+		<result column="user_serial_number" jdbcType="VARCHAR"
+			property="userSerialNumber" />
+		<result column="user_identity_card" jdbcType="VARCHAR"
+			property="userIdentityCard" />
+		<result column="user_teacher_fee_status" property="userTeacherFeeStatus"
+			jdbcType="TINYINT" />
+		<result column="user_teacher_fee_valid" property="userTeacherFeeValid"
+			jdbcType="VARCHAR" />
+		<result column="user_integral" property="userIntegral"
+			jdbcType="DECIMAL" />
+	</resultMap>
+
+	<resultMap id="BaseResultMap_uMsIds" type="com.zeng.ezsh.wy.entity.ResidentialUser"
+		extends="BaseResultMap">
+		<collection property="uroomList" javaType="ArrayList"
+			column="user_id" ofType="com.zeng.ezsh.wy.entity.UMsIds"
+			select="com.zeng.ezsh.wy.dao.UMsIdsMapper.gtUserManagersInfoByUserId">
+			<id property="userManagerId" column="user_manager_id"></id>
+		</collection>
+	</resultMap>
+
+	<resultMap id="BaseResultMap_ToGoodsComment" type="com.zeng.ezsh.wy.entity.ResidentialUser">
+		<id column="user_id" jdbcType="INTEGER" property="userId" />
+		<result column="user_icon" jdbcType="VARCHAR" property="userIcon" />
+		<result column="user_nickname" jdbcType="VARCHAR" property="userNickname" />
+	</resultMap>
+
+	<resultMap id="BaseResultMap_Account_List" type="com.zeng.ezsh.wy.entity.ResidentialUser"
+		extends="BaseResultMap">
+		<collection property="uroomList" javaType="ArrayList"
+			ofType="com.zeng.ezsh.wy.entity.UMsIds">
+			<id column="u_ms_id" property="uMsId" jdbcType="INTEGER" />
+			<result column="p_user_id" property="pUserId" jdbcType="INTEGER" />
+			<result column="p_manager_id" property="pManagerId" jdbcType="INTEGER" />
+			<result column="p_build_id" property="pBuildId" jdbcType="INTEGER" />
+			<result column="p_room_id" property="pRoomId" jdbcType="INTEGER" />
+			<result column="p_owner_id" property="pOwnerId" jdbcType="INTEGER" />
+			<result column="register_name" property="registerName"
+				jdbcType="VARCHAR" />
+			<result column="register_telephone" property="registerTelephone"
+				jdbcType="VARCHAR" />
+			<result column="identify_classify" property="identifyClassify"
+				jdbcType="TINYINT" />
+			<result column="apply_time" property="applyTime" jdbcType="VARCHAR" />
+			<result column="check_status" property="checkStatus" jdbcType="TINYINT" />
+			<result column="failure_info" property="failureInfo" jdbcType="VARCHAR" />
+		</collection>
+	</resultMap>
+
+	<!-- residential_user表字段 -->
+	<sql id="Base_Column_List">
+		user_id, user_icon, user_linkphone, user_account,
+		user_password, user_name,
+		user_sex,
+		user_nickname, user_serial_number,
+		user_identity_card, user_teacher_fee_status,
+		user_teacher_fee_valid,
+		user_integral
+	</sql>
+
+	<!-- residential_user表字段（除去密码字段） -->
+	<sql id="Base_Column_List_Except_Password">
+		user_id, user_icon, user_linkphone, user_account,
+		user_name, user_sex,
+		user_nickname, user_serial_number,
+		user_identity_card, user_teacher_fee_status,
+		user_teacher_fee_valid,
+		user_integral
+	</sql>
+
+	<!-- 级联residential_user表字段（除去密码字段）和 u_ms_ids表字段 -->
+	<sql id="Base_Column_List_Except_Password_By_UserId_uMSId">
+		u.user_id,u.user_icon, u.user_linkphone, u.user_account,
+		u.user_name, u.user_sex,
+		u.user_nickname, u.user_serial_number,
+		u.user_identity_card, u.user_teacher_fee_status,
+		u.user_teacher_fee_valid,
+		u_m.u_ms_id, u_m.p_user_id, u_m.p_manager_id,
+		u_m.p_build_id, u_m.p_room_id,
+		u_m.p_owner_id,u_m.register_name,
+		u_m.register_telephone,u_m.identify_classify, u_m.apply_time,
+		u_m.check_status,u_m.failure_info,u_m.privilege
+	</sql>
+
+	<sql id="Base_Column_List_Except_Password_To_GoodsComment">
+		user_id,user_icon, user_nickname
+	</sql>
+
+	<!-- 根据userId获取用户的一些信息(用于商品评价回复处) -->
+	<select id="selectByPrimaryKeyToGoodsComment" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap_ToGoodsComment">
+		select
+		<include refid="Base_Column_List_Except_Password_To_GoodsComment" />
+		from residential_user
+		where user_id = #{0}
+	</select>
+
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap_uMsIds">
+		select
+		<include refid="Base_Column_List" />
+		from residential_user
+		where user_id = #{userId,jdbcType=INTEGER}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		residential_user
+		where user_id = #{userId,jdbcType=INTEGER}
+	</delete>
+
+	<!-- 根据手机号码获取管理处ID集合 -->
+	<select id="getManageIds" parameterType="java.lang.String"
+		resultType="java.lang.Integer">
+		select p_manager_id from residential_user where
+		user_account = #{0}
+	</select>
+
+	<!-- 检测账户是否存在 -->
+	<select id="checkAccountIsIn" parameterType="java.lang.String"
+		resultType="java.lang.Integer" useCache="false">
+		select count(*) from
+		residential_user where user_account = #{0}
+	</select>
+
+	<!-- 根据用户的p_manager_id获取manger信息 -->
+	<select id="getManagementByIds" parameterType="java.util.Arrays"
+		resultType="com.zeng.ezsh.wy.entity.Management">
+		select manager_id,manager_name from management
+		where manager_id in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<!--用户注册 -->
+	<insert id="addUser" useGeneratedKeys="true" keyProperty="userId"
+		parameterType="com.zeng.ezsh.wy.entity.ResidentialUser">
+		insert into residential_user (user_id,user_account,
+		user_linkphone,
+		user_password, user_name, user_sex, user_nickname,
+		user_serial_number,
+		user_identity_card)
+		values
+		(#{userId,jdbcType=INTEGER}, #{userAccount,jdbcType=VARCHAR},
+		#{userLinkphone,jdbcType=VARCHAR}, #{userPassword,jdbcType=VARCHAR},
+		#{userName,jdbcType=VARCHAR}, #{userSex,jdbcType=VARCHAR},
+		#{userNickname,jdbcType=VARCHAR},
+		#{userSerialNumber,jdbcType=VARCHAR},#{userIdentityCard,jdbcType=VARCHAR})
+	</insert>
+
+	<!-- 更新用户信息 -->
+	<update id="updateByUserId" parameterType="com.zeng.ezsh.wy.entity.ResidentialUser">
+		update residential_user
+		<set>
+			<if test="userIcon != null">
+				user_icon = #{userIcon,jdbcType=VARCHAR},
+			</if>
+			<if test="userLinkphone != null">
+				user_linkphone = #{userLinkphone,jdbcType=VARCHAR},
+			</if>
+			<!-- <if test="userPassword != null"> user_password = #{userPassword,jdbcType=VARCHAR}, 
+				</if> -->
+			<if test="userName != null">
+				user_name = #{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="userSex != null">
+				user_sex = #{userSex,jdbcType=VARCHAR},
+			</if>
+			<if test="userNickname != null">
+				user_nickname = #{userNickname,jdbcType=VARCHAR},
+			</if>
+			<if test="userSerialNumber != null">
+				user_serial_number =
+				#{userSerialNumber,jdbcType=VARCHAR},
+			</if>
+			<if test="userIdentityCard != null">
+				user_identity_card =
+				#{userIdentityCard,jdbcType=VARCHAR},
+			</if>
+			<if test="userIntegral != null">
+				user_integral =
+				#{userIntegral,jdbcType=DECIMAL},
+			</if>
+			<if test="userTeacherFeeValid != null">
+				user_teacher_fee_valid =
+				#{userTeacherFeeValid,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where user_id = #{userId,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 更新用户积分 -->
+	<update id="updateIntegralByUserId" parameterType="com.zeng.ezsh.wy.entity.ResidentialUser">
+		update residential_user
+		<set>
+			<if test="userIntegral != null">
+				user_integral =
+				#{userIntegral,jdbcType=DECIMAL},
+			</if>
+		</set>
+		where user_id = #{userId,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 更新家教平台移动端支付记录的同时更新用户信息的支付状态和费用有效期 -->
+	<update id="upSelectiveForTeacherPay" parameterType="com.zeng.ezsh.wy.entity.ResidentialUser">
+		update residential_user
+		<set>
+			<if test="userTeacherFeeStatus != null">
+				user_teacher_fee_status =
+				#{userTeacherFeeStatus,jdbcType=INTEGER},
+			</if>
+			<if test="userTeacherFeeValid != null">
+				user_teacher_fee_valid =
+				#{userTeacherFeeValid,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where user_id = #{userId,jdbcType=INTEGER}
+	</update>
+
+
+	<!-- 密码更新修改【移动端】 -->
+	<update id="updateByUserAccount" parameterType="com.zeng.ezsh.wy.entity.ResidentialUser">
+		update residential_user
+		<set>
+			<if test="userPassword != null">
+				user_password = #{userPassword,jdbcType=VARCHAR},
+			</if>
+			<if test="userIdentityCard != null">
+				user_identity_card = #{userIdentityCard,jdbcType=VARCHAR},
+			</if>
+			<if test="userName != null">
+				user_name = #{userName,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where user_account = #{userAccount,jdbcType=VARCHAR}
+	</update>
+
+	<!-- 用户登录(账号密码登录)【移动端】 -->
+	<select id="getUserLoginInfo" resultMap="BaseResultMap_uMsIds"
+		parameterType="com.zeng.ezsh.wy.entity.ResidentialUser">
+		select
+		<include refid="Base_Column_List_Except_Password" />
+		from residential_user
+		where user_account =
+		#{userAccount,jdbcType=INTEGER} and user_password =
+		#{userPassword,jdbcType=INTEGER}
+	</select>
+
+	<!-- 获取用户积分信息【移动端】 -->
+	<select id="getUserIntegralByUserId" resultMap="BaseResultMap"
+		parameterType="com.zeng.ezsh.wy.entity.ResidentialUser">
+		select
+		<include refid="Base_Column_List" />
+		from residential_user
+		where user_id = #{userId,jdbcType=INTEGER}
+	</select>
+
+	<select id="getUserLoginInfoByUserId" resultMap="BaseResultMap_uMsIds"
+		parameterType="com.zeng.ezsh.wy.entity.ResidentialUser">
+		select
+		<include refid="Base_Column_List_Except_Password" />
+		from residential_user
+		where user_id = #{userId,jdbcType=INTEGER}
+	</select>
+
+	<!-- 根据条件获取用户信息 -->
+	<select id="getResidentialUserByParam" resultMap="BaseResultMap_uMsIds"
+		parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List_Except_Password" />
+		from residential_user
+		where user_account =
+		#{userAccount,jdbcType=INTEGER}
+	</select>
+
+	<!-- 条件获取用户信息集合 -->
+	<select id="selectUserInfoByCondition" resultMap="BaseResultMap_uMsIds"
+		parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List_Except_Password" />
+		from residential_user
+		<if test="keyWord != null">
+			<where>
+				user_name LIKE concat('%',#{keyWord},'%')
+			</where>
+		</if>
+	</select>
+
+	<!-- 根据条件获取单个用户信息 -->
+	<select id="getOneUserInfo" resultMap="BaseResultMap_uMsIds"
+		parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List_Except_Password" />
+		from residential_user
+		<if test="userId != null">
+			<where>
+				user_id =#{userId}
+			</where>
+		</if>
+		<if test="userAccount != null">
+			<where>
+				user_account =#{userAccount} and (user_check_status =2 or
+				user_check_status =0)
+			</where>
+		</if>
+	</select>
+
+	<!-- 获取App端注册用户信息集合 （后台列表展示） -->
+	<select id="getResidentialUserList" resultMap="BaseResultMap_Account_List"
+		parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List_Except_Password_By_UserId_uMSId" />
+		from residential_user u inner join u_ms_ids u_m on
+		u.user_id=u_m.p_user_id
+		<where>
+			<if test="userName != null">
+				and u_m.user_name = #{userName}
+			</if>
+			<if test="pManagerId != null">
+				and u_m.p_manager_id = #{pManagerId}
+			</if>
+		</where>
+	</select>
+</mapper>

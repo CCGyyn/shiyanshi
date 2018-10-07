@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.AdviceFeedbackMapper" >
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.AdviceFeedback" >
+    <id column="feedback_id" property="feedbackId" jdbcType="INTEGER" />
+    <result column="pt_user_id" property="ptUserId" jdbcType="INTEGER" />
+    <result column="pt_manager_id" property="ptManagerId" jdbcType="INTEGER" />
+    <result column="pt_build_id" property="ptBuildId" jdbcType="INTEGER" />
+    <result column="add_time" property="addTime" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.zeng.ezsh.wy.entity.AdviceFeedback" extends="BaseResultMap" >
+    <result column="feedback_content" property="feedbackContent" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    feedback_id, pt_user_id, pt_manager_id, pt_build_id, add_time
+  </sql>
+  <sql id="Blob_Column_List" >
+    feedback_content
+  </sql>
+  
+  <!-- 添加反馈意见【移动端】-->
+  <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.AdviceFeedback" >
+    insert into advice_feedback (feedback_id, pt_user_id, pt_manager_id, 
+      pt_build_id, feedback_content, add_time)
+    values (#{feedbackId,jdbcType=INTEGER}, #{ptUserId,jdbcType=INTEGER}, #{ptManagerId,jdbcType=INTEGER}, 
+      #{ptBuildId,jdbcType=INTEGER}, #{feedbackContent,jdbcType=LONGVARCHAR}, #{addTime,jdbcType=VARCHAR})
+  </insert>
+  
+  <!-- <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.AdviceFeedbackExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from advice_feedback
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zeng.ezsh.wy.entity.AdviceFeedbackExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from advice_feedback
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from advice_feedback
+    where feedback_id = #{feedbackId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from advice_feedback
+    where feedback_id = #{feedbackId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.zeng.ezsh.wy.entity.AdviceFeedbackExample" >
+    delete from advice_feedback
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.AdviceFeedback" >
+    insert into advice_feedback
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="feedbackId != null" >
+        feedback_id,
+      </if>
+      <if test="ptUserId != null" >
+        pt_user_id,
+      </if>
+      <if test="ptManagerId != null" >
+        pt_manager_id,
+      </if>
+      <if test="ptBuildId != null" >
+        pt_build_id,
+      </if>
+      <if test="feedbackContent != null" >
+        feedback_content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="feedbackId != null" >
+        #{feedbackId,jdbcType=INTEGER},
+      </if>
+      <if test="ptUserId != null" >
+        #{ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="ptManagerId != null" >
+        #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="ptBuildId != null" >
+        #{ptBuildId,jdbcType=INTEGER},
+      </if>
+      <if test="feedbackContent != null" >
+        #{feedbackContent,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.zeng.ezsh.wy.entity.AdviceFeedbackExample" resultType="java.lang.Integer" >
+    select count(*) from advice_feedback
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update advice_feedback
+    <set >
+      <if test="record.feedbackId != null" >
+        feedback_id = #{record.feedbackId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptUserId != null" >
+        pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptManagerId != null" >
+        pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ptBuildId != null" >
+        pt_build_id = #{record.ptBuildId,jdbcType=INTEGER},
+      </if>
+      <if test="record.feedbackContent != null" >
+        feedback_content = #{record.feedbackContent,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update advice_feedback
+    set feedback_id = #{record.feedbackId,jdbcType=INTEGER},
+      pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+      pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      pt_build_id = #{record.ptBuildId,jdbcType=INTEGER},
+      feedback_content = #{record.feedbackContent,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update advice_feedback
+    set feedback_id = #{record.feedbackId,jdbcType=INTEGER},
+      pt_user_id = #{record.ptUserId,jdbcType=INTEGER},
+      pt_manager_id = #{record.ptManagerId,jdbcType=INTEGER},
+      pt_build_id = #{record.ptBuildId,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.AdviceFeedback" >
+    update advice_feedback
+    <set >
+      <if test="ptUserId != null" >
+        pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      </if>
+      <if test="ptManagerId != null" >
+        pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="ptBuildId != null" >
+        pt_build_id = #{ptBuildId,jdbcType=INTEGER},
+      </if>
+      <if test="feedbackContent != null" >
+        feedback_content = #{feedbackContent,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where feedback_id = #{feedbackId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zeng.ezsh.wy.entity.AdviceFeedback" >
+    update advice_feedback
+    set pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      pt_build_id = #{ptBuildId,jdbcType=INTEGER},
+      feedback_content = #{feedbackContent,jdbcType=LONGVARCHAR}
+    where feedback_id = #{feedbackId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.AdviceFeedback" >
+    update advice_feedback
+    set pt_user_id = #{ptUserId,jdbcType=INTEGER},
+      pt_manager_id = #{ptManagerId,jdbcType=INTEGER},
+      pt_build_id = #{ptBuildId,jdbcType=INTEGER}
+    where feedback_id = #{feedbackId,jdbcType=INTEGER}
+  </update> -->
+</mapper>

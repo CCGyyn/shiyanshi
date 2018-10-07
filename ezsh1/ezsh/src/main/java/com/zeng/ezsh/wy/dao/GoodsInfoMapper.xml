@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.GoodsInfoMapper" >
+	<!-- 获取商品的基本信息，用于首页的粗略浏览 -->
+  <resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.GoodsInfo" >
+    <id column="goods_info_id" jdbcType="INTEGER" property="goodsInfoId" />
+    <result column="p_goods_classfy_id" jdbcType="INTEGER" property="pGoodsClassfyId" />
+    <result column="p_manager_id" jdbcType="INTEGER" property="pManagerId" />
+    <result column="p_merchant_id" jdbcType="INTEGER" property="pMerchantId" />
+    <result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
+    <result column="goods_slide_show" jdbcType="VARCHAR" property="goodsSlideShow" />
+    <result column="goods_carriage" jdbcType="VARCHAR" property="goodsCarriage" />
+    <result column="goods_image_text" jdbcType="VARCHAR" property="goodsImageText" />
+    <result column="goods_source_area" jdbcType="VARCHAR" property="goodsSourceArea" />
+    <result column="goods_distribution" jdbcType="VARCHAR" property="goodsDistribution" />
+    <result column="goods_time_mark" jdbcType="VARCHAR" property="goodsTimeMark" />
+    <result column="goods_brand" jdbcType="VARCHAR" property="goodsBrand" />
+    <result column="goods_parameter" jdbcType="VARCHAR" property="goodsParameter" />
+    <result column="goods_total_sale_amount" property="goodsTotalSaleAmount" jdbcType="VARCHAR" />
+    <result column="goods_min_price" property="goodsMinPrice" jdbcType="DECIMAL" />
+    <result column="goods_max_price" property="goodsMaxPrice" jdbcType="DECIMAL" />
+    <result column="section_one_name" jdbcType="VARCHAR" property="sectionOneName" />
+    <result column="section_two_name" jdbcType="VARCHAR" property="sectionTwoName" />
+    <result column="section_three_name" jdbcType="VARCHAR" property="sectionThreeName" />
+    <result column="section_four_name" jdbcType="VARCHAR" property="sectionFourName" />
+    <result column="section_five_name" jdbcType="VARCHAR" property="sectionFiveName" />
+    <result column="addtime" jdbcType="VARCHAR" property="addtime" />
+    <result column="goods_show_classfy" jdbcType="VARCHAR" property="goodsShowClassfy" />
+    <collection property="goodsClassfyInfo" javaType="com.zeng.ezsh.wy.entity.GoodsClassfy" column="p_goods_classfy_id" ofType="com.zeng.ezsh.wy.entity.GoodsClassfy" select="com.zeng.ezsh.wy.dao.GoodsClassfyMapper.getGoodsClassfyInfoById">
+       
+    </collection>
+    <collection property="goodsDiscountsInfo" javaType="com.zeng.ezsh.wy.entity.GoodsDiscounts" column="goods_info_id" ofType="com.zeng.ezsh.wy.entity.GoodsInfo" select="com.zeng.ezsh.wy.dao.GoodsDiscountsMapper.selectDiscountInfoByGoodsInfoId">
+       
+    </collection>
+  </resultMap>
+  
+  <!-- 条件获取商品集合信息（用于后台） -->
+  <resultMap id="BaseResultMapToAdmin" type="com.zeng.ezsh.wy.entity.GoodsInfo" >
+    <id column="goods_info_id" jdbcType="INTEGER" property="goodsInfoId" />
+    <result column="p_goods_classfy_id" jdbcType="INTEGER" property="pGoodsClassfyId" />
+    <result column="p_manager_id" jdbcType="INTEGER" property="pManagerId" />
+    <result column="p_merchant_id" jdbcType="INTEGER" property="pMerchantId" />
+    <result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
+    <result column="goods_slide_show" jdbcType="VARCHAR" property="goodsSlideShow" />
+    <result column="goods_carriage" jdbcType="VARCHAR" property="goodsCarriage" />
+    <result column="goods_image_text" jdbcType="VARCHAR" property="goodsImageText" />
+    <result column="goods_source_area" jdbcType="VARCHAR" property="goodsSourceArea" />
+    <result column="goods_distribution" jdbcType="VARCHAR" property="goodsDistribution" />
+    <result column="goods_time_mark" jdbcType="VARCHAR" property="goodsTimeMark" />
+    <result column="goods_brand" jdbcType="VARCHAR" property="goodsBrand" />
+    <result column="goods_parameter" jdbcType="VARCHAR" property="goodsParameter" />
+    <result column="goods_total_sale_amount" property="goodsTotalSaleAmount" jdbcType="VARCHAR" />
+    <result column="goods_min_price" property="goodsMinPrice" jdbcType="DECIMAL" />
+    <result column="goods_max_price" property="goodsMaxPrice" jdbcType="DECIMAL" />
+    <result column="section_one_name" jdbcType="VARCHAR" property="sectionOneName" />
+    <result column="section_two_name" jdbcType="VARCHAR" property="sectionTwoName" />
+    <result column="section_three_name" jdbcType="VARCHAR" property="sectionThreeName" />
+    <result column="section_four_name" jdbcType="VARCHAR" property="sectionFourName" />
+    <result column="section_five_name" jdbcType="VARCHAR" property="sectionFiveName" />
+    <result column="addtime" jdbcType="VARCHAR" property="addtime" />
+    <result column="goods_show_classfy" jdbcType="VARCHAR" property="goodsShowClassfy" />
+    <!-- <collection property="goodsList" javaType="ArrayList" column="goods_info_id" ofType="com.zeng.ezsh.wy.entity.GoodsInfo" select="com.zeng.ezsh.wy.dao.GoodsMapper.selectGoodsListPrimaryKey">
+         <id property="goodsId" column="goods_id"></id>
+    </collection>
+    <collection property="goodsDiscountsInfo" javaType="com.zeng.ezsh.wy.entity.GoodsDiscounts" column="goods_info_id" ofType="com.zeng.ezsh.wy.entity.GoodsInfo" select="com.zeng.ezsh.wy.dao.GoodsDiscountsMapper.selectDiscountInfoByGoodsInfoId">
+    </collection> -->
+  </resultMap>
+  
+  <!-- 用于根据商品基本ID获取商品的详细信息，用于点击单个商品后的信息浏览 -->
+  <resultMap id="BaseResultMap_To_Details" type="com.zeng.ezsh.wy.entity.GoodsInfo" >
+    <id column="goods_info_id" jdbcType="INTEGER" property="goodsInfoId" />
+    <result column="p_goods_classfy_id" jdbcType="INTEGER" property="pGoodsClassfyId" />
+    <result column="p_manager_id" jdbcType="INTEGER" property="pManagerId" />
+    <result column="p_merchant_id" jdbcType="INTEGER" property="pMerchantId" />
+    <result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
+    <result column="goods_slide_show" jdbcType="VARCHAR" property="goodsSlideShow" />
+    <result column="goods_carriage" jdbcType="VARCHAR" property="goodsCarriage" />
+    <result column="goods_image_text" jdbcType="VARCHAR" property="goodsImageText" />
+    <result column="goods_source_area" jdbcType="VARCHAR" property="goodsSourceArea" />
+    <result column="goods_distribution" jdbcType="VARCHAR" property="goodsDistribution" />
+    <result column="goods_time_mark" jdbcType="VARCHAR" property="goodsTimeMark" />
+    <result column="goods_brand" jdbcType="VARCHAR" property="goodsBrand" />
+    <result column="goods_parameter" jdbcType="VARCHAR" property="goodsParameter" />
+    <result column="goods_total_sale_amount" property="goodsTotalSaleAmount" jdbcType="VARCHAR" />
+    <result column="goods_min_price" property="goodsMinPrice" jdbcType="DECIMAL" />
+    <result column="goods_max_price" property="goodsMaxPrice" jdbcType="DECIMAL" />
+    <result column="section_one_name" jdbcType="VARCHAR" property="sectionOneName" />
+    <result column="section_two_name" jdbcType="VARCHAR" property="sectionTwoName" />
+    <result column="section_three_name" jdbcType="VARCHAR" property="sectionThreeName" />
+    <result column="section_four_name" jdbcType="VARCHAR" property="sectionFourName" />
+    <result column="section_five_name" jdbcType="VARCHAR" property="sectionFiveName" />
+    <result column="addtime" jdbcType="VARCHAR" property="addtime" />
+    <result column="goods_show_classfy" jdbcType="VARCHAR" property="goodsShowClassfy" />
+    <collection property="goodsList" javaType="ArrayList" column="goods_info_id" ofType="com.zeng.ezsh.wy.entity.Goods" select="com.zeng.ezsh.wy.dao.GoodsMapper.selectGoodsListPrimaryKey">
+         <id property="goodsId" column="goods_id"></id>
+    </collection>
+    <collection property="goodsClassfyInfo" javaType="com.zeng.ezsh.wy.entity.GoodsClassfy" column="p_goods_classfy_id" ofType="com.zeng.ezsh.wy.entity.GoodsClassfy" select="com.zeng.ezsh.wy.dao.GoodsClassfyMapper.getGoodsClassfyInfoById">
+       
+    </collection>
+    <collection property="goodsMerchantInfo" javaType="com.zeng.ezsh.wy.entity.GoodsMerchant" column="p_merchant_id" ofType="com.zeng.ezsh.wy.entity.GoodsMerchant" select="com.zeng.ezsh.wy.dao.GoodsMerchantMapper.getMerchantInfoById">
+       
+    </collection>
+  </resultMap>
+  
+  <!-- 用于订单信息的浏览 -->
+  <resultMap id="BaseResultMapToOrder" type="com.zeng.ezsh.wy.entity.GoodsInfo" >
+    <id column="goods_info_id" jdbcType="INTEGER" property="goodsInfoId" />
+    <result column="p_goods_classfy_id" jdbcType="INTEGER" property="pGoodsClassfyId" />
+    <result column="p_manager_id" jdbcType="INTEGER" property="pManagerId" />
+    <result column="goods_name" jdbcType="VARCHAR" property="goodsName" />
+    <result column="goods_slide_show" jdbcType="VARCHAR" property="goodsSlideShow" />
+    <result column="goods_carriage" jdbcType="VARCHAR" property="goodsCarriage" />
+    <result column="goods_image_text" jdbcType="VARCHAR" property="goodsImageText" />
+    <result column="goods_source_area" jdbcType="VARCHAR" property="goodsSourceArea" />
+    <result column="goods_time_mark" jdbcType="VARCHAR" property="goodsTimeMark" />
+    <result column="goods_brand" jdbcType="VARCHAR" property="goodsBrand" />
+    <result column="goods_parameter" jdbcType="VARCHAR" property="goodsParameter" />
+    <result column="goods_total_sale_amount" property="goodsTotalSaleAmount" jdbcType="VARCHAR" />
+    <result column="goods_min_price" property="goodsMinPrice" jdbcType="DECIMAL" />
+    <result column="goods_max_price" property="goodsMaxPrice" jdbcType="DECIMAL" />
+    <result column="section_one_name" jdbcType="VARCHAR" property="sectionOneName" />
+    <result column="section_two_name" jdbcType="VARCHAR" property="sectionTwoName" />
+    <result column="section_three_name" jdbcType="VARCHAR" property="sectionThreeName" />
+    <result column="section_four_name" jdbcType="VARCHAR" property="sectionFourName" />
+    <result column="section_five_name" jdbcType="VARCHAR" property="sectionFiveName" />
+    <result column="addtime" jdbcType="VARCHAR" property="addtime" />
+    <result column="goods_show_classfy" jdbcType="VARCHAR" property="goodsShowClassfy" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    goods_info_id, p_goods_classfy_id, p_manager_id, p_merchant_id, goods_name, goods_slide_show, goods_carriage, 
+    goods_image_text, goods_distribution, goods_parameter, goods_total_sale_amount,goods_min_price,
+    goods_max_price, section_one_name, section_two_name, section_three_name, section_four_name, section_five_name, 
+    addtime, goods_show_classfy
+  </sql>
+  
+  <!-- 根据商品的基本信息ID获取商品的详细信息 -->
+  <select id="getGoodsDetailsByGoodsInfoId" resultMap="BaseResultMap_To_Details" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_info where goods_info_id =#{0}
+  </select>
+  
+  <!-- <select id="getGoodsDetailsByGoodsInfoId" resultMap="BaseResultMap_To_Details" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_info where goods_info_id =#{0}
+  </select> -->
+  
+  <!-- 通过条件获取商品集合信息 -->
+  <select id="getGoodsInfoListByParam" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_info where goods_info_id>0
+    <if test="managetId!=null and managetId!=''">
+    and p_manager_id =#{managetId}
+    </if>
+    <if test="hotKeyWord!=null and hotKeyWord!=''">
+    and p_goods_classfy_id =#{hotKeyWord}
+    </if>
+    <if test="keyWord!=null and keyWord!=''">
+    and goods_name like CONCAT('%','${keyWord}','%' )
+    </if>
+    <if test="hotKeyWord==null or hotKeyWord==''">
+    and goods_show_classfy=#{showClassfy,jdbcType=INTEGER}
+    </if>
+    <if test="orderBy!=null and orderBy=='synthesize'">
+    ORDER BY goods_total_sale_amount DESC,goods_min_price ASC
+    </if>
+    <if test="orderBy!=null and orderBy=='hignPrice'">
+    ORDER BY goods_max_price DESC
+    </if>
+    <if test="orderBy!=null and orderBy=='lowPrice'">
+    ORDER BY goods_min_price ASC
+    </if>
+  </select>
+  
+  <!-- 通过条件获取商品集合信息(用于后台) -->
+  <select id="getGoodsInfoListByParamToAdmin" resultMap="BaseResultMapToAdmin" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_info where goods_info_id>0
+    <if test="managetId!=null and managetId!=''">
+    and p_manager_id =#{managetId}
+    </if>
+    <if test="hotKeyWord!=null and hotKeyWord!=''">
+    and p_goods_classfy_id =#{hotKeyWord}
+    </if>
+    <if test="keyWord!=null and keyWord!=''">
+    and goods_name like CONCAT('%','${keyWord}','%' )
+    </if>
+    <if test="hotKeyWord==null or hotKeyWord==''">
+    and goods_show_classfy=#{showClassfy,jdbcType=INTEGER}
+    </if>
+    <if test="orderBy!=null and orderBy=='synthesize'">
+    ORDER BY goods_total_sale_amount DESC,goods_min_price ASC
+    </if>
+    <if test="orderBy!=null and orderBy=='hignPrice'">
+    ORDER BY goods_max_price DESC
+    </if>
+    <if test="orderBy!=null and orderBy=='lowPrice'">
+    ORDER BY goods_min_price ASC
+    </if>
+  </select>
+  
+  <!-- 获取商品基本信息通过商品基本信息ID -->
+  <select id="getGoodsInfoByGoodsInfoId" resultMap="BaseResultMapToOrder" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_info where goods_info_id=#{0}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from goods_info
+    where goods_info_id = #{goodsInfoId,jdbcType=INTEGER}
+  </delete>
+  
+  <!-- 添加商品基本信息 -->
+  <insert id="addGoodsInfo" parameterType="com.zeng.ezsh.wy.entity.GoodsInfo" useGeneratedKeys="true" keyProperty="goodsInfoId">
+    insert into goods_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="pGoodsClassfyId != null">
+        p_goods_classfy_id,
+      </if>
+      <if test="pManagerId != null">
+        p_manager_id,
+      </if>
+      <if test="pMerchantId != null" >
+        p_merchant_id,
+      </if>
+      <if test="goodsName != null">
+        goods_name,
+      </if>
+      <if test="goodsSlideShow != null">
+        goods_slide_show,
+      </if>
+      <if test="goodsCarriage != null">
+        goods_carriage,
+      </if>
+      <if test="goodsImageText != null">
+        goods_image_text,
+      </if>
+      <if test="goodsSourceArea != null">
+        goods_source_area,
+      </if>
+      <if test="goodsDistribution !=null">
+      	goods_distribution,
+      </if>
+      <if test="goodsTimeMark != null">
+        goods_time_mark,
+      </if>
+      <if test="goodsBrand != null">
+        goods_brand,
+      </if>
+      <if test="goodsParameter != null">
+        goods_parameter,
+      </if>
+      <if test="goodsTotalSaleAmount != null" >
+        goods_total_sale_amount,
+      </if>
+      <if test="goodsMinPrice != null" >
+        goods_min_price,
+      </if>
+      <if test="goodsMaxPrice != null" >
+        goods_max_price,
+      </if>
+      <if test="sectionOneName != null">
+        section_one_name,
+      </if>
+      <if test="sectionTwoName != null">
+        section_two_name,
+      </if>
+      <if test="sectionThreeName != null">
+        section_three_name,
+      </if>
+      <if test="sectionFourName != null">
+        section_four_name,
+      </if>
+      <if test="sectionFiveName != null">
+        section_five_name,
+      </if>
+      <if test="addtime != null">
+        addtime,
+      </if>
+      <if test="goodsShowClassfy != null">
+        goods_show_classfy,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="pGoodsClassfyId != null">
+        #{pGoodsClassfyId,jdbcType=INTEGER},
+      </if>
+      <if test="pManagerId != null">
+        #{pManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="pMerchantId != null" >
+        #{pMerchantId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsName != null">
+        #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsSlideShow != null">
+        #{goodsSlideShow,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsCarriage != null">
+        #{goodsCarriage,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsImageText != null">
+        #{goodsImageText,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsSourceArea != null">
+        #{goodsSourceArea,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsDistribution != null">
+        #{goodsDistribution,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsTimeMark != null">
+        #{goodsTimeMark,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsBrand != null">
+        #{goodsBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsParameter != null">
+        #{goodsParameter,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsTotalSaleAmount != null" >
+        #{goodsTotalSaleAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsMinPrice != null" >
+        #{goodsMinPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="goodsMaxPrice != null" >
+        #{goodsMaxPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="sectionOneName != null">
+        #{sectionOneName,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionTwoName != null">
+        #{sectionTwoName,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionThreeName != null">
+        #{sectionThreeName,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionFourName != null">
+        #{sectionFourName,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionFiveName != null">
+        #{sectionFiveName,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null">
+        #{addtime,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsShowClassfy != null">
+        #{goodsShowClassfy,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 更新商品基本信息 -->
+  <update id="updateByPrimaryKeySelective" parameterType="com.zeng.ezsh.wy.entity.GoodsInfo" >
+    update goods_info
+    <set>
+      <if test="pGoodsClassfyId != null and pGoodsClassfyId != ''">
+        p_goods_classfy_id = #{pGoodsClassfyId,jdbcType=INTEGER},
+      </if>
+      <if test="pManagerId != null and pManagerId != ''">
+        p_manager_id = #{pManagerId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsName != null and goodsName != ''">
+        goods_name = #{goodsName,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsSlideShow != null and goodsSlideShow != ''">
+        goods_slide_show = #{goodsSlideShow,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsCarriage != null and goodsCarriage != ''">
+        goods_carriage = #{goodsCarriage,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsImageText != null and goodsImageText != ''">
+        goods_image_text = #{goodsImageText,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsSourceArea != null and goodsSourceArea != ''">
+        goods_source_area = #{goodsSourceArea,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsDistribution != null and goodsDistribution != ''">
+        goods_distribution = #{goodsDistribution,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsTimeMark != null and goodsTimeMark != ''">
+        goods_time_mark = #{goodsTimeMark,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsBrand != null and goodsBrand != ''">
+        goods_brand = #{goodsBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsParameter != null and goodsParameter != ''">
+        goods_parameter = #{goodsParameter,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsTotalSaleAmount != null" >
+        goods_total_sale_amount = #{record.goodsTotalSaleAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsMinPrice != null" >
+        goods_min_price = #{record.goodsMinPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="goodsMaxPrice != null" >
+        goods_max_price = #{record.goodsMaxPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="sectionOneName != null and sectionOneName != ''">
+        section_one_name = #{sectionOneName,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionTwoName != null and sectionTwoName != ''">
+        section_two_name = #{sectionTwoName,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionThreeName != null and sectionThreeName != ''">
+        section_three_name = #{sectionThreeName,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionFourName != null and sectionFourName != ''">
+        section_four_name = #{sectionFourName,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionFiveName != null and sectionFiveName != ''">
+        section_five_name = #{sectionFiveName,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null and addtime != ''">
+        addtime = #{addtime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where goods_info_id = #{goodsInfoId,jdbcType=INTEGER}
+  </update>
+
+</mapper>

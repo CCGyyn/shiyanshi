@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.GoodsMapper" >
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.Goods" >
+	  <id column="goods_id" property="goodsId" jdbcType="INTEGER" />
+	  <result column="p_goods_info_id" property="pGoodsInfoId" jdbcType="INTEGER" />
+	  <result column="section_one_value" property="sectionOneValue" jdbcType="VARCHAR" />
+	  <result column="section_one_image" property="sectionOneImage" jdbcType="VARCHAR" />
+	  <result column="section_two_value" property="sectionTwoValue" jdbcType="VARCHAR" />
+	  <result column="section_three_value" property="sectionThreeValue" jdbcType="VARCHAR" />
+	  <result column="section_four_value" property="sectionFourValue" jdbcType="VARCHAR" />
+	  <result column="section_five_value" property="sectionFiveValue" jdbcType="VARCHAR" />
+	  <result column="goods_price" property="goodsPrice" jdbcType="DECIMAL" />
+	  <result column="goods_amount" property="goodsAmount" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<!-- 用于订单 -->
+	<resultMap id="BaseResultMap_ForOrder" type="com.zeng.ezsh.wy.entity.Goods" extends="BaseResultMap">
+	  <collection property="goodsInfo"  column="p_goods_info_id" select="com.zeng.ezsh.wy.dao.GoodsInfoMapper.getGoodsInfoByGoodsInfoId">
+	  </collection>
+	</resultMap>
+	
+	<!--用于查看订单列表-->
+	<resultMap id="BaseResultMap_For_Order_Look" type="com.zeng.ezsh.wy.entity.Goods" extends="BaseResultMap">
+	  <collection property="goodsInfo"  column="p_goods_info_id" select="com.zeng.ezsh.wy.dao.GoodsInfoMapper.getGoodsInfoByGoodsInfoId">
+	  </collection>
+	</resultMap>
+	
+	<sql id="Base_Column_List" >
+	  goods_id, p_goods_info_id, section_one_value, section_one_image, section_two_value, 
+	  section_three_value, section_four_value, section_five_value, goods_price, goods_amount
+	</sql>
+	
+	<sql id="Base_Column_List_For_Order" >
+	  goods_id, p_goods_info_id, section_one_value, section_one_image, section_two_value,
+	  section_three_value, section_four_value, section_five_value, goods_price, goods_price, goods_amount
+	</sql>
+  
+	<!-- 通过商品基本信息ID获取商品数据 -->
+	<select id="selectGoodsListPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+	  select 
+	  <include refid="Base_Column_List" />
+	  from goods where p_goods_info_id =#{0}
+	</select>
+	
+	<!-- 根据商品ID批量获取商品信息集合 -->
+	<select id="getGoodsListByIdsForOrder" resultMap="BaseResultMap_ForOrder" parameterType="java.lang.String">  
+	 SELECT
+	 <include refid="Base_Column_List"/> 
+	 from goods where goods_id =#{0}
+	</select> 
+   
+	<!-- 批量获取商品然后生成订单，加行锁 【移动端】-->
+	<select id="getGoodsByIds" resultMap="BaseResultMap_ForOrder">
+	   select
+	   <include refid="Base_Column_List_For_Order"></include>
+	   from goods  where goods_id in
+	   <foreach item="goodsIdArray" index="index" collection="array" open="(" separator="," close=")">  
+	       #{goodsIdArray}
+	   </foreach>
+	   for update
+	</select>
+   
+	<!-- 批量生成商品 -->
+	<insert id="addGood" parameterType="com.zeng.ezsh.wy.entity.Goods" >
+	    insert into goods (goods_id, p_goods_info_id, section_one_value, 
+	    section_one_image, section_two_value, section_three_value, 
+	    section_four_value, section_five_value, goods_price, goods_amount) values 
+	    <foreach collection="list" item="item" index="index" separator=",">
+	   (#{item.goodsId,jdbcType=INTEGER}, #{item.pGoodsInfoId,jdbcType=INTEGER}, #{item.sectionOneValue,jdbcType=VARCHAR}, 
+	    #{item.sectionOneImage,jdbcType=VARCHAR}, #{item.sectionTwoValue,jdbcType=VARCHAR}, #{item.sectionThreeValue,jdbcType=VARCHAR}, 
+	    #{item.sectionFourValue,jdbcType=VARCHAR}, #{item.sectionFiveValue,jdbcType=VARCHAR}, #{item.goodsPrice,jdbcType=DECIMAL}, 
+	    #{item.goodsAmount,jdbcType=INTEGER})
+	    </foreach>
+	</insert>
+    
+	<!-- 用户下单，批量更新商品库存 -->
+	<update id="updateGoodsByGoodsId"  parameterType="java.util.List">  
+	    <foreach collection="list" item="item" index="index" open="" close="" separator=";">  
+	         update goods   
+	         <set>  
+	           goods_amount=#{item.goodsAmount}
+	         </set>  
+	         where goods_id = #{item.goodsId}  
+	    </foreach>       
+	</update> 
+  
+    <!-- 更新商品详细信息（后台） -->
+	<update id="updateGoodsDetails" parameterType="java.util.Map" >
+	  update goods
+	  <set >
+	    <!-- <if test="pGoodsInfoId != null" >
+	      p_goods_info_id = #{pGoodsInfoId,jdbcType=INTEGER},
+	    </if>
+	    <if test="sectionOneName != null" >
+	      section_one_name = #{sectionOneName,jdbcType=VARCHAR},
+	    </if> -->
+	    <if test="sectionOneValueNew != null" >
+	      section_one_value = #{sectionOneValueNew,jdbcType=VARCHAR},
+	    </if>
+	    <if test="record.sectionOneImage != null">
+	      section_one_image = #{record.sectionOneImage,jdbcType=VARCHAR},
+	    </if>
+	    <if test="sectionTwoValueNew != null" >
+	      section_two_value = #{sectionTwoValueNew,jdbcType=VARCHAR},
+	    </if>
+	    <if test="sectionThreeValueNew != null" >
+	      section_three_value = #{sectionThreeValueNew,jdbcType=VARCHAR},
+	    </if>
+	    <if test="record.goodsPrice != null">
+	      goods_price = #{record.goodsPrice,jdbcType=DECIMAL},
+	    </if>
+	    <if test="record.goodsAmount != null" >
+	      goods_amount = #{goodsAmount,jdbcType=INTEGER},
+	    </if>
+	  </set>
+	  where p_goods_info_id = #{record.pGoodsInfoId,jdbcType=INTEGER}
+	  and section_one_value = #{record.sectionOneValue,jdbcType=VARCHAR}
+	  and section_two_value = #{record.sectionTwoValue,jdbcType=VARCHAR}
+	  and section_three_value = #{record.sectionThreeValue,jdbcType=VARCHAR}
+	</update>
+	
+  <insert id="insertSelective" parameterType="com.zeng.ezsh.wy.entity.Goods" >
+    insert into goods
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="pGoodsInfoId != null" >
+        p_goods_info_id,
+      </if>
+      <if test="sectionOneName != null" >
+        section_one_name,
+      </if>
+      <if test="sectionOneValue != null" >
+        section_one_value,
+      </if>
+      <if test="sectionOneImage != null">
+        section_one_image,
+      </if>
+      <if test="sectionTwoName != null" >
+        section_two_name,
+      </if>
+      <if test="sectionTwoValue != null" >
+        section_two_value,
+      </if>
+      <if test="sectionThreeName != null" >
+        section_three_name,
+      </if>
+      <if test="sectionThreeValue != null" >
+        section_three_value,
+      </if>
+      <if test="sectionFourName != null" >
+        section_four_name,
+      </if>
+      <if test="sectionFourValue != null" >
+        section_four_value,
+      </if>
+      <if test="sectionFiveName != null" >
+        section_five_name,
+      </if>
+      <if test="sectionFiveValue != null" >
+        section_five_value,
+      </if>
+      <if test="goodsPrice != null">
+        goods_price,
+      </if>
+      <if test="goodsAmount != null" >
+        goods_amount,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="pGoodsInfoId != null" >
+        #{pGoodsInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="sectionOneName != null" >
+        #{sectionOneName,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionOneValue != null" >
+        #{sectionOneValue,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionOneImage != null">
+        #{sectionOneImage,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionTwoName != null" >
+        #{sectionTwoName,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionTwoValue != null" >
+        #{sectionTwoValue,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionThreeName != null" >
+        #{sectionThreeName,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionThreeValue != null" >
+        #{sectionThreeValue,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionFourName != null" >
+        #{sectionFourName,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionFourValue != null" >
+        #{sectionFourValue,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionFiveName != null" >
+        #{sectionFiveName,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionFiveValue != null" >
+        #{sectionFiveValue,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsPrice != null">
+        #{goodsPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="goodsAmount != null" >
+        #{goodsAmount,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- <update id="updateByPrimaryKey" parameterType="com.zeng.ezsh.wy.entity.Goods" >
+    update goods
+    set p_goods_info_id = #{pGoodsInfoId,jdbcType=INTEGER},
+      section_one_name = #{sectionOneName,jdbcType=VARCHAR},
+      section_one_value = #{sectionOneValue,jdbcType=VARCHAR},
+      section_one_image = #{sectionOneImage,jdbcType=VARCHAR},
+      section_two_name = #{sectionTwoName,jdbcType=VARCHAR},
+      section_two_value = #{sectionTwoValue,jdbcType=VARCHAR},
+      section_three_name = #{sectionThreeName,jdbcType=VARCHAR},
+      section_three_value = #{sectionThreeValue,jdbcType=VARCHAR},
+      section_four_name = #{sectionFourName,jdbcType=VARCHAR},
+      section_four_value = #{sectionFourValue,jdbcType=VARCHAR},
+      section_five_name = #{sectionFiveName,jdbcType=VARCHAR},
+      section_five_value = #{sectionFiveValue,jdbcType=VARCHAR},
+      goods_price = #{record.goodsPrice,jdbcType=DECIMAL},
+      goods_amount = #{goodsAmount,jdbcType=INTEGER}
+    where goosd_id = #{goosdId,jdbcType=INTEGER}
+  </update>
+   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from goods
+    where goosd_id = #{goosdId,jdbcType=INTEGER}
+  </delete> -->
+</mapper>

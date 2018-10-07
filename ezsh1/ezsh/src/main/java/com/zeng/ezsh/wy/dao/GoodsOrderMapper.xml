@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zeng.ezsh.wy.dao.GoodsOrderMapper">
+	<resultMap id="BaseResultMap" type="com.zeng.ezsh.wy.entity.GoodsOrder">
+		<id column="order_id" property="orderId" jdbcType="INTEGER" />
+		<result column="p_user_id" property="pUserId" jdbcType="INTEGER" />
+		<result column="pt_manager_id" property="ptManagerId" jdbcType="INTEGER" />
+		<result column="pt_build_id" property="ptBuildId" jdbcType="INTEGER" />
+		<result column="p_merchant_id" property="pMerchantId" jdbcType="INTEGER" />
+		<result column="order_distribution" property="orderDistribution"
+			jdbcType="VARCHAR" />
+		<result column="link_man" property="linkMan" jdbcType="VARCHAR" />
+		<result column="link_phone" property="linkPhone" jdbcType="VARCHAR" />
+		<result column="address_content" property="addressContent"
+			jdbcType="VARCHAR" />
+		<result column="order_serial_num" property="orderSerialNum"
+			jdbcType="VARCHAR" />
+		<result column="transaction_num" property="transactionNum"
+			jdbcType="VARCHAR" />
+		<result column="pay_time" property="payTime" jdbcType="VARCHAR" />
+		<result column="add_time" property="addTime" jdbcType="VARCHAR" />
+		<result column="pay_status" property="payStatus" jdbcType="INTEGER" />
+		<result column="order_status" property="orderStatus" jdbcType="INTEGER" />
+		<result column="used_integral" property="usedIntegral" jdbcType="DECIMAL" />
+		<result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+		<result column="del_status" property="delStatus" jdbcType="INTEGER" />
+		<result column="pay_classify" property="payClassify" jdbcType="INTEGER" />
+	</resultMap>
+
+	<resultMap id="BaseResultMap_Android" type="com.zeng.ezsh.wy.entity.GoodsOrder"
+		extends="BaseResultMap">
+		<collection property="orderDetailsList"
+			ofType="com.zeng.ezsh.wy.entity.GoodsOrderDetails">
+			<id column="order_details_id" property="orderDetailsId" jdbcType="INTEGER" />
+			<result column="p_order_id" property="pOrderId" jdbcType="INTEGER" />
+			<result column="p_goods_id" property="pGoodsId" jdbcType="INTEGER" />
+			<result column="goods_name" property="goodsName" jdbcType="INTEGER" />
+			<result column="buy_amount" property="buyAmount" jdbcType="INTEGER" />
+			<result column="price" property="price" jdbcType="DECIMAL" />
+			<result column="refund_content" property="refundContent"
+				jdbcType="VARCHAR" />
+			<result column="refund_imgs" property="refundImgs" jdbcType="VARCHAR" />
+			<result column="refund_money" property="refundMoney" jdbcType="DECIMAL" />
+			<result column="after_sale_status" property="afterSaleStatus"
+				jdbcType="INTEGER" />
+			<result column="appraise_status" property="appraiseStatus"
+				jdbcType="INTEGER" />
+		</collection>
+		<!-- <collection property="orderDetailsList" javaType="ArrayList" column="order_id" 
+			ofType="com.zeng.ezsh.wy.entity.GoodsOrderDetails" select="com.zeng.ezsh.wy.dao.GoodsOrderDetailsMapper.selectDetailsByOrderId"> 
+			</collection> -->
+		<collection property="merchantInfo"
+			javaType="com.zeng.ezsh.wy.entity.GoodsMerchant" column="p_merchant_id"
+			ofType="com.zeng.ezsh.wy.entity.GoodsMerchant" select="com.zeng.ezsh.wy.dao.GoodsMerchantMapper.getMerchantInfoById">
+		</collection>
+	</resultMap>
+
+	<!-- goods_order表的字段 -->
+	<sql id="Base_Column_List">
+		order_id, p_user_id, pt_manager_id, pt_build_id,
+		p_merchant_id,
+		order_distribution,
+		link_man, link_phone,
+		address_content, order_serial_num, transaction_num,
+		pay_time,
+		add_time,
+		pay_status, order_status, all_appraise, after_status, total_price,
+		del_status
+	</sql>
+
+	<!-- 级联goods_order和goods_order_details两张表的字段 -->
+	<sql id="Base_Column_List_Order_Find">
+		o.order_id, o.p_user_id, o.p_merchant_id,
+		o.order_distribution, o.link_man,
+		o.link_phone, o.address_content,
+		o.order_serial_num, o.transaction_num, o.pay_time, o.add_time,
+		o.pay_status,
+		o.order_status,
+		o.total_price, o.del_status,
+		o_d.order_details_id, o_d.p_order_id, o_d.p_goods_id, o_d.goods_name,
+		o_d.buy_amount,
+		o_d.price, o_d.refund_content, o_d.refund_imgs,
+		o_d.refund_money, o_d.after_sale_status, o_d.appraise_status
+	</sql>
+
+	<!-- 检测商品支付订单是否存在【移动端】 -->
+	<select id="checkOrderSerialNumIsOn" resultMap="BaseResultMap_Android"
+		parameterType="com.zeng.ezsh.wy.entity.GoodsOrder">
+		select *
+		from goods_order
+		<where>
+			<if test="orderSerialNum != null and orderSerialNum != ''">
+				order_serial_num= #{orderSerialNum,jdbcType=VARCHAR} and
+				del_status = 0
+			</if>
+			<if
+				test="orderSerialNum != null and orderSerialNum != '' and  transactionNum != null and transactionNum != ''">
+				order_serial_num= #{orderSerialNum,jdbcType=VARCHAR} and
+				transaction_num=#{transactionNum,jdbcType=VARCHAR} and del_status = 0
+			</if>
+			<if test="payClassify != null">
+				and pay_classify = #{payClassify,jdbcType=INTEGER}
+			</if>
+		</where>
+	</select>
+
+	<!-- 按条件获取商品订单【移动端】 -->
+	<select id="getGoodsOrders" resultMap="BaseResultMap_Android"
+		parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List_Order_Find" />
+		from goods_order o inner join goods_order_details o_d on
+		o.order_id=o_d.p_order_id
+		where del_status = 0 and p_user_id =
+		#{userId}
+		<if test="appraiseStatus!=null">
+			and o_d.appraise_status=#{appraiseStatus}
+		</if>
+		<if test="orderStatus !=null">
+			and o.order_status between 1 and 4
+		</if>
+		<if test="afterSaleStatus !=null">
+			and o_d.after_sale_status between 1 and 4
+		</if>
+	</select>
+
+	<!-- 根据订单ID获取订单信息【移动端】 -->
+	<select id="getGoodsOrdersByOrderId" resultMap="BaseResultMap"
+		parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List" />
+		from goods_order
+		where order_id= #{orderId} and del_status = 0
+	</select>
+
+	<!-- 生成订单【移动端】 -->
+	<insert id="createGoodsOrder" parameterType="com.zeng.ezsh.wy.entity.GoodsOrder"
+		useGeneratedKeys="true" keyProperty="orderId">
+		insert into goods_order
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="orderId != null">
+				order_id,
+			</if>
+			<if test="pUserId != null">
+				p_user_id,
+			</if>
+			<if test="ptManagerId != null">
+				pt_manager_id,
+			</if>
+			<if test="ptBuildId != null">
+				pt_build_id,
+			</if>
+			<if test="pMerchantId != null">
+				p_merchant_id,
+			</if>
+			<if test="orderDistribution != null">
+				order_distribution,
+			</if>
+			<if test="linkMan != null">
+				link_man,
+			</if>
+			<if test="linkPhone != null">
+				link_phone,
+			</if>
+			<if test="addressContent != null">
+				address_content,
+			</if>
+			<if test="orderSerialNum != null">
+				order_serial_num,
+			</if>
+			<if test="transactionNum != null">
+				transaction_num,
+			</if>
+			<if test="payTime != null">
+				pay_time,
+			</if>
+			<if test="addTime != null">
+				add_time,
+			</if>
+			<if test="payStatus != null">
+				pay_status,
+			</if>
+			<if test="orderStatus != null">
+				order_status,
+			</if>
+			<if test="usedIntegral != null">
+				used_integral,
+			</if>
+			<if test="totalPrice != null">
+				total_price,
+			</if>
+			<if test="delStatus != null">
+				del_status,
+			</if>
+			<if test="payClassify != null">
+				pay_classify,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="orderId != null">
+				#{orderId,jdbcType=INTEGER},
+			</if>
+			<if test="pUserId != null">
+				#{pUserId,jdbcType=INTEGER},
+			</if>
+			<if test="ptManagerId != null">
+				#{ptManagerId,jdbcType=INTEGER},
+			</if>
+			<if test="ptBuildId != null">
+				#{ptBuildId,jdbcType=INTEGER},
+			</if>
+			<if test="pMerchantId != null">
+				#{pMerchantId,jdbcType=INTEGER},
+			</if>
+			<if test="orderDistribution != null">
+				#{orderDistribution,jdbcType=VARCHAR},
+			</if>
+			<if test="linkMan != null">
+				#{linkMan,jdbcType=VARCHAR},
+			</if>
+			<if test="linkPhone != null">
+				#{linkPhone,jdbcType=VARCHAR},
+			</if>
+			<if test="addressContent != null">
+				#{addressContent,jdbcType=VARCHAR},
+			</if>
+			<if test="orderSerialNum != null">
+				#{orderSerialNum,jdbcType=VARCHAR},
+			</if>
+			<if test="transactionNum != null">
+				#{transactionNum,jdbcType=VARCHAR},
+			</if>
+			<if test="payTime != null">
+				#{payTime,jdbcType=VARCHAR},
+			</if>
+			<if test="addTime != null">
+				#{addTime,jdbcType=VARCHAR},
+			</if>
+			<if test="payStatus != null">
+				#{payStatus,jdbcType=INTEGER},
+			</if>
+			<if test="orderStatus != null">
+				#{orderStatus,jdbcType=INTEGER},
+			</if>
+			<if test="usedIntegral != null">
+				#{usedIntegral,jdbcType=DECIMAL},
+			</if>
+			<if test="totalPrice != null">
+				#{totalPrice,jdbcType=DECIMAL},
+			</if>
+			<if test="delStatus != null">
+				#{delStatus,jdbcType=INTEGER},
+			</if>
+			<if test="payClassify != null">
+				#{payClassify,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+
+	<!-- 更新订单(取消订单)【移动端】 -->
+	<update id="updateOrderByOrderId" parameterType="com.zeng.ezsh.wy.entity.GoodsOrder">
+		update goods_order
+		<set>
+			order_status =-1
+		</set>
+		where order_id = #{orderId,jdbcType=INTEGER} and order_status =0
+	</update>
+
+	<!-- 通过商家后台生成的订单号更新订单信息 【移动端】 -->
+	<update id="updateOrderSerialNum" parameterType="com.zeng.ezsh.wy.entity.GoodsOrder">
+		update goods_order
+		<set>
+			<if test="payStatus != null">
+				pay_status=#{payStatus,jdbcType=INTEGER},
+			</if>
+			<if test="payTime != null">
+				pay_time=#{payTime,jdbcType=VARCHAR},
+			</if>
+			<if test="transactionNum != null">
+				transaction_num=#{transactionNum,jdbcType=VARCHAR},
+			</if>
+			<if test="orderStatus != null">
+				order_status=#{orderStatus,jdbcType=INTEGER},
+			</if>
+		</set>
+		where order_serial_num = #{orderSerialNum,jdbcType=VARCHAR} and
+		order_status =0
+	</update>
+
+	<!-- 用户确定收货 【移动端】 -->
+	<update id="confirmAcceptGoods" parameterType="com.zeng.ezsh.wy.entity.GoodsOrder">
+		update goods_order
+		<set>
+			order_status =3
+		</set>
+		where order_id = #{orderId,jdbcType=INTEGER}
+	</update>
+
+	<!-- <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		goods_order where order_id = #{orderId,jdbcType=INTEGER}
+	</delete> -->
+
+	<!-- <insert id="insert" parameterType="com.zeng.ezsh.wy.entity.GoodsOrder"
+		useGeneratedKeys="true" keyProperty="orderId"> insert into goods_order
+		(order_id, p_user_id, pt_manager_id,
+		pt_build_id, p_merchant_id,
+		order_distribution, link_man, link_phone,
+		address_content,
+		order_serial_num, transaction_num, pay_time, add_time, pay_status,
+		order_status,
+		all_appraise, after_status, total_price,
+		del_status,pay_classify)
+		values
+		(#{orderId,jdbcType=INTEGER},
+		#{pUserId,jdbcType=INTEGER}, #{ptManagerId,jdbcType=INTEGER},
+		#{ptBuildId,jdbcType=INTEGER}, #{pMerchantId,jdbcType=VARCHAR},
+		#{orderDistribution,jdbcType=VARCHAR},
+		#{linkMan,jdbcType=VARCHAR},
+		#{linkPhone,jdbcType=VARCHAR}, #{addressContent,jdbcType=VARCHAR},
+		#{orderSerialNum,jdbcType=VARCHAR},
+		#{transactionNum,jdbcType=VARCHAR}, #{payTime,jdbcType=VARCHAR},
+		#{addTime,jdbcType=VARCHAR}, #{payStatus,jdbcType=INTEGER},
+		#{orderStatus,jdbcType=INTEGER},
+		#{allAppraise,jdbcType=TINYINT},
+		#{afterStatus,jdbcType=TINYINT}, #{totalPrice,jdbcType=DECIMAL},
+		#{delStatus,jdbcType=TINYINT},#{payClassify,jdbcType=TINYINT})
+	</insert> -->
+</mapper>
